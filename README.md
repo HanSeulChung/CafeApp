@@ -36,4 +36,4 @@
 </div>
 
 ### Trouble Shooting
-
+[troble shooting 보러가기](https://github.com/HanSeulChung/CafeApp/blob/main/doc/TROUBLE_SHOOTING.md)
