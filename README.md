@@ -13,6 +13,9 @@
 
 ## ERD
 
+10/19 초기 ERD 셋팅 (추후 변경이 필요하면 변경될 예정)
+![image](https://github.com/HanSeulChung/CafeApp/assets/94779505/86442c64-e416-41e6-970f-2eeb4fb45de3)
+
 
 ## Tech Stack
 <div align=center>
