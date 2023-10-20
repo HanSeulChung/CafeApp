@@ -1,11 +1,15 @@
 package com.chs.cafeapp.menu.entity;
 
 import com.chs.cafeapp.base.BaseEntity;
+import com.chs.cafeapp.menu.category.entity.Category;
 import com.chs.cafeapp.menu.dto.MenuDto;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -21,7 +25,6 @@ public class Menus extends BaseEntity {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private long id;
 
-  private String menuType;
   private String name;
   private int kcal;
   private String description;
@@ -29,10 +32,16 @@ public class Menus extends BaseEntity {
   private int price;
   private String status;
 
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name="category_id")
+  private Category category;
+
+  public void setCategory(Category category) {
+    this.category = category;
+  }
   public static Menus toEntity(MenuDto menuDto) {
     return Menus.builder()
                   .id(menuDto.getId())
-                  .menuType(menuDto.getMenuType())
                   .name(menuDto.getName())
                   .kcal(menuDto.getKcal())
                   .description(menuDto.getDescription())
@@ -41,5 +50,4 @@ public class Menus extends BaseEntity {
                   .status(menuDto.getStatus())
                   .build();
   }
-
 }

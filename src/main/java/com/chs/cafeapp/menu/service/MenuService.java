@@ -1,23 +1,38 @@
 package com.chs.cafeapp.menu.service;
 
 import com.chs.cafeapp.menu.dto.MenuDto;
+import com.chs.cafeapp.menu.dto.MenuEditInput;
 import com.chs.cafeapp.menu.dto.MenuInput;
+import java.util.List;
 
 public interface MenuService {
   /**
    * 메뉴 추가
    */
   MenuDto add(MenuInput menuInput);
+
   /**
    * 메뉴 수정
    */
-  MenuDto edit(MenuInput menuInput);
+  MenuDto edit(MenuEditInput menuEditInput);
+
   /**
    * 메뉴 삭제
    */
   void delete(Long menuId);
-  /**
-   * 메뉴 조회
-   */
 
+  /**
+   * 메뉴 전체 조회
+   */
+  List<MenuDto> viewAllMenus();
+
+  /**
+   * 메뉴 카테고리 대분류로 조회
+   */
+  List<MenuDto> viewAllFromSuperCategory(String superCategory);
+
+  /**
+   * 메뉴 카테고리 중분류로 조회
+   */
+  List<MenuDto> viewAllFromBaseCategory(String baseCategory);
 }

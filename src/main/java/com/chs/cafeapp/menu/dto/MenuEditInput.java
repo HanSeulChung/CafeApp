@@ -9,7 +9,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 @Data
-public class MenuInput {
+public class MenuEditInput {
+  private long id;
   private String name;
   private int kcal;
   private String description;
