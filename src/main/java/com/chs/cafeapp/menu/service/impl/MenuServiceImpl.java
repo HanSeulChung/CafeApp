@@ -33,11 +33,13 @@ public class MenuServiceImpl implements MenuService {
     Menus menu = menuRepository.findById(menuInput.getId())
                   .orElseThrow(() -> new RuntimeException("메뉴가 존재하지 않습니다."));
 
-    Menus menuEntity = menuRepository.findMenusByName(menuInput.getName()).orElseThrow(() -> new RuntimeException("존재하지 않는 메뉴 이름입니다."));
-
+    boolean existMenu = menuRepository.existsByName(menuInput.getName());
+    if (existMenu) {
+      throw new RuntimeException("이미 존재하는 메뉴 이름입니다. 다시 확인 후 수정해주세요.");
+    }
     return MenuDto.of(menuRepository.save(
                         Menus.builder()
-                            .id(menuEntity.getId())
+                            .id(menu.getId())
                             .menuType(menuInput.getMenuType())
                             .name(menuInput.getName())
                             .kcal(menuInput.getKcal())

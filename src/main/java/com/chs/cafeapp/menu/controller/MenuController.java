@@ -1,6 +1,8 @@
 package com.chs.cafeapp.menu.controller;
 
+import com.chs.cafeapp.menu.dto.MenuDto;
 import com.chs.cafeapp.menu.dto.MenuInput;
+import com.chs.cafeapp.menu.dto.MenuResponse;
 import com.chs.cafeapp.menu.service.MenuService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -26,17 +28,19 @@ public class MenuController {
    * 메뉴 추가 Controller
    */
   @PostMapping()
-  public ResponseEntity<?> addMenu(@RequestBody MenuInput request) {
-    var result = menuService.add(request);
-    return ResponseEntity.ok(result);
+  public MenuResponse addMenu(@RequestBody MenuInput request) {
+    MenuDto menuDto = menuService.add(request);
+    var result = MenuResponse.toResponse(menuDto);
+    return result;
   }
   /**
    * 메뉴 수정 Controller
    */
   @PutMapping()
-  public ResponseEntity<?> editMenu(@RequestBody MenuInput request) {
-    var result = menuService.edit(request);
-    return ResponseEntity.ok(result);
+  public MenuResponse editMenu(@RequestBody MenuInput request) {
+    MenuDto menuDto = menuService.edit(request);
+    var result = MenuResponse.toResponse(menuDto);
+    return result;
   }
   /**
    * 메뉴 삭제 Controller
