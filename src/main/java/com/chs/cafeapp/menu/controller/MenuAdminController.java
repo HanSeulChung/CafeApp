@@ -8,6 +8,8 @@ import com.chs.cafeapp.menu.service.MenuService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -34,6 +36,7 @@ public class MenuAdminController {
     var result = MenuResponse.toResponse(menuDto);
     return result;
   }
+
   /**
    * 메뉴 수정 Controller
    */
@@ -43,6 +46,7 @@ public class MenuAdminController {
     var result = MenuResponse.toResponse(menuDto);
     return result;
   }
+
   /**
    * 메뉴 삭제 Controller
    */
@@ -55,21 +59,28 @@ public class MenuAdminController {
   /**
    * 메뉴 전체 조회
    */
+  @GetMapping()
+  public ResponseEntity<?> readAllMenus() {
+    var result = MenuResponse.toResponse(menuService.viewAllMenus());
+    return ResponseEntity.ok(result);
+  }
 
   /**
-   * 메뉴 음료 카테고리 조회(대분류)
+   * 메뉴 카테고리 대분류로 조회
    */
+  @GetMapping("superCategory/{superCategory}")
+  public ResponseEntity<?> readAllMenusBySuperCategory(@PathVariable("superCategory") String superCategory) {
+    var result = MenuResponse.toResponse(menuService.viewAllBySuperCategory(superCategory));
+    return ResponseEntity.ok(result);
+  }
 
   /**
-   * 메뉴 음식 카테고리 조회(대분류)
+   * 메뉴 카테고리 중분류로 조회
    */
-
-  /**
-   * 메뉴 음식>케이크 카테고리 조회(중분류)
-   */
-
-  /**
-   * 메뉴 음식>샌드위치 카테고리 조회(중분류)
-   */
+  @GetMapping("/baseCategory/{baseCategory}")
+  public ResponseEntity<?> readAllMenusByBaseCategory(@PathVariable("baseCategory") String baseCategory) {
+    var result = MenuResponse.toResponse(menuService.viewAllByBaseCategory(baseCategory));
+    return ResponseEntity.ok(result);
+  }
 
 }

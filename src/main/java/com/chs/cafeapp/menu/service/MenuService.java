@@ -29,10 +29,10 @@ public interface MenuService {
   /**
    * 메뉴 카테고리 대분류로 조회
    */
-  List<MenuDto> viewAllFromSuperCategory(String superCategory);
+  List<MenuDto> viewAllBySuperCategory(String superCategory);
 
   /**
    * 메뉴 카테고리 중분류로 조회
    */
-  List<MenuDto> viewAllFromBaseCategory(String baseCategory);
+  List<MenuDto> viewAllByBaseCategory(String baseCategory);
 }

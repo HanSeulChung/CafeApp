@@ -11,6 +11,9 @@ version = '0.0.1-SNAPSHOT'
 
 sourceCompatibility = '11'
 
+compileJava {
+	options.compilerArgs << "-parameters"
+}
 
 configurations {
 	compileOnly {
@@ -43,11 +46,13 @@ dependencies {
 	implementation group: 'org.apache.commons', name: 'commons-collections4', version: '4.3'
 	runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
 
+	implementation 'com.querydsl:querydsl-jpa'
+	annotationProcessor 'com.querydsl:querydsl-apt'
+
 	compileOnly 'org.projectlombok:lombok:1.18.20'
 	annotationProcessor 'org.projectlombok:lombok:1.18.20'
 	compileOnly('javax.servlet:javax.servlet-api:4.0.1')
 	compileOnly("org.springframework.boot:spring-boot-starter-mail")
-	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.security:spring-security-test'
 	testRuntimeOnly("com.h2database:h2")

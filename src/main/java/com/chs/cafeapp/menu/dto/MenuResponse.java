@@ -1,5 +1,7 @@
 package com.chs.cafeapp.menu.dto;
 
+import java.util.ArrayList;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -21,6 +23,18 @@ public class MenuResponse {
   private String superCategory;
   private String baseCategory;
 
+
+  public static List<MenuResponse> toResponse(List<MenuDto> menuDtos) {
+
+    if (menuDtos != null) {
+      List<MenuResponse> menuResponses = new ArrayList<>();
+      for(MenuDto x : menuDtos) {
+        menuResponses.add(toResponse(x));
+      }
+      return menuResponses;
+    }
+    return null;
+  }
   public static MenuResponse toResponse(MenuDto menuDto) {
     return MenuResponse.builder()
                         .name(menuDto.getName())
