@@ -20,7 +20,6 @@ public class MenuDto {
   private String description;
   private int stock;
   private int price;
-  private String status;
   private boolean isSoldOut;
 
   private String superCategory;
@@ -47,7 +46,6 @@ public class MenuDto {
                 .description(menu.getDescription())
                 .stock(menu.getStock())
                 .price(menu.getPrice())
-                .status(menu.getStatus())
                 .isSoldOut(menu.isSoldOut())
                 .superCategory(menu.getCategory().getSuperCategory())
                 .baseCategory(menu.getCategory().getBaseCategory())
@@ -61,7 +59,6 @@ public class MenuDto {
         .description(menuInput.getDescription())
         .stock(menuInput.getStock())
         .price(menuInput.getPrice())
-        .status(menuInput.getStatus())
         .isSoldOut(false)
         .superCategory(menuInput.getSuperCategory())
         .baseCategory(menuInput.getBaseCategory())

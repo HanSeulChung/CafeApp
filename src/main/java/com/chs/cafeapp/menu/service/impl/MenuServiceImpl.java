@@ -71,7 +71,6 @@ public class MenuServiceImpl implements MenuService {
         .kcal(menuEditInput.getKcal())
         .description(menuEditInput.getDescription())
         .stock(menuEditInput.getStock())
-        .status(menuEditInput.getStatus())
         .price(menuEditInput.getPrice())
         .build();
 

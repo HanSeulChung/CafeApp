@@ -30,7 +30,6 @@ public class Menus extends BaseEntity {
   private String description;
   private int stock;
   private int price;
-  private String status;
   private boolean isSoldOut;
 
   @ManyToOne(fetch = FetchType.LAZY)
@@ -48,7 +47,6 @@ public class Menus extends BaseEntity {
                   .description(menuDto.getDescription())
                   .stock(menuDto.getStock())
                   .price(menuDto.getPrice())
-                  .status(menuDto.getStatus())
                   .isSoldOut(menuDto.isSoldOut())
                   .build();
   }
