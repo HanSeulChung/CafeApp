@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -81,6 +82,22 @@ public class MenuAdminController {
   public ResponseEntity<?> readAllMenusByBaseCategory(@PathVariable("baseCategory") String baseCategory) {
     var result = MenuResponse.toResponse(menuService.viewAllByBaseCategory(baseCategory));
     return ResponseEntity.ok(result);
+  }
+
+  /**
+   * 메뉴 품절 상태
+   */
+  @PatchMapping("/soldout")
+  public ResponseEntity<?> soldOut(@RequestParam Long menuId) {
+    return ResponseEntity.ok(menuService.changeToSoldOut(menuId));
+  }
+
+  /**
+   * 품절된 메뉴 다시 판매
+   */
+  @PatchMapping("/sale")
+  public ResponseEntity<?> sold(@RequestParam Long menuId) {
+    return ResponseEntity.ok(menuService.changeToSale(menuId));
   }
 
 }

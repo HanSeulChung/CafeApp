@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
  * 카테고리 CRUD Controller
  */
 @RestController
-@RequestMapping("admin/category")
+@RequestMapping("/admin/category")
 public class CategoryController {
   @Autowired
   private CategoryService categoryService;

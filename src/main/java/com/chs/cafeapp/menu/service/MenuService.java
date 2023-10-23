@@ -35,4 +35,14 @@ public interface MenuService {
    * 메뉴 카테고리 중분류로 조회
    */
   List<MenuDto> viewAllByBaseCategory(String baseCategory);
+
+  /**
+   * 품절으로 상태 변경
+   */
+  MenuDto changeToSoldOut(Long menuId);
+
+  /**
+   * 판매중으로 상태 변경
+   */
+  MenuDto changeToSale(Long menuId);
 }

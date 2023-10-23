@@ -9,7 +9,9 @@ import com.chs.cafeapp.menu.entity.Menus;
 import com.chs.cafeapp.menu.repository.MenuRepository;
 import com.chs.cafeapp.menu.service.MenuService;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import java.awt.Menu;
 import java.util.List;
+import java.util.Optional;
 import javax.persistence.EntityManager;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -109,5 +111,40 @@ public class MenuServiceImpl implements MenuService {
     }
     List<Menus> allByCategoryIdIn = menuRepository.findAllByCategoryIdIn(categoryIds);
     return MenuDto.of(allByCategoryIdIn);
+  }
+
+  @Override
+  public MenuDto changeToSoldOut(Long menuId) {
+    Menus menu = menuRepository.findById(menuId)
+        .orElseThrow(() -> new RuntimeException("해당 메뉴가 존재하지 않습니다."));
+
+    if (menu.isSoldOut()) {
+      throw new RuntimeException("이미 품절된 메뉴입니다.");
+    }
+
+    MenuDto menuDto = MenuDto.of(menu);
+    menuDto.setSoldOut(true);
+    Menus saveMenu = Menus.toEntity(menuDto);
+    saveMenu.setCategory(menu.getCategory());
+    menuRepository.save(saveMenu);
+    return menuDto;
+  }
+
+  @Override
+  public MenuDto changeToSale(Long menuId) {
+    Menus menu = menuRepository.findById(menuId)
+        .orElseThrow(() -> new RuntimeException("해당 메뉴가 존재하지 않습니다."));
+
+    if (!menu.isSoldOut()) {
+      throw new RuntimeException("이미 판매중인 메뉴입니다.");
+    }
+
+    MenuDto menuDto = MenuDto.of(menu);
+    menuDto.setSoldOut(false);
+    Menus saveMenu = Menus.toEntity(menuDto);
+    saveMenu.setCategory(menu.getCategory());
+
+    menuRepository.save(saveMenu);
+    return menuDto;
   }
 }
