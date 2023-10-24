@@ -18,7 +18,7 @@ public class MenuResponse {
   private String description;
   private int stock;
   private int price;
-  private String status;
+  private boolean isSoldOut;
 
   private String superCategory;
   private String baseCategory;
@@ -42,7 +42,7 @@ public class MenuResponse {
                         .description(menuDto.getDescription())
                         .stock(menuDto.getStock())
                         .price(menuDto.getPrice())
-                        .status(menuDto.getStatus())
+                        .isSoldOut(menuDto.isSoldOut())
                         .superCategory(menuDto.getSuperCategory())
                         .baseCategory(menuDto.getBaseCategory())
                         .build();
