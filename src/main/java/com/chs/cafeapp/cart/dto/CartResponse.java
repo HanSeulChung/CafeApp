@@ -14,14 +14,14 @@ public class CartResponse {
   private String menuName;
   private int quantity;
   private String message;
-  public static CartResponse toResponse(CartMenuDto cartMenuDto) {
+  public static CartResponse toResponse(CartMenuDto cartMenuDto, String message) {
     return CartResponse.builder()
                         .id(cartMenuDto.getId())
                         .cartId(cartMenuDto.getCartId())
                         .menuId(cartMenuDto.getMenuId())
                         .menuName(cartMenuDto.getMenuName())
                         .quantity(cartMenuDto.getQuantity())
-                        .message("장바구니에 해당 메뉴가 추가되었습니다.")
+                        .message(message)
                         .build();
   }
 }

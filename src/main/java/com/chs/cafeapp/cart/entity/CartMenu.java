@@ -45,6 +45,10 @@ public class CartMenu extends BaseEntity {
   public void addQuantity(int quantity) {
     this.quantity += quantity;
   }
+
+  public void minusQuantity(int quantity) {
+    this.quantity -= quantity;
+  }
   public void setCart(Cart cart) {
     this.cart = cart;
   }

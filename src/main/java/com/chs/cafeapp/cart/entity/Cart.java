@@ -42,10 +42,10 @@ public class Cart extends BaseEntity {
     this.user = user;
   }
 
-  public void setTotalQuantity(int quantity) {
+  public void addTotalQuantity(int quantity) {
     this.totalQuantity += quantity;
   }
-  public void setTotalPrice(int quantity, int price) {
+  public void addTotalPrice(int quantity, int price) {
     this.totalPrice += quantity * price;
   }
 

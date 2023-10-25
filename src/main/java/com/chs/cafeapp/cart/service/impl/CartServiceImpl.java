@@ -64,8 +64,8 @@ public class CartServiceImpl implements CartService {
 
     cart.getCartMenu().add(cartMenu);
 
-    cart.setTotalPrice(cartMenu.getQuantity(), cartMenu.getMenus().getPrice());
-    cart.setTotalQuantity(cartMenu.getQuantity());
+    cart.addTotalPrice(cartMenu.getQuantity(), cartMenu.getMenus().getPrice());
+    cart.addTotalQuantity(cartMenu.getQuantity());
 
     cartRepository.save(cart);
 
