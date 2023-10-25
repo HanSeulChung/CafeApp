@@ -4,8 +4,8 @@ import com.chs.cafeapp.cart.dto.CartInput;
 import com.chs.cafeapp.cart.dto.CartMenuDto;
 import com.chs.cafeapp.cart.entity.Cart;
 import com.chs.cafeapp.cart.entity.CartMenu;
-import com.chs.cafeapp.cart.repository.CartRepository;
 import com.chs.cafeapp.cart.repository.CartMenusRepository;
+import com.chs.cafeapp.cart.repository.CartRepository;
 import com.chs.cafeapp.cart.service.CartService;
 import com.chs.cafeapp.menu.entity.Menus;
 import com.chs.cafeapp.menu.repository.MenuRepository;
@@ -13,11 +13,11 @@ import com.chs.cafeapp.user.entity.User;
 import com.chs.cafeapp.user.repository.UserRepository;
 import java.util.List;
 import java.util.Optional;
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
-@RequiredArgsConstructor
+@AllArgsConstructor
 public class CartServiceImpl implements CartService {
   private final CartRepository cartRepository;
   private final CartMenusRepository cartMenusRepository;
@@ -34,7 +34,7 @@ public class CartServiceImpl implements CartService {
 
     Cart cart = user.getCart();
 
-    if (menus.getStock() - cartInput.getQuantity() <= 0) {
+    if (menus.getStock() - cartInput.getQuantity() < 0) {
       throw new RuntimeException("해당 메뉴의 재고 수량만큼만 장바구니에 담을 수 있습니다.");
     }
 
@@ -78,7 +78,6 @@ public class CartServiceImpl implements CartService {
         .orElseThrow(() -> new RuntimeException("해당 사용자가 존재하지 않습니다."));
 
     Cart cart = cartRepository.findById(user.getCart().getId()).orElse(null);
-
     if (cart != null) {
       List<CartMenuDto> cartMenuDtoList = CartMenuDto.of(cart.getCartMenu());
       return cartMenuDtoList;

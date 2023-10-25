@@ -4,6 +4,7 @@ import com.chs.cafeapp.base.BaseEntity;
 import com.chs.cafeapp.user.entity.User;
 import java.util.ArrayList;
 import java.util.List;
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -34,7 +35,7 @@ public class Cart extends BaseEntity {
   @JoinColumn(name = "user_id")
   private User user;
 
-  @OneToMany(mappedBy = "cart", fetch = FetchType.EAGER)
+  @OneToMany(mappedBy = "cart", fetch = FetchType.EAGER, cascade = CascadeType.REMOVE)
   private List<CartMenu> cartMenu = new ArrayList<>();
 
   public void setUser(User user) {
@@ -54,5 +55,19 @@ public class Cart extends BaseEntity {
 
   public void minusTotalPrice(int quantity, int price) {
     this.totalPrice -= quantity * price;
+  }
+
+  public void resetTotalPrice() {
+    if (this.cartMenu.isEmpty()) {
+      this.totalPrice = 0;
+    }
+    throw new RuntimeException("장바구니에 메뉴가 남아있습니다.");
+  }
+
+  public void resetTotalQuantity() {
+    if (this.cartMenu.isEmpty()) {
+      this.totalQuantity = 0;
+    }
+    throw new RuntimeException("장바구니에 메뉴가 남아있습니다.");
   }
 }
