@@ -1,6 +1,8 @@
 package com.chs.cafeapp.cart.dto;
 
 import com.chs.cafeapp.cart.entity.CartMenu;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,6 +17,16 @@ public class CartMenuDto {
   private String menuName;
   private int quantity;
 
+
+  public static List<CartMenuDto> of(List<CartMenu> cartMenuList) {
+    List<CartMenuDto> cartMenuDtoList = new ArrayList<>();
+    if (cartMenuList != null) {
+      for (CartMenu x : cartMenuList) {
+        cartMenuDtoList.add(CartMenuDto.of(x));
+      }
+    }
+    return cartMenuDtoList;
+  }
   public static CartMenuDto of(CartMenu cartMenu) {
     return CartMenuDto.builder()
                       .id(cartMenu.getId())

@@ -52,7 +52,7 @@ public class CartServiceImpl implements CartService {
       cart.getCartMenu().remove(cartMenu);
       cart.minusTotalQuantity(cartMenu.getQuantity());
       cart.minusTotalPrice(cartMenu.getQuantity(), cartMenu.getMenus().getPrice());
-      cartMenu.addQuantity(cartInput.getQuantity());
+      cartMenu.addQuantity( cartInput.getQuantity());
 
     } else {
       cartMenu.setMenus(menus);
@@ -70,5 +70,20 @@ public class CartServiceImpl implements CartService {
     cartRepository.save(cart);
 
     return CartMenuDto.of(saveCartMenu);
+  }
+
+  @Override
+  public List<CartMenuDto> viewAllCartMenuInCart(String userId) {
+    User user = userRepository.findByLoginId(userId)
+        .orElseThrow(() -> new RuntimeException("해당 사용자가 존재하지 않습니다."));
+
+    Cart cart = cartRepository.findById(user.getCart().getId()).orElse(null);
+
+    if (cart != null) {
+      List<CartMenuDto> cartMenuDtoList = CartMenuDto.of(cart.getCartMenu());
+      return cartMenuDtoList;
+    }
+
+    return null;
   }
 }

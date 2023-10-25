@@ -5,6 +5,7 @@ import com.chs.cafeapp.user.entity.User;
 import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -33,7 +34,7 @@ public class Cart extends BaseEntity {
   @JoinColumn(name = "user_id")
   private User user;
 
-  @OneToMany(mappedBy = "cart")
+  @OneToMany(mappedBy = "cart", fetch = FetchType.EAGER)
   private List<CartMenu> cartMenu = new ArrayList<>();
 
   public void setUser(User user) {
