@@ -25,7 +25,7 @@ public class CartServiceImpl implements CartService {
   private final MenuRepository menuRepository;
 
   @Override
-  public CartMenuDto addOrder(CartInput cartInput, String userId) {
+  public CartMenuDto addCart(CartInput cartInput, String userId) {
 
     User user = userRepository.findByLoginId(userId)
         .orElseThrow(() -> new RuntimeException("해당 사용자가 없습니다."));
