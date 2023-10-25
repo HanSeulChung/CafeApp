@@ -1,5 +1,6 @@
 package com.chs.cafeapp.base;
 
+import javax.persistence.Column;
 import lombok.Getter;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
@@ -15,7 +16,9 @@ import java.time.LocalDateTime;
 @MappedSuperclass
 public abstract class BaseEntity {
     @CreatedDate
+    @Column(updatable = false) // 업데이트 후 null 되는 것 방지
     private LocalDateTime createDate;
+
     @LastModifiedDate
     private LocalDateTime updateDate;
 }
