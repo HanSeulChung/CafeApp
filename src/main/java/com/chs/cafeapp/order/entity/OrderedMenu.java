@@ -1,6 +1,7 @@
 package com.chs.cafeapp.order.entity;
 
 import com.chs.cafeapp.base.BaseEntity;
+import com.chs.cafeapp.cart.entity.CartMenu;
 import com.chs.cafeapp.menu.entity.Menus;
 import com.chs.cafeapp.order.dto.OrderedMenuDto;
 import java.util.ArrayList;
@@ -66,5 +67,24 @@ public class OrderedMenu extends BaseEntity {
                       .quantity(orderedMenuDto.getQuantity())
                       .totalPrice(orderedMenuDto.getTotalPrice())
                       .build();
+  }
+
+  public static List<OrderedMenu> fromCartMenu(List<CartMenu> cartMenuList) {
+    List<OrderedMenu> orderedMenuList = new ArrayList<>();
+    if (cartMenuList != null) {
+      for (CartMenu x : cartMenuList) {
+        orderedMenuList.add(OrderedMenu.fromCartMenu(x));
+      }
+    }
+    return orderedMenuList;
+  }
+
+  public static OrderedMenu fromCartMenu(CartMenu cartMenu) {
+    return OrderedMenu.builder()
+        .userId(cartMenu.getCart().getUser().getLoginId())
+        .quantity(cartMenu.getQuantity())
+        .totalPrice(cartMenu.getQuantity() * cartMenu.getMenus().getPrice())
+        .menus(cartMenu.getMenus())
+        .build();
   }
 }

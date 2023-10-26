@@ -35,9 +35,9 @@ public class OrderController {
    * 장바구니에서 주문 생성
    */
   @PostMapping("/shopping-basket")
-  public OrderResponse addOrderFromBasket(@RequestBody OrderFromCartInput request) {
-
-    return OrderResponse.builder().build();
+  public OrderResponse addOrderFromBasket(@RequestBody OrderFromCartInput request, @RequestParam String userId) {
+    OrderDto orderDto = orderService.orderFromCart(request, userId);
+    return OrderResponse.toResponse(orderDto);
   }
 
 }

@@ -13,6 +13,6 @@ public interface OrderService {
   /**
    * 장바구니에서 여러 상품 주문
    */
-  OrderDto orderFromCart(OrderFromCartInput orderFromCartInput);
+  OrderDto orderFromCart(OrderFromCartInput orderFromCartInput, String userId);
 
 }
