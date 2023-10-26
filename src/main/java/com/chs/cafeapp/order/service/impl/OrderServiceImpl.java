@@ -7,6 +7,7 @@ import com.chs.cafeapp.cart.repository.CartRepository;
 import com.chs.cafeapp.cart.service.CartMenuService;
 import com.chs.cafeapp.menu.entity.Menus;
 import com.chs.cafeapp.menu.repository.MenuRepository;
+import com.chs.cafeapp.order.dto.OrderAllFromCartInput;
 import com.chs.cafeapp.order.dto.OrderDto;
 import com.chs.cafeapp.order.dto.OrderFromCartInput;
 import com.chs.cafeapp.order.dto.OrderInput;
@@ -74,7 +75,7 @@ public class OrderServiceImpl implements OrderService {
         .orElseThrow(() -> new RuntimeException("해당 사용자가 존재하지 않습니다."));
 
     Cart cart = cartRepository.findById(orderFromCartInput.getCartId())
-        .orElseThrow(() -> new RuntimeException("해당 카트가 존재하지 않습니다."));
+        .orElseThrow(() -> new RuntimeException("해당 장바구니가 존재하지 않습니다."));
 
     if (orderFromCartInput.getIdList().size() == 1) {
       CartMenu cartMenu = cartMenusRepository.findById(orderFromCartInput.getIdList().get(0))
@@ -119,6 +120,45 @@ public class OrderServiceImpl implements OrderService {
     saveOrder.setTotalQuantity(orderedMenuList);
     saveOrder.setOrderStatus(OrderStatus.PaySuccess);
 
+    return OrderDto.of(orderRepository.save(saveOrder));
+  }
+
+  @Override
+  public OrderDto orderAllFromCart(OrderAllFromCartInput orderAllFromCartInput, String userId) {
+    User user = userRepository.findByLoginId(userId)
+        .orElseThrow(() -> new RuntimeException("해당 사용자가 존재하지 않습니다."));
+
+    Cart cart = cartRepository.findById(orderAllFromCartInput.getCartId())
+        .orElseThrow(() -> new RuntimeException("해당 장바구니가 존재하지 않습니다."));
+
+    Order order = Order.builder()
+        .user(user)
+        .couponUse(orderAllFromCartInput.isCouponUse())
+        .build();
+    Order saveOrder = orderRepository.save(order);
+
+    List<OrderedMenu> orderedMenuList = new ArrayList<>();
+    for (CartMenu cartMenu : cart.getCartMenu()) {
+
+      Menus menus = menuRepository.findById(cartMenu.getMenus().getId())
+          .orElseThrow(() -> new RuntimeException("해당되는 메뉴가 존재하지 않습니다."));
+
+      menus.minusStock(cartMenu.getQuantity());
+      if(menus.getStock() == 0) {
+        menus.setSoldOut(true);
+      }
+
+      menuRepository.save(menus);
+
+      OrderedMenu orderedMenu = OrderedMenu.fromCartMenu(cartMenu, saveOrder);
+      orderedMenuRepository.save(orderedMenu);
+      orderedMenuList.add(orderedMenu);
+    }
+
+    saveOrder.setTotalPrice(orderedMenuList);
+    saveOrder.setTotalQuantity(orderedMenuList);
+    saveOrder.setOrderStatus(OrderStatus.PaySuccess);
+    cartMenuService.deleteAllCartMenu(orderAllFromCartInput.getCartId(), userId);
     return OrderDto.of(orderRepository.save(saveOrder));
   }
 }

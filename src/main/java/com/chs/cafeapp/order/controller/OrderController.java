@@ -1,6 +1,7 @@
 package com.chs.cafeapp.order.controller;
 
 
+import com.chs.cafeapp.order.dto.OrderAllFromCartInput;
 import com.chs.cafeapp.order.dto.OrderDto;
 import com.chs.cafeapp.order.dto.OrderFromCartInput;
 import com.chs.cafeapp.order.dto.OrderInput;
@@ -32,7 +33,7 @@ public class OrderController {
   }
 
   /**
-   * 장바구니에서 주문 생성
+   * 장바구니에서 주문 생성(선택 주문 가능)
    */
   @PostMapping("/shopping-basket")
   public OrderResponse addOrderFromBasket(@RequestBody OrderFromCartInput request, @RequestParam String userId) {
@@ -40,4 +41,12 @@ public class OrderController {
     return OrderResponse.toResponse(orderDto);
   }
 
+  /**
+   * 장바구니에서 주문 생성(장바구니 메뉴 전체 주문)
+   */
+  @PostMapping("/shopping-basket/all")
+  public OrderResponse addOrderFromBasket(@RequestBody OrderAllFromCartInput reqeust, @RequestParam String userId) {
+    OrderDto orderDto = orderService.orderAllFromCart(reqeust, userId);
+    return OrderResponse.toResponse(orderDto);
+  }
 }
