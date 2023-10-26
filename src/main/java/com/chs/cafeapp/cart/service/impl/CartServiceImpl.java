@@ -11,6 +11,7 @@ import com.chs.cafeapp.menu.entity.Menus;
 import com.chs.cafeapp.menu.repository.MenuRepository;
 import com.chs.cafeapp.user.entity.User;
 import com.chs.cafeapp.user.repository.UserRepository;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import lombok.AllArgsConstructor;
@@ -77,7 +78,16 @@ public class CartServiceImpl implements CartService {
     User user = userRepository.findByLoginId(userId)
         .orElseThrow(() -> new RuntimeException("해당 사용자가 존재하지 않습니다."));
 
+    if (user.getCart() == null) {
+      Cart newCart = new Cart();
+      user.setCart(newCart);
+      newCart.setUser(user);
+      cartRepository.save(newCart);
+    }
+
     Cart cart = cartRepository.findById(user.getCart().getId()).orElse(null);
+
+
     if (cart != null) {
       List<CartMenuDto> cartMenuDtoList = CartMenuDto.of(cart.getCartMenu());
       return cartMenuDtoList;

@@ -2,6 +2,7 @@ package com.chs.cafeapp.cart.entity;
 
 import com.chs.cafeapp.base.BaseEntity;
 import com.chs.cafeapp.menu.entity.Menus;
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;

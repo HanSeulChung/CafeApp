@@ -35,11 +35,18 @@ public class Cart extends BaseEntity {
   @JoinColumn(name = "user_id")
   private User user;
 
-  @OneToMany(mappedBy = "cart", fetch = FetchType.EAGER, cascade = CascadeType.REMOVE)
+  @OneToMany(mappedBy = "cart", cascade = CascadeType.REMOVE)
   private List<CartMenu> cartMenu = new ArrayList<>();
 
   public void setUser(User user) {
     this.user = user;
+  }
+
+  public void setCartMenu(CartMenu cartMenu) {
+    if (this.getCartMenu() == null) {
+      this.cartMenu = new ArrayList<>();
+    }
+    this.cartMenu.add(cartMenu);
   }
 
   public void addTotalQuantity(int quantity) {
@@ -60,14 +67,16 @@ public class Cart extends BaseEntity {
   public void resetTotalPrice() {
     if (this.cartMenu.isEmpty()) {
       this.totalPrice = 0;
+    } else {
+      throw new RuntimeException("장바구니에 메뉴가 남아있습니다.");
     }
-    throw new RuntimeException("장바구니에 메뉴가 남아있습니다.");
   }
 
   public void resetTotalQuantity() {
     if (this.cartMenu.isEmpty()) {
       this.totalQuantity = 0;
+    } else {
+      throw new RuntimeException("장바구니에 메뉴가 남아있습니다.");
     }
-    throw new RuntimeException("장바구니에 메뉴가 남아있습니다.");
   }
 }
