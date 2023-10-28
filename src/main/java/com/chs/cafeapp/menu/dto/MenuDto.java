@@ -26,10 +26,11 @@ public class MenuDto {
   private String baseCategory;
 
   public static List<MenuDto> of(List<Menus> menusList) {
+
     if(menusList != null) {
       List<MenuDto> menuDtoList = new ArrayList<>();
-      for (Menus x : menusList) {
-        menuDtoList.add(MenuDto.of(x));
+      for (Menus menu : menusList) {
+        menuDtoList.add(MenuDto.of(menu));
       }
       return menuDtoList;
     }

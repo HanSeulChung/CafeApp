@@ -19,6 +19,7 @@ public class MenuController {
 
   /**
    * 메뉴 전체 조회
+   * @return 등록된 메뉴들 List 형식으로 반환
    */
   @GetMapping()
   public ResponseEntity<?> readAllMenus() {
@@ -28,6 +29,9 @@ public class MenuController {
 
   /**
    * 메뉴 카테고리 대분류로 조회
+   * @param superCategory: 대분류 카테고리 이름 ex) 음식, 음료, 굿즈
+   * @return 해당 카테고리에 설정되어있는 메뉴 List로 반환
+   * @throws Exception: 해당 대분류 카테고리 이름이 없을 경우 CustomException 발생
    */
   @GetMapping("/superCategory/{superCategory}")
   public ResponseEntity<?> readAllMenusBySuperCategory(@PathVariable("superCategory") String superCategory) {
@@ -37,6 +41,9 @@ public class MenuController {
 
   /**
    * 메뉴 카테고리 중분류로 조회
+   * @param baseCategory: 중분류 카테고리 이름 ex) 케이크, 샌드위치, 에스프레소, 텀블러
+   * @return 해당 카테고리에 설정되어있는 메뉴들 List로 반환
+   * @throws Exception: 해당 중분류 카테고리 이름이 없을 경우 CustomException 발생
    */
   @GetMapping("/baseCategory/{baseCategory}")
   public ResponseEntity<?> readAllMenusByBaseCategory(@PathVariable("baseCategory") String baseCategory) {
