@@ -16,8 +16,8 @@ public class OrderDto {
 
   private OrderStatus orderStatus;
 
-  private int totalQuantity = 0;
-  private int totalPrice = 0;
+  private int totalQuantity;
+  private int totalPrice;
 
   private boolean couponUse;
 

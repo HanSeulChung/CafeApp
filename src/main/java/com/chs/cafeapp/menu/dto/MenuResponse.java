@@ -28,8 +28,8 @@ public class MenuResponse {
 
     if (menuDtos != null) {
       List<MenuResponse> menuResponses = new ArrayList<>();
-      for(MenuDto x : menuDtos) {
-        menuResponses.add(toResponse(x));
+      for(MenuDto menuDto : menuDtos) {
+        menuResponses.add(toResponse(menuDto));
       }
       return menuResponses;
     }

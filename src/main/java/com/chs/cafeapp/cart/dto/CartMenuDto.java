@@ -19,13 +19,15 @@ public class CartMenuDto {
 
 
   public static List<CartMenuDto> of(List<CartMenu> cartMenuList) {
-    List<CartMenuDto> cartMenuDtoList = new ArrayList<>();
+
     if (cartMenuList != null) {
-      for (CartMenu x : cartMenuList) {
-        cartMenuDtoList.add(CartMenuDto.of(x));
+      List<CartMenuDto> cartMenuDtoList = new ArrayList<>();
+      for (CartMenu cartMenu : cartMenuList) {
+        cartMenuDtoList.add(CartMenuDto.of(cartMenu));
       }
+      return cartMenuDtoList;
     }
-    return cartMenuDtoList;
+    return null;
   }
   public static CartMenuDto of(CartMenu cartMenu) {
     return CartMenuDto.builder()
