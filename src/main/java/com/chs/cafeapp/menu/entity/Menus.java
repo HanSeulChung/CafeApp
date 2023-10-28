@@ -50,4 +50,20 @@ public class Menus extends BaseEntity {
                   .isSoldOut(menuDto.isSoldOut())
                   .build();
   }
+
+  public void addStock(int stockAmount) {
+    this.stock += stockAmount;
+  }
+
+  public void minusStock(int stockAmount) {
+    this.stock -= stockAmount;
+    if (this.stock < 0) {
+      this.stock += stockAmount;
+      throw new RuntimeException("해당 개수를 구매할 수 없습니다");
+    }
+  }
+
+  public void setSoldOut(boolean isSoldOut) {
+    this.isSoldOut = isSoldOut;
+  }
 }

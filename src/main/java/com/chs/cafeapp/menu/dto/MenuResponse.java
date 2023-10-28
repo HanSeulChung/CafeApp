@@ -18,7 +18,7 @@ public class MenuResponse {
   private String description;
   private int stock;
   private int price;
-  private String status;
+  private boolean isSoldOut;
 
   private String superCategory;
   private String baseCategory;
@@ -28,8 +28,8 @@ public class MenuResponse {
 
     if (menuDtos != null) {
       List<MenuResponse> menuResponses = new ArrayList<>();
-      for(MenuDto x : menuDtos) {
-        menuResponses.add(toResponse(x));
+      for(MenuDto menuDto : menuDtos) {
+        menuResponses.add(toResponse(menuDto));
       }
       return menuResponses;
     }
@@ -42,7 +42,7 @@ public class MenuResponse {
                         .description(menuDto.getDescription())
                         .stock(menuDto.getStock())
                         .price(menuDto.getPrice())
-                        .status(menuDto.getStatus())
+                        .isSoldOut(menuDto.isSoldOut())
                         .superCategory(menuDto.getSuperCategory())
                         .baseCategory(menuDto.getBaseCategory())
                         .build();
