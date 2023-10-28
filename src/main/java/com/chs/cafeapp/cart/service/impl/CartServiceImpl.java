@@ -85,8 +85,8 @@ public class CartServiceImpl implements CartService {
       cartRepository.save(newCart);
     }
 
-    Cart cart = cartRepository.findById(user.getCart().getId()).orElse(null);
-
+    Cart cart = cartRepository.findById(user.getCart().getId())
+                                .orElse(null);
 
     if (cart != null) {
       List<CartMenuDto> cartMenuDtoList = CartMenuDto.of(cart.getCartMenu());

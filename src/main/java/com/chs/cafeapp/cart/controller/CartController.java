@@ -2,8 +2,7 @@ package com.chs.cafeapp.cart.controller;
 
 import com.chs.cafeapp.cart.dto.CartInput;
 import com.chs.cafeapp.cart.dto.CartMenuDto;
-import com.chs.cafeapp.cart.dto.CartMenuQuantityAdd;
-import com.chs.cafeapp.cart.dto.CartMenuQuantityMinus;
+import com.chs.cafeapp.cart.dto.CartMenuChangeQuantity;
 import com.chs.cafeapp.cart.dto.CartResponse;
 import com.chs.cafeapp.cart.service.CartMenuService;
 import com.chs.cafeapp.cart.service.CartService;
@@ -26,7 +25,7 @@ import com.chs.cafeapp.exception.CustomException;
  */
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/cart")
+@RequestMapping("/carts")
 public class CartController {
   private final CartService cartService;
   private final CartMenuService cartMenuService;
@@ -47,7 +46,7 @@ public class CartController {
    * @throws CustomException: 해당 userId를 가진 사용자가 없을 경우 CustomException 발생
    */
   @GetMapping()
-  public ResponseEntity<List<CartMenuDto>> addCart(@RequestParam String userId) {
+  public ResponseEntity<List<CartMenuDto>> viewCart(@RequestParam String userId) {
     List<CartMenuDto> cartMenuDtos = cartService.viewAllCartMenuInCart(userId);
     return ResponseEntity.ok(cartMenuDtos);
   }
@@ -60,7 +59,7 @@ public class CartController {
    * @throws CustomException: 장바구니의 실제 사용자와 파라미터 값으로 찾은 사용자가 다를 경우,
    *                          장바구니와 사용자가 없을 경우, 이미 비어있는 경우 CustomException 발생
    */
-  @DeleteMapping("/{cartId}/all")
+  @DeleteMapping("/{cartId}")
   public ResponseEntity<String> deleteAll(@PathVariable Long cartId, @RequestParam String userId) {
     cartMenuService.deleteAllCartMenu(cartId, userId);
     return ResponseEntity.ok("해당 장바구니를 전체 삭제 했습니다.");
@@ -75,27 +74,32 @@ public class CartController {
    *                          장바구니와 사용자가 없을 경우, 장바구니가 비어있는 경우,
    *                          해당 장바구니 메뉴가 없는 경우 CustomException 발생
    */
-  @DeleteMapping("/{cartMenuId}")
-  public ResponseEntity<String> deleteSpecific(@PathVariable Long cartMenuId, @RequestParam String userId) {
-    cartMenuService.deleteSpecificCartMenu(cartMenuId, userId);
+  @DeleteMapping("/{cartId}/cartMenus/{cartMenuId}")
+  public ResponseEntity<String> deleteSpecific(@PathVariable Long cartId, @PathVariable Long cartMenuId, @RequestParam String userId) {
+    cartMenuService.deleteSpecificCartMenu(cartId, cartMenuId, userId);
     return ResponseEntity.ok("해당 선택한 메뉴가 장바구니에서 삭제됐습니다.");
   }
 
-  /**
-   * 장바구니 메뉴 수량 변경 (add, minus 분리하지 않고 한 곳에서 다루는 것으로 수정 예정
-   */
-  @PatchMapping("/change/add")
-  public ResponseEntity<CartResponse> addCartMenuQuantity(@RequestBody CartMenuQuantityAdd request, @RequestParam String userId) {
-    CartMenuDto cartMenuDto = cartMenuService.addCartMenuQuantity(request, userId);
-    return ResponseEntity.ok(CartResponse.toResponse(cartMenuDto, "장바구니의 해당 메뉴의 수량이 증가되었습니다."));
-  }
 
   /**
-   * 장바구니 메뉴 수량 감소
+   * 장바구니 메뉴 수량 변경
+   * @param request: 장바구니 id, 장바구니 menuId, 변경할 수량(예시> 5, -10)
+   * @param userId: 장바구니를 갖고 있는 사용자
+   * @return CartResponse: 수량 변경된 장바구니 메뉴 정보와 message 반환
+   * @throws CustomException: 사용자 loginId가 존재하지 않는 경우, 장바구니가 존재하지 않는 경우,
+   *                          장바구니에 해당 메뉴가 존재하지 않을 경우, 사용자의 장바구니 id 가 아닐경우,
+   *                          CustomException 발생
    */
-  @PatchMapping("/change/minus")
-  public ResponseEntity<CartResponse> minusCartMenuQuantity(@RequestBody CartMenuQuantityMinus request, @RequestParam String userId) {
-    CartMenuDto cartMenuDto = cartMenuService.minusCartMenuQuantity(request, userId);
-    return ResponseEntity.ok(CartResponse.toResponse(cartMenuDto, "장바구니의 해당 메뉴의 수량이 감소되었습니다."));
+  @PatchMapping("/change")
+  public ResponseEntity<CartResponse> changeCartMenuQuantity(@RequestBody CartMenuChangeQuantity request, @RequestParam String userId) {
+    CartMenuDto cartMenuDto = cartMenuService.changeCartMenuQuantity(request, userId);
+    String message = "";
+    if(request.getQuantity() > 0) {
+      message = "장바구니의 해당 메뉴의 수량이 증가되었습니다.";
+    } else if (request.getQuantity() < 0) {
+      message = "장바구니의 해당 메뉴의 수량이 감소되었습니다.";
+    }
+    return ResponseEntity.ok(CartResponse.toResponse(cartMenuDto, message));
   }
+
 }

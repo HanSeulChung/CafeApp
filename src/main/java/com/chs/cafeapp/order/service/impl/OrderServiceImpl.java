@@ -52,20 +52,25 @@ public class OrderServiceImpl implements OrderService {
     }
     menuRepository.save(menus);
 
-    Order fromOrderInput = Order.fromOrderInput(orderInput);
-    fromOrderInput.setUser(user);
-    fromOrderInput.setOrderStatus(OrderStatus.PaySuccess);
-    OrderedMenu orderedMenu = OrderedMenu.builder()
-                                        .totalPrice(orderInput.getMenuPrice() * orderInput.getQuantity())
-                                        .quantity(orderInput.getQuantity())
-                                        .userId(user.getLoginId())
-                                        .build();
-    orderedMenu.setMenus(menus);
-    orderedMenu.setOrder(fromOrderInput);
-    Order savedOrder = orderRepository.save(fromOrderInput);
-    orderedMenuRepository.save(orderedMenu);
+    OrderedMenu saveOrderedMenu = orderedMenuRepository.save(
+                                          OrderedMenu.builder()
+                                                      .userId(userId)
+                                                      .quantity(orderInput.getQuantity())
+                                                      .totalPrice(orderInput.getMenuPrice() * orderInput.getQuantity())
+                                                      .menus(menus)
+                                                      .build());
 
-    return OrderDto.of(savedOrder);
+    Order saveOrder = orderRepository.save(Order.builder()
+                                                .couponUse(orderInput.isCouponUse())
+                                                .user(user)
+                                                .build());
+
+
+    saveOrder.setOrderStatus(OrderStatus.PaySuccess);
+    saveOrderedMenu.setOrder(saveOrder);
+    orderedMenuRepository.save(saveOrderedMenu);
+
+    return OrderDto.of(orderRepository.save(saveOrder));
   }
 
   @Override
@@ -74,7 +79,7 @@ public class OrderServiceImpl implements OrderService {
         .orElseThrow(() -> new RuntimeException("해당 사용자가 존재하지 않습니다."));
 
     Cart cart = cartRepository.findById(orderFromCartInput.getCartId())
-        .orElseThrow(() -> new RuntimeException("해당 카트가 존재하지 않습니다."));
+        .orElseThrow(() -> new RuntimeException("해당 장바구니가 존재하지 않습니다."));
 
     if (orderFromCartInput.getIdList().size() == 1) {
       CartMenu cartMenu = cartMenusRepository.findById(orderFromCartInput.getIdList().get(0))
@@ -85,7 +90,7 @@ public class OrderServiceImpl implements OrderService {
       OrderInput orderInput = new OrderInput(
           menus.getId(), menus.getName(), menus.getPrice(),
           cartMenu.getQuantity(), orderFromCartInput.isCouponUse());
-      cartMenuService.deleteSpecificCartMenu(cartMenu.getId(), userId);
+      cartMenuService.deleteSpecificCartMenu(cart.getId(), cartMenu.getId(), userId);
       return orderIndividualMenu(orderInput, userId);
     }
 
@@ -113,7 +118,7 @@ public class OrderServiceImpl implements OrderService {
       OrderedMenu orderedMenu = OrderedMenu.fromCartMenu(cartMenu);
       orderedMenu.setOrder(saveOrder);
       orderedMenuList.add(orderedMenuRepository.save(orderedMenu));
-      cartMenuService.deleteSpecificCartMenu(cartMenu.getId(), userId);
+      cartMenuService.deleteSpecificCartMenu(cart.getId(), cartMenu.getId(), userId);
     }
     saveOrder.setTotalPrice(orderedMenuList);
     saveOrder.setTotalQuantity(orderedMenuList);

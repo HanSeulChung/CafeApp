@@ -1,6 +1,5 @@
 package com.chs.cafeapp.cart.dto;
 
-import javax.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -10,7 +9,7 @@ import lombok.Setter;
 @Setter
 @Builder
 @AllArgsConstructor
-public class CartMenuQuantityMinus {
+public class CartMenuChangeQuantity {
   private long id;
   private long menuId;
   private int quantity;

@@ -83,12 +83,22 @@ public class OrderedMenu extends BaseEntity {
 //    return null;
 //  }
 //
-//  public static OrderedMenu fromCartMenu(CartMenu cartMenu) {
-//    return OrderedMenu.builder()
-//        .userId(cartMenu.getCart().getUser().getLoginId())
-//        .quantity(cartMenu.getQuantity())
-//        .totalPrice(cartMenu.getQuantity() * cartMenu.getMenus().getPrice())
-//        .menus(cartMenu.getMenus())
-//        .build();
-//  }
+  public static List<OrderedMenu> fromCartMenu(List<CartMenu> cartMenuList) {
+    if (cartMenuList != null) {
+      List<OrderedMenu> orderedMenuList = new ArrayList<>();
+      for (CartMenu cartMenu : cartMenuList) {
+        orderedMenuList.add(OrderedMenu.fromCartMenu(cartMenu));
+      }
+      return orderedMenuList;
+    }
+    return null;
+  }
+  public static OrderedMenu fromCartMenu(CartMenu cartMenu) {
+    return OrderedMenu.builder()
+        .userId(cartMenu.getCart().getUser().getLoginId())
+        .quantity(cartMenu.getQuantity())
+        .totalPrice(cartMenu.getQuantity() * cartMenu.getMenus().getPrice())
+        .menus(cartMenu.getMenus())
+        .build();
+  }
 }
