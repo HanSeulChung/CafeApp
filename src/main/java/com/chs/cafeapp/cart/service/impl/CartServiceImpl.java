@@ -33,17 +33,17 @@ public class CartServiceImpl implements CartService {
     Menus menus = menuRepository.findById(cartInput.getMenuId())
         .orElseThrow(() -> new RuntimeException("해당 메뉴가 존재하지 않습니다."));
 
-    Cart cart = user.getCart();
-
     if (menus.getStock() - cartInput.getQuantity() < 0) {
       throw new RuntimeException("해당 메뉴의 재고 수량만큼만 장바구니에 담을 수 있습니다.");
     }
 
-    if (cart == null) {
-      cart = new Cart();
-      cart.setUser(user);
-      user.setCart(cart);
-    }
+    Cart cart = user.getCart();
+    cart = Optional.ofNullable(cart).orElseGet(() -> {
+      Cart newCart = new Cart();
+      newCart.setUser(user);
+      user.setCart(newCart);
+      return newCart;
+    });
 
     CartMenu cartMenu = new CartMenu();
     Optional<CartMenu> byMenusId = cartMenusRepository.findByMenusId(cartInput.getMenuId());
@@ -93,6 +93,6 @@ public class CartServiceImpl implements CartService {
       return cartMenuDtoList;
     }
 
-    return null;
+    return new ArrayList<>();
   }
 }
