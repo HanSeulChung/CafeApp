@@ -49,42 +49,46 @@ public class OrderedMenu extends BaseEntity {
   public void setMenus(Menus menus) {
     this.menus = menus;
   }
-  public static List<OrderedMenu> fromDto(List<OrderedMenuDto> orderedMenuDtos) {
-    List<OrderedMenu> orderedMenus = new ArrayList<>();
 
-    if(orderedMenuDtos != null) {
-      for (OrderedMenuDto orderedMenuDto : orderedMenuDtos) {
-        orderedMenus.add(OrderedMenu.fromDto(orderedMenuDto));
-      }
-    }
-    return orderedMenus;
-  }
-
-  public static OrderedMenu fromDto(OrderedMenuDto orderedMenuDto) {
-    return OrderedMenu.builder()
-                      .id(orderedMenuDto.getId())
-                      .userId(orderedMenuDto.getUserId())
-                      .quantity(orderedMenuDto.getQuantity())
-                      .totalPrice(orderedMenuDto.getTotalPrice())
-                      .build();
-  }
-
-  public static List<OrderedMenu> fromCartMenu(List<CartMenu> cartMenuList) {
-    List<OrderedMenu> orderedMenuList = new ArrayList<>();
-    if (cartMenuList != null) {
-      for (CartMenu x : cartMenuList) {
-        orderedMenuList.add(OrderedMenu.fromCartMenu(x));
-      }
-    }
-    return orderedMenuList;
-  }
-
-  public static OrderedMenu fromCartMenu(CartMenu cartMenu) {
-    return OrderedMenu.builder()
-        .userId(cartMenu.getCart().getUser().getLoginId())
-        .quantity(cartMenu.getQuantity())
-        .totalPrice(cartMenu.getQuantity() * cartMenu.getMenus().getPrice())
-        .menus(cartMenu.getMenus())
-        .build();
-  }
+  // TO-DO : 주문 기능 구현시 SRP, OCP 원칙 생각하기
+//  public static List<OrderedMenu> fromDto(List<OrderedMenuDto> orderedMenuDtos) {
+//
+//    if(orderedMenuDtos != null) {
+//      List<OrderedMenu> orderedMenus = new ArrayList<>();
+//      for (OrderedMenuDto orderedMenuDto : orderedMenuDtos) {
+//        orderedMenus.add(OrderedMenu.fromDto(orderedMenuDto));
+//      }
+//    }
+//    return null;
+//  }
+//
+//  public static OrderedMenu fromDto(OrderedMenuDto orderedMenuDto) {
+//    return OrderedMenu.builder()
+//                      .id(orderedMenuDto.getId())
+//                      .userId(orderedMenuDto.getUserId())
+//                      .quantity(orderedMenuDto.getQuantity())
+//                      .totalPrice(orderedMenuDto.getTotalPrice())
+//                      .build();
+//  }
+//
+//  public static List<OrderedMenu> fromCartMenu(List<CartMenu> cartMenuList) {
+//
+//    if (cartMenuList != null) {
+//      List<OrderedMenu> orderedMenuList = new ArrayList<>();
+//      for (CartMenu x : cartMenuList) {
+//        orderedMenuList.add(OrderedMenu.fromCartMenu(x));
+//      }
+//      return orderedMenuList;
+//    }
+//    return null;
+//  }
+//
+//  public static OrderedMenu fromCartMenu(CartMenu cartMenu) {
+//    return OrderedMenu.builder()
+//        .userId(cartMenu.getCart().getUser().getLoginId())
+//        .quantity(cartMenu.getQuantity())
+//        .totalPrice(cartMenu.getQuantity() * cartMenu.getMenus().getPrice())
+//        .menus(cartMenu.getMenus())
+//        .build();
+//  }
 }
