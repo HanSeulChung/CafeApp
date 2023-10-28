@@ -38,7 +38,7 @@ dependencies {
 //    implementation 'com.sun.mail:javax.mail:1.7.3'
 
 	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
-
+	implementation 'com.h2database:h2:1.4.200'
 	implementation 'io.springfox:springfox-boot-starter:3.0.0'
 	implementation 'io.springfox:springfox-swagger-ui:3.0.0'
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
@@ -53,9 +53,13 @@ dependencies {
 	annotationProcessor 'org.projectlombok:lombok:1.18.20'
 	compileOnly('javax.servlet:javax.servlet-api:4.0.1')
 	compileOnly("org.springframework.boot:spring-boot-starter-mail")
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	testImplementation 'org.springframework.security:spring-security-test'
-	testRuntimeOnly("com.h2database:h2")
+
+	testImplementation 'com.h2database:h2'
+	testImplementation('org.springframework.boot:spring-boot-starter-test')
+	testImplementation('org.junit.jupiter:junit-jupiter')
+	testImplementation('org.junit.jupiter:junit-jupiter-api')
+	testRuntimeOnly('org.junit.jupiter:junit-jupiter-engine')
+	testRuntimeOnly 'com.h2database:h2'
 }
 
 tasks.named('test') {
