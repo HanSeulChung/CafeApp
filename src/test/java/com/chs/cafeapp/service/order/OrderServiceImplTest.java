@@ -4,6 +4,8 @@ import static org.hibernate.validator.internal.util.Contracts.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.times;
@@ -40,7 +42,9 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.SpyBean;
+import org.springframework.transaction.annotation.Transactional;
 
 @ExtendWith(MockitoExtension.class)
 class OrderServiceImplTest {
@@ -61,7 +65,11 @@ class OrderServiceImplTest {
   @InjectMocks
   private OrderServiceImpl orderService;
 
+  @Mock
+  private CartMenuServiceImpl cartMenuService;
+
   @Test
+  @Transactional
   @DisplayName("장바구니 전체 메뉴 주문 성공")
   void orderAllFromCart_Success() {
     // given
@@ -121,22 +129,37 @@ class OrderServiceImplTest {
     cartMenu1.setCart(cart);
     cartMenu2.setCart(cart);
     user.setCart(cart);
+
+    userRepository.save(user);
+    menuRepository.save(menu1);
+    menuRepository.save(menu2);
+    cartRepository.save(cart);
+    cartMenusRepository.save(cartMenu1);
+    cartMenusRepository.save(cartMenu2);
+
     when(userRepository.findByLoginId("user2@naver.com")).thenReturn(Optional.of(user));
     when(cartRepository.findById(1L)).thenReturn(Optional.of(cart));
     when(menuRepository.findById(1L)).thenReturn(Optional.of(menu1));
     when(menuRepository.findById(2L)).thenReturn(Optional.of(menu2));
+    when(cartMenusRepository.findAllByCartId(1L)).thenReturn(Arrays.asList(cartMenu1, cartMenu2));
     when(orderRepository.save(any(Order.class))).thenReturn(order);
-
+    when(orderedMenuRepository.save(any(OrderedMenu.class))).thenReturn(any());
+//    doNothing().when(cartMenuService).deleteAllCartMenu(anyLong(), anyString());
     // When
     OrderAllFromCartInput orderAllFromCartInput = new OrderAllFromCartInput(1L, false);
     OrderDto result = orderService.orderAllFromCart(orderAllFromCartInput, "user2@naver.com");
 
     // Then
+    verify(cartMenuService, times(1)).deleteAllCartMenu(1L, "user2@naver.com");
+    assertNotNull(result);
+    System.out.println(result);
+    assertEquals(result.getOrderedMenus().size(), 2);
     assertEquals(menu1.getStock(), 10 - 3);
     assertEquals(menu2.getStock(), 10 - 3);
     assertEquals(order.getOrderStatus(), OrderStatus.PaySuccess);
-    assertEquals(order.getOrderedMenus().size(), 2);
-    assertEquals(cart.getCartMenu().size(), 0);
-
+    assertEquals(result.getTotalQuantity(), 6);
+    assertEquals(result.getTotalPrice(), cartMenu1.getMenus().getPrice() * cartMenu1.getQuantity() + cartMenu2.getMenus().getPrice() * cartMenu2.getQuantity());
+//    assertEquals(cartRepository.findById(1L).get().getCartMenu().size(), 0);
+    assertEquals(cartMenusRepository.findAllByCartId(1L).size() , 0);
   }
 }
