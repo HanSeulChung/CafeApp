@@ -15,11 +15,4 @@ public class OrderInput {
   private int quantity;
   private boolean couponUse;
 
-//  public OrderInput(OrderInput originInput, String userLoginId) {
-//    this.userLoginId = userLoginId;
-//    this.menuId = originInput.getMenuId();
-//    this.menuName = originInput.getMenuName();
-//    this.menuPrice = originInput.getMenuPrice();
-//    this.count = originInput.getCount();
-//  }
 }

@@ -26,7 +26,7 @@ public class User extends BaseEntity {
     @Column
     private String loginId; // 이메일
     private String password;
-    
+
     private String userName;
     private String nickName;
     private String sex;

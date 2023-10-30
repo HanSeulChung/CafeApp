@@ -5,8 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
-import com.chs.cafeapp.cart.dto.CartMenuQuantityAdd;
-import com.chs.cafeapp.cart.dto.CartMenuQuantityMinus;
+import com.chs.cafeapp.cart.dto.CartMenuChangeQuantity;
 import com.chs.cafeapp.cart.entity.Cart;
 import com.chs.cafeapp.cart.entity.CartMenu;
 import com.chs.cafeapp.cart.repository.CartMenusRepository;
@@ -167,7 +166,7 @@ class CartMenuServiceImplTest {
     when(cartMenusRepository.findById(1L)).thenReturn(Optional.of(cartMenu1));
 
     //when
-    assertDoesNotThrow(() -> cartMenuService.deleteSpecificCartMenu(1L, "user2@naver.com"));
+    assertDoesNotThrow(() -> cartMenuService.deleteSpecificCartMenu(1L, 1L, "user2@naver.com"));
     //then
     assertTrue(cart.getCartMenu().size() == 1);
     assertEquals(cart.getCartMenu().get(0), cartMenu2);
@@ -217,8 +216,8 @@ class CartMenuServiceImplTest {
     when(cartMenusRepository.save(cartMenu1)).thenReturn(cartMenu1);
 
     //when
-    CartMenuQuantityAdd cartMenuQuantityAdd = new CartMenuQuantityAdd(1L, 1L, 20);
-    assertDoesNotThrow(() -> cartMenuService.addCartMenuQuantity(cartMenuQuantityAdd, "user2@naver.com"));
+    CartMenuChangeQuantity cartMenuChangeQuantity = new CartMenuChangeQuantity(1L, 1L, 20);
+    assertDoesNotThrow(() -> cartMenuService.changeCartMenuQuantity(cartMenuChangeQuantity, "user2@naver.com"));
     //then
     assertTrue(cart.getCartMenu().get(0).getQuantity() == 20 + 3);
   }
@@ -267,8 +266,8 @@ class CartMenuServiceImplTest {
     when(cartMenusRepository.save(cartMenu1)).thenReturn(cartMenu1);
 
     //when
-    CartMenuQuantityMinus cartMenuQuantityMinus = new CartMenuQuantityMinus(1L, 1L, 5);
-    assertDoesNotThrow(() -> cartMenuService.minusCartMenuQuantity(cartMenuQuantityMinus, "user2@naver.com"));
+    CartMenuChangeQuantity cartMenuChangeQuantity = new CartMenuChangeQuantity(1L, 1L, -5);
+    assertDoesNotThrow(() -> cartMenuService.changeCartMenuQuantity(cartMenuChangeQuantity, "user2@naver.com"));
     //then
     assertTrue(cart.getCartMenu().get(0).getQuantity() == 15 - 5);
   }
