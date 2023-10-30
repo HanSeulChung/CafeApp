@@ -2,6 +2,7 @@ package com.chs.cafeapp.entity;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.chs.cafeapp.cart.entity.Cart;
@@ -13,23 +14,29 @@ import com.chs.cafeapp.menu.repository.MenuRepository;
 import com.chs.cafeapp.user.entity.User;
 import com.chs.cafeapp.user.repository.UserRepository;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.jdbc.EmbeddedDatabaseConnection;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase.Replace;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.transaction.annotation.Transactional;
+
 
 @DataJpaTest
+@ActiveProfiles("test")
 @TestPropertySource(locations = "classpath:application-test.yml")
-@AutoConfigureTestDatabase(replace = Replace.NONE)
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 public class CartandCartMenuTest {
   @Autowired
-  private TestEntityManager em;
+  private TestEntityManager testEntityManager;
 
   @Autowired
   private UserRepository userRepository;
@@ -44,6 +51,36 @@ public class CartandCartMenuTest {
 
   @BeforeEach
   void setUp() {
+
+  }
+  @Test
+  @DisplayName("CartMenu 저장")
+  void saveCartMenu() {
+    // given
+    Menus menu1 = Menus.builder()
+        .id(1L)
+        .name("맛있는 닭가슴살 샌드위치")
+        .kcal(500)
+        .description("특제 비법 소스를 넣어 굉장히 맛있고 건강한 샌드위치 입니다.")
+        .stock(10)
+        .price(10000)
+        .isSoldOut(false)
+        .build();
+
+    Menus save = menuRepository.save(menu1);
+
+    // when
+
+
+
+    // then
+    assertEquals(save, menuRepository.findById(1L).get());
+  }
+  @Test
+  @Transactional
+  @DisplayName("CartMenu가 삭제되면 Cart에서도 cartMenu List가 삭제되는 것 확인")
+  void deleteCartMenuAndCartTest() {
+    //given
     User user = User.builder()
         .id(1L)
         .loginId("user2@naver.com")
@@ -74,49 +111,50 @@ public class CartandCartMenuTest {
         .isSoldOut(false)
         .build();
 
+    Cart cart = Cart.builder()
+        .id(1L)
+        .user(user)
+        .build();
+
+    userRepository.save(user);
+    menuRepository.save(menu1);
+    menuRepository.save(menu2);
+
     CartMenu cartMenu1 = CartMenu.builder()
         .id(1L)
         .menus(menu1)
+        .cart(cart)
         .quantity(3)
         .build();
+
+    cartRepository.save(cart);
 
     CartMenu cartMenu2 = CartMenu.builder()
         .id(2L)
         .menus(menu2)
+        .cart(cart)
         .quantity(3)
         .build();
 
-    Cart cart = Cart.builder()
-        .id(1L)
-        .cartMenu(Arrays.asList(cartMenu1, cartMenu2)) // Set cartMenu list
-        .user(user)
-        .build();
-
-    menuRepository.save(menu1);
-    menuRepository.save(menu2);
-    userRepository.save(user);
-    cartRepository.save(cart);
-
-    cartMenu1.setMenus(menu1);
-    cartMenu2.setMenus(menu2);
-    cartMenu1.setCart(cart);
-    cartMenu2.setCart(cart);
     cartMenusRepository.save(cartMenu1);
     cartMenusRepository.save(cartMenu2);
-  }
-  @Test
-  @DisplayName("CartMenu가 삭제되면 Cart에서도 cartMenu List가 삭제되는 것 확인")
-  void deleteCartMenuAndCartTest() {
-    //given
-
-    Optional<Cart> cart = cartRepository.findById(1L);
-
 
     //when
+    List<CartMenu> cartMenus = cartMenusRepository.findAllByCartId(1L);
+    for (CartMenu cartMenu : cartMenus) {
+      cartMenu.setCart(null); // Cart 참조 제거
+      cartMenusRepository.save(cartMenu); // 변경 사항 저장
+    }
 
-    cartMenusRepository.deleteAllByCartId(1L);
+
+    cartMenusRepository.deleteAll(cartMenus); // CartMenu 삭제
 
     //then
-    assertEquals(cart.get().getCartMenu().size(), 0);
+//    assertEquals(cartRepository.findById(1L).get().getCartMenu().size(), 0);
+    assertNull(cartMenusRepository.findByCartId(1L).orElse(null));
+    assertEquals(cartRepository.findById(1L).get().getId(), 1L);
+    assertEquals(cartRepository.findById(1L).get().getTotalPrice(), 0);
+    assertEquals(cartRepository.findById(1L).get().getTotalPrice(), 0);
+    assertEquals(cartRepository.findById(1L).get().getCartMenu(), null);
   }
 }

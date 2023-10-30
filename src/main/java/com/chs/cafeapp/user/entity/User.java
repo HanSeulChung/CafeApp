@@ -2,6 +2,7 @@ package com.chs.cafeapp.user.entity;
 
 import com.chs.cafeapp.base.BaseEntity;
 import com.chs.cafeapp.cart.entity.Cart;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -32,7 +33,7 @@ public class User extends BaseEntity {
     private String sex;
     private int age;
 
-    @OneToOne(mappedBy = "user")
+    @OneToOne(cascade = CascadeType.ALL, mappedBy = "user")
     @ToString.Exclude
     private Cart cart;
 
