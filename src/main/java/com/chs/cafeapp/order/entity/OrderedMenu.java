@@ -50,39 +50,16 @@ public class OrderedMenu extends BaseEntity {
     this.menus = menus;
   }
 
-  // TO-DO : 주문 기능 구현시 SRP, OCP 원칙 생각하기
-//  public static List<OrderedMenu> fromDto(List<OrderedMenuDto> orderedMenuDtos) {
-//
-//    if(orderedMenuDtos != null) {
-//      List<OrderedMenu> orderedMenus = new ArrayList<>();
-//      for (OrderedMenuDto orderedMenuDto : orderedMenuDtos) {
-//        orderedMenus.add(OrderedMenu.fromDto(orderedMenuDto));
-//      }
-//    }
-//    return null;
-//  }
-//
-//  public static OrderedMenu fromDto(OrderedMenuDto orderedMenuDto) {
-//    return OrderedMenu.builder()
-//                      .id(orderedMenuDto.getId())
-//                      .userId(orderedMenuDto.getUserId())
-//                      .quantity(orderedMenuDto.getQuantity())
-//                      .totalPrice(orderedMenuDto.getTotalPrice())
-//                      .build();
-//  }
-//
-//  public static List<OrderedMenu> fromCartMenu(List<CartMenu> cartMenuList) {
-//
-//    if (cartMenuList != null) {
-//      List<OrderedMenu> orderedMenuList = new ArrayList<>();
-//      for (CartMenu x : cartMenuList) {
-//        orderedMenuList.add(OrderedMenu.fromCartMenu(x));
-//      }
-//      return orderedMenuList;
-//    }
-//    return null;
-//  }
-//
+  public static List<OrderedMenu> fromCartMenu(List<CartMenu> cartMenuList, Order order) {
+    List<OrderedMenu> orderedMenuList = new ArrayList<>();
+    if (cartMenuList != null) {
+      for (CartMenu x : cartMenuList) {
+        orderedMenuList.add(OrderedMenu.fromCartMenu(x , order));
+      }
+    }
+    return orderedMenuList;
+  }
+
   public static List<OrderedMenu> fromCartMenu(List<CartMenu> cartMenuList) {
     if (cartMenuList != null) {
       List<OrderedMenu> orderedMenuList = new ArrayList<>();
@@ -93,12 +70,14 @@ public class OrderedMenu extends BaseEntity {
     }
     return null;
   }
-  public static OrderedMenu fromCartMenu(CartMenu cartMenu) {
+
+  public static OrderedMenu fromCartMenu(CartMenu cartMenu, Order order) {
     return OrderedMenu.builder()
         .userId(cartMenu.getCart().getUser().getLoginId())
         .quantity(cartMenu.getQuantity())
         .totalPrice(cartMenu.getQuantity() * cartMenu.getMenus().getPrice())
         .menus(cartMenu.getMenus())
+        .order(order)
         .build();
   }
 }

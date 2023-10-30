@@ -2,7 +2,6 @@ package com.chs.cafeapp.user.entity;
 
 import com.chs.cafeapp.base.BaseEntity;
 import com.chs.cafeapp.cart.entity.Cart;
-import com.chs.cafeapp.grade.entity.Grade;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;

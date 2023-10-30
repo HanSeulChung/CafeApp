@@ -21,9 +21,6 @@ import org.springframework.stereotype.Service;
 @Service
 public class MenuServiceImpl implements MenuService {
 
-  @Autowired
-  private EntityManager entityManager;
-
   private final MenuRepository menuRepository;
   private final CategoryRepository categoryRepository;
   @Override
@@ -82,7 +79,7 @@ public class MenuServiceImpl implements MenuService {
   @Override
   public void delete(Long menuId) {
     Menus menu = menuRepository.findById(menuId)
-                                .orElseThrow(() -> new RuntimeException("존재하지 않는 메뉴입니다.."));
+                                .orElseThrow(() -> new RuntimeException("존재하지 않는 메뉴입니다."));
     menuRepository.deleteById(menuId);
   }
 
