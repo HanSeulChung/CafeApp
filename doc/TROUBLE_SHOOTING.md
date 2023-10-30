@@ -7,10 +7,12 @@
 
 ![image](https://github.com/HanSeulChung/CafeApp/assets/94779505/1be00d94-af62-44ba-818f-95111128029b)
 ### 2. PR 2만 Merge full request했을 때 PR 3도 merge 되어 닫힌 경우 발생
-<detail>
-  <summary>
-
-  ![image](https://github.com/HanSeulChung/CafeApp/assets/94779505/3cf52552-37d1-4d2d-b6cc-1c1a7a91ed78)
-  ![image](https://github.com/HanSeulChung/CafeApp/assets/94779505/d133fa2b-6152-4595-9fb5-fb4d0a14991a)    
-  </summary>
-</detail>
+<img src="https://github.com/HanSeulChung/CafeApp/assets/94779505/d133fa2b-6152-4595-9fb5-fb4d0a14991a" width="600" height="220">
+<br>
+<img src="https://github.com/HanSeulChung/CafeApp/assets/94779505/3cf52552-37d1-4d2d-b6cc-1c1a7a91ed78" width="700" height="400">
+<h3>문제 원인</h3>
+<h4>PR3의 브랜치가 PR2 브랜치에서 분기된 브랜치였고, PR2의 브랜치가 PR3의 히스토리를 포함했기 때문이었다.</h4>
+<h3>문제 방지 해결책</h3>
+<h4>PR할때 기능은 최대한 세부화할 것. ex> 메뉴주문 x -> 단일 메뉴 주문, 여러 상품 메뉴 주문</h4>
+<h4>브랜치 간섭을 최소화 하기 위해서 git flow를 참고해 브랜치 전략을 세웠다.
+main, dev, feature/기능, test/feature-test와 같이 두고 dev를 각 기능 브랜치 분기점 포인트로 잡고 기능 개발 후 테스트까지 완료 한 뒤 dev 브랜치에 병합하고 마지막으로 dev -> main으로 병합할것이다.</h4>
