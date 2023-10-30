@@ -10,6 +10,7 @@ import com.chs.cafeapp.cart.repository.CartRepository;
 import com.chs.cafeapp.cart.service.CartMenuService;
 import com.chs.cafeapp.user.entity.User;
 import com.chs.cafeapp.user.repository.UserRepository;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -35,11 +36,17 @@ public class CartMenuServiceImpl implements CartMenuService {
       throw new RuntimeException("장바구니에 담긴 메뉴가 없습니다.");
     }
 
+    List<CartMenu> cartMenus = cartMenusRepository.findAllByCartId(cartId);
+    for (CartMenu cartMenu : cartMenus) {
+      cartMenu.setCart(null); // Cart 참조 제거
+      cartMenusRepository.save(cartMenu); // 변경 사항 저장
+    }
+
     cart.getCartMenu().clear();
     cart.resetTotalPrice();
     cart.resetTotalQuantity();
     cartRepository.save(cart);
-    cartMenusRepository.deleteAllByCartId(cartId);
+
   }
 
   @Override

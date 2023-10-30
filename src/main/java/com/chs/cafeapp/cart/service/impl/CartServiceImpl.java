@@ -33,41 +33,44 @@ public class CartServiceImpl implements CartService {
     Menus menus = menuRepository.findById(cartInput.getMenuId())
         .orElseThrow(() -> new RuntimeException("해당 메뉴가 존재하지 않습니다."));
 
-    Cart cart = user.getCart();
-
     if (menus.getStock() - cartInput.getQuantity() < 0) {
       throw new RuntimeException("해당 메뉴의 재고 수량만큼만 장바구니에 담을 수 있습니다.");
     }
 
-    if (cart == null) {
-      cart = new Cart();
-      cart.setUser(user);
-      user.setCart(cart);
-    }
+    Cart cart = user.getCart();
+    cart = Optional.ofNullable(cart).orElseGet(() -> {
+      Cart newCart = new Cart();
+      newCart.setUser(user);
+      user.setCart(newCart);
+      cartRepository.save(newCart);
+      return newCart;
+    });
 
     CartMenu cartMenu = new CartMenu();
     Optional<CartMenu> byMenusId = cartMenusRepository.findByMenusId(cartInput.getMenuId());
 
     if (byMenusId.isPresent()) {
       cartMenu = byMenusId.get();
-      cart.getCartMenu().remove(cartMenu);
       cart.minusTotalQuantity(cartMenu.getQuantity());
       cart.minusTotalPrice(cartMenu.getQuantity(), cartMenu.getMenus().getPrice());
-      cartMenu.addQuantity( cartInput.getQuantity());
+      cartMenu.addQuantity(cartInput.getQuantity());
 
     } else {
       cartMenu.setMenus(menus);
       cartMenu.setQuantity(cartInput.getQuantity());
       cartMenu.setCart(cart);
     }
-
     CartMenu saveCartMenu = cartMenusRepository.save(cartMenu);
 
-    cart.getCartMenu().add(cartMenu);
+    List<CartMenu> cartMenuList = cart.getCartMenu();
+    cartMenuList = Optional.ofNullable(cartMenuList).orElseGet(() -> {
+      List<CartMenu> newCartMenuList = new ArrayList<>();
+      return newCartMenuList;
+    });
 
+    cartMenuList.add(cartMenu);
     cart.addTotalPrice(cartMenu.getQuantity(), cartMenu.getMenus().getPrice());
     cart.addTotalQuantity(cartMenu.getQuantity());
-
     cartRepository.save(cart);
 
     return CartMenuDto.of(saveCartMenu);
