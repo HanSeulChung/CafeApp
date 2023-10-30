@@ -49,25 +49,6 @@ public class OrderedMenu extends BaseEntity {
   public void setMenus(Menus menus) {
     this.menus = menus;
   }
-  public static List<OrderedMenu> fromDto(List<OrderedMenuDto> orderedMenuDtos) {
-    List<OrderedMenu> orderedMenus = new ArrayList<>();
-
-    if(orderedMenuDtos != null) {
-      for (OrderedMenuDto orderedMenuDto : orderedMenuDtos) {
-        orderedMenus.add(OrderedMenu.fromDto(orderedMenuDto));
-      }
-    }
-    return orderedMenus;
-  }
-
-  public static OrderedMenu fromDto(OrderedMenuDto orderedMenuDto) {
-    return OrderedMenu.builder()
-                      .id(orderedMenuDto.getId())
-                      .userId(orderedMenuDto.getUserId())
-                      .quantity(orderedMenuDto.getQuantity())
-                      .totalPrice(orderedMenuDto.getTotalPrice())
-                      .build();
-  }
 
   public static List<OrderedMenu> fromCartMenu(List<CartMenu> cartMenuList, Order order) {
     List<OrderedMenu> orderedMenuList = new ArrayList<>();
@@ -78,14 +59,16 @@ public class OrderedMenu extends BaseEntity {
     }
     return orderedMenuList;
   }
+
   public static List<OrderedMenu> fromCartMenu(List<CartMenu> cartMenuList) {
-    List<OrderedMenu> orderedMenuList = new ArrayList<>();
     if (cartMenuList != null) {
-      for (CartMenu x : cartMenuList) {
-        orderedMenuList.add(OrderedMenu.fromCartMenu(x));
+      List<OrderedMenu> orderedMenuList = new ArrayList<>();
+      for (CartMenu cartMenu : cartMenuList) {
+        orderedMenuList.add(OrderedMenu.fromCartMenu(cartMenu));
       }
+      return orderedMenuList;
     }
-    return orderedMenuList;
+    return null;
   }
 
   public static OrderedMenu fromCartMenu(CartMenu cartMenu, Order order) {
@@ -95,14 +78,6 @@ public class OrderedMenu extends BaseEntity {
         .totalPrice(cartMenu.getQuantity() * cartMenu.getMenus().getPrice())
         .menus(cartMenu.getMenus())
         .order(order)
-        .build();
-  }
-  public static OrderedMenu fromCartMenu(CartMenu cartMenu) {
-    return OrderedMenu.builder()
-        .userId(cartMenu.getCart().getUser().getLoginId())
-        .quantity(cartMenu.getQuantity())
-        .totalPrice(cartMenu.getQuantity() * cartMenu.getMenus().getPrice())
-        .menus(cartMenu.getMenus())
         .build();
   }
 }

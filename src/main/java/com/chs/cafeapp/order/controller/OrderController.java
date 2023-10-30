@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
+import com.chs.cafeapp.exception.CustomException;
 
 /**
  * 주문 Controller
@@ -24,8 +24,14 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/order")
 public class OrderController {
   private final OrderService orderService;
+
+
   /**
-   * 개별 주문 생성
+   * 개별 주문 생성(수정 필요
+   * @param request
+   * @param userId
+   * @return
+   * @throws CustomException:
    */
   @PostMapping()
   public OrderResponse addOrder(@RequestBody OrderInput request, @RequestParam String userId) {
@@ -33,8 +39,13 @@ public class OrderController {
     return OrderResponse.toResponse(orderDto);
   }
 
+
   /**
    * 장바구니에서 주문 생성(선택 주문 가능)
+   * @param request
+   * @param userId
+   * @return
+   * @throws CustomException
    */
   @PostMapping("/shopping-basket/select-items/{selectItemCount}")
   public OrderResponse addOrderFromBasket(@PathVariable int selectItemCount, @RequestBody OrderFromCartInput request, @RequestParam String userId) {

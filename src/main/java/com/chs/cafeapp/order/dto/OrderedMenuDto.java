@@ -23,14 +23,15 @@ public class OrderedMenuDto {
 
 
   public static List<OrderedMenuDto> of(List<OrderedMenu> orderedMenus) {
-    List<OrderedMenuDto> orderedMenuDtos = new ArrayList<>();
 
     if(orderedMenus != null) {
+      List<OrderedMenuDto> orderedMenuDtos = new ArrayList<>();
       for (OrderedMenu orderedMenu : orderedMenus) {
         orderedMenuDtos.add(OrderedMenuDto.of(orderedMenu));
       }
+      return orderedMenuDtos;
     }
-    return orderedMenuDtos;
+    return null;
   }
 
   public static OrderedMenuDto of(OrderedMenu orderedMenu) {

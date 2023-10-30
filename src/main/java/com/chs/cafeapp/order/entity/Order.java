@@ -37,8 +37,8 @@ public class Order extends BaseEntity {
   @Enumerated(EnumType.STRING)
   private OrderStatus orderStatus;
 
-  private int totalQuantity = 0;
-  private int totalPrice = 0;
+  private int totalQuantity;
+  private int totalPrice;
 
   private boolean couponUse;
 
@@ -47,7 +47,7 @@ public class Order extends BaseEntity {
   private User user;
 
   @OneToMany(mappedBy = "order") // 일대다 양방향 매핑
-  private List<OrderedMenu> orderedMenus = new ArrayList<>();
+  private List<OrderedMenu> orderedMenus;
 
   public void setUser(User user) {
     this.user = user;
@@ -63,9 +63,10 @@ public class Order extends BaseEntity {
     this.orderStatus = orderStatus;
   }
   public void setTotalQuantity(List<OrderedMenu> orderedMenus) {
-
-    for (OrderedMenu orderedMenu : orderedMenus) {
-      this.totalQuantity += orderedMenu.getQuantity();
+    if (orderedMenus != null) {
+      for (OrderedMenu orderedMenu : orderedMenus) {
+        this.totalQuantity += orderedMenu.getQuantity();
+      }
     }
   }
 
@@ -74,22 +75,24 @@ public class Order extends BaseEntity {
       this.totalPrice += orderedMenu.getMenus().getPrice() * orderedMenu.getQuantity();
     }
   }
-  public static Order fromOrderInput(OrderInput orderInput) {
-    return Order.builder()
-                .totalQuantity(orderInput.getQuantity())
-                .totalPrice(orderInput.getMenuPrice() * orderInput.getQuantity())
-                .couponUse(orderInput.isCouponUse())
-                .build();
-  }
 
-  public static Order toEntity(OrderDto orderDto) {
-    return Order.builder()
-                .id(orderDto.getId())
-                .orderStatus(orderDto.getOrderStatus())
-                .couponUse(orderDto.isCouponUse())
-                .totalQuantity(orderDto.getTotalQuantity())
-                .totalPrice(orderDto.getTotalPrice())
-                .orderedMenus(OrderedMenu.fromDto(orderDto.getOrderedMenus()))
-                .build();
-  }
+  // TO-DO : 주문 기능 구현시 SRP, OCP 원칙 생각하기
+//  public static Order fromOrderInput(OrderInput orderInput) {
+//    return Order.builder()
+//                .totalQuantity(orderInput.getQuantity())
+//                .totalPrice(orderInput.getMenuPrice() * orderInput.getQuantity())
+//                .couponUse(orderInput.isCouponUse())
+//                .build();
+//  }
+//
+//  public static Order toEntity(OrderDto orderDto) {
+//    return Order.builder()
+//                .id(orderDto.getId())
+//                .orderStatus(orderDto.getOrderStatus())
+//                .couponUse(orderDto.isCouponUse())
+//                .totalQuantity(orderDto.getTotalQuantity())
+//                .totalPrice(orderDto.getTotalPrice())
+//                .orderedMenus(OrderedMenu.fromDto(orderDto.getOrderedMenus()))
+//                .build();
+//  }
 }
