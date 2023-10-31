@@ -41,7 +41,6 @@ public class OrderServiceImpl implements OrderService {
   @Override
   public OrderDto orderIndividualMenu(OrderInput orderInput, String userId) {
 
-    // TO-DO: Order 엔티티 및 dto 관계 정리 후 기능 구현 다시
     User user = userRepository.findByLoginId(userId)
         .orElseThrow(() -> new RuntimeException("해당 사용자가 존재하지 않습니다."));
     Menus menus = menuRepository.findById(orderInput.getMenuId())
@@ -51,12 +50,6 @@ public class OrderServiceImpl implements OrderService {
       throw new RuntimeException("메뉴 id와 이름이 맞지않습니다.");
     }
 
-    menus.minusStock(orderInput.getQuantity());
-    if(menus.getStock() == 0) {
-      menus.setSoldOut(true);
-    }
-    menuRepository.save(menus);
-
     OrderedMenu saveOrderedMenu = orderedMenuRepository.save(
                                           OrderedMenu.builder()
                                                       .userId(userId)
@@ -65,15 +58,26 @@ public class OrderServiceImpl implements OrderService {
                                                       .menus(menus)
                                                       .build());
 
-    Order saveOrder = orderRepository.save(Order.builder()
-                                                .couponUse(orderInput.isCouponUse())
-                                                .user(user)
-                                                .build());
+    Order order = Order.builder()
+                      .couponUse(orderInput.isCouponUse())
+                      .user(user)
+                      .totalQuantity(saveOrderedMenu.getQuantity())
+                      .totalPrice(saveOrderedMenu.getTotalPrice())
+                      .build();
 
-
+    Order saveOrder = orderRepository.save(order);
+    // 테스트 코드 진행시 이것을 주석을 풀면 order에 orderedMenu가 두번 저장된다.
+//    saveOrderedMenu.setOrder(saveOrder);
     saveOrder.setOrderStatus(OrderStatus.PaySuccess);
-    saveOrderedMenu.setOrder(saveOrder);
+    saveOrder.getOrderedMenus().add(saveOrderedMenu);
     orderedMenuRepository.save(saveOrderedMenu);
+
+
+    menus.minusStock(orderInput.getQuantity());
+    if(menus.getStock() == 0) {
+      menus.setSoldOut(true);
+    }
+    menuRepository.save(menus);
 
     return OrderDto.of(orderRepository.save(saveOrder));
   }
@@ -81,7 +85,6 @@ public class OrderServiceImpl implements OrderService {
   @Override
   public OrderDto orderFromCart(OrderFromCartInput orderFromCartInput, String userId) {
 
-    // TO-DO: Order 엔티티 및 dto 관계 정리 후 기능 구현 다시
     User user = userRepository.findByLoginId(userId)
         .orElseThrow(() -> new RuntimeException("해당 사용자가 존재하지 않습니다."));
 
@@ -95,8 +98,8 @@ public class OrderServiceImpl implements OrderService {
           .orElseThrow(() -> new RuntimeException("해당되는 메뉴가 메뉴 목록에 존재하지 않습니다."));
 
       OrderInput orderInput = new OrderInput(
-          menus.getId(), menus.getName(), menus.getPrice(),
-          cartMenu.getQuantity(), orderFromCartInput.isCouponUse());
+                                      menus.getId(), menus.getName(), menus.getPrice(),
+                                      cartMenu.getQuantity(), orderFromCartInput.isCouponUse());
       cartMenuService.deleteSpecificCartMenu(cart.getId(), cartMenu.getId(), userId);
       return orderIndividualMenu(orderInput, userId);
     }
@@ -107,29 +110,39 @@ public class OrderServiceImpl implements OrderService {
                         .build();
 
     Order saveOrder = orderRepository.save(order);
-    List<OrderedMenu> orderedMenuList = new ArrayList<>();
+    Map<Menus, Integer> menusMap = new HashMap<>();
 
-    for (Long x : orderFromCartInput.getIdList()) {
-      CartMenu cartMenu = cartMenusRepository.findById(x)
+    for (Long cartMenuId : orderFromCartInput.getIdList()) {
+      CartMenu cartMenu = cartMenusRepository.findById(cartMenuId)
           .orElseThrow(() -> new RuntimeException("해당 되는 장바구니 메뉴가 없습니다."));
 
       Menus menus = menuRepository.findById(cartMenu.getMenus().getId())
           .orElseThrow(() -> new RuntimeException("해당되는 메뉴가 존재하지 않습니다."));
 
-      menus.minusStock(cartMenu.getQuantity());
-      if(menus.getStock() == 0) {
-        menus.setSoldOut(true);
+      if (menus.getStock() - cartMenu.getQuantity() < 0) {
+        throw new RuntimeException("메뉴의 재고이상 주문할 수 없습니다.");
       }
-      menuRepository.save(menus);
 
-      OrderedMenu orderedMenu = OrderedMenu.fromCartMenu(cartMenu);
-      orderedMenu.setOrder(saveOrder);
-      orderedMenuList.add(orderedMenuRepository.save(orderedMenu));
+      menusMap.put(menus, cartMenu.getQuantity());
+
+      OrderedMenu orderedMenu = OrderedMenu.fromCartMenu(cartMenu, saveOrder);
+      OrderedMenu saveOrderedMenu = orderedMenuRepository.save(orderedMenu);
+      saveOrder.getOrderedMenus().add(saveOrderedMenu);
       cartMenuService.deleteSpecificCartMenu(cart.getId(), cartMenu.getId(), userId);
     }
-    saveOrder.setTotalPrice(orderedMenuList);
-    saveOrder.setTotalQuantity(orderedMenuList);
+    saveOrder.setTotalPrice(saveOrder.getOrderedMenus());
+    saveOrder.setTotalQuantity(saveOrder.getOrderedMenus());
     saveOrder.setOrderStatus(OrderStatus.PaySuccess);
+
+    if (menusMap != null) {
+      for (Menus menus : menusMap.keySet()) {
+        menus.minusStock(menusMap.get(menus));
+        if(menus.getStock() == 0) {
+          menus.setSoldOut(true);
+        }
+        menuRepository.save(menus);
+      }
+    }
 
     return OrderDto.of(orderRepository.save(saveOrder));
 

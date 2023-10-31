@@ -71,6 +71,14 @@ public class OrderedMenu extends BaseEntity {
     return null;
   }
 
+  public static OrderedMenu fromCartMenu(CartMenu cartMenu) {
+    return OrderedMenu.builder()
+        .userId(cartMenu.getCart().getUser().getLoginId())
+        .quantity(cartMenu.getQuantity())
+        .totalPrice(cartMenu.getQuantity() * cartMenu.getMenus().getPrice())
+        .menus(cartMenu.getMenus())
+        .build();
+  }
   public static OrderedMenu fromCartMenu(CartMenu cartMenu, Order order) {
     return OrderedMenu.builder()
         .userId(cartMenu.getCart().getUser().getLoginId())
