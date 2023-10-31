@@ -1,11 +1,13 @@
 package com.chs.cafeapp.cart.service.impl;
 
 import com.chs.cafeapp.cart.dto.CartInput;
+import com.chs.cafeapp.cart.dto.CartMenuChangeQuantity;
 import com.chs.cafeapp.cart.dto.CartMenuDto;
 import com.chs.cafeapp.cart.entity.Cart;
 import com.chs.cafeapp.cart.entity.CartMenu;
 import com.chs.cafeapp.cart.repository.CartMenusRepository;
 import com.chs.cafeapp.cart.repository.CartRepository;
+import com.chs.cafeapp.cart.service.CartMenuService;
 import com.chs.cafeapp.cart.service.CartService;
 import com.chs.cafeapp.menu.entity.Menus;
 import com.chs.cafeapp.menu.repository.MenuRepository;
@@ -20,10 +22,13 @@ import org.springframework.stereotype.Service;
 @Service
 @AllArgsConstructor
 public class CartServiceImpl implements CartService {
-  private final CartRepository cartRepository;
-  private final CartMenusRepository cartMenusRepository;
+
   private final UserRepository userRepository;
+  private final CartRepository cartRepository;
   private final MenuRepository menuRepository;
+  private final CartMenusRepository cartMenusRepository;
+
+  private final CartMenuService cartMenuService;
 
   @Override
   public CartMenuDto addCart(CartInput cartInput, String userId) {
@@ -46,21 +51,23 @@ public class CartServiceImpl implements CartService {
       return newCart;
     });
 
-    CartMenu cartMenu = new CartMenu();
-    Optional<CartMenu> byMenusId = cartMenusRepository.findByMenusId(cartInput.getMenuId());
+    boolean existsCartMenu = cartMenusRepository.existsByMenusId(cartInput.getMenuId());
 
-    if (byMenusId.isPresent()) {
-      cartMenu = byMenusId.get();
-      cart.minusTotalQuantity(cartMenu.getQuantity());
-      cart.minusTotalPrice(cartMenu.getQuantity(), cartMenu.getMenus().getPrice());
-      cartMenu.addQuantity(cartInput.getQuantity());
-
-    } else {
-      cartMenu.setMenus(menus);
-      cartMenu.setQuantity(cartInput.getQuantity());
-      cartMenu.setCart(cart);
+    if (existsCartMenu) {
+      CartMenu cartMenu = cartMenusRepository.findByMenusId(cartInput.getMenuId()).get();
+      CartMenuDto cartMenuDto = cartMenuService.changeCartMenuQuantity(
+          new CartMenuChangeQuantity(cartMenu.getId(), cartInput.getMenuId(),
+              cartInput.getQuantity()), userId);
+      return cartMenuDto;
     }
-    CartMenu saveCartMenu = cartMenusRepository.save(cartMenu);
+
+    CartMenu buildCartMenu = CartMenu.builder()
+        .quantity(cartInput.getQuantity())
+        .menus(menus)
+        .cart(cart)
+        .build();
+
+    CartMenu saveCartMenu = cartMenusRepository.save(buildCartMenu);
 
     List<CartMenu> cartMenuList = cart.getCartMenu();
     cartMenuList = Optional.ofNullable(cartMenuList).orElseGet(() -> {
@@ -68,9 +75,9 @@ public class CartServiceImpl implements CartService {
       return newCartMenuList;
     });
 
-    cartMenuList.add(cartMenu);
-    cart.addTotalPrice(cartMenu.getQuantity(), cartMenu.getMenus().getPrice());
-    cart.addTotalQuantity(cartMenu.getQuantity());
+    cartMenuList.add(saveCartMenu);
+    cart.addTotalPrice(saveCartMenu.getQuantity(), saveCartMenu.getMenus().getPrice());
+    cart.addTotalQuantity(saveCartMenu.getQuantity());
     cartRepository.save(cart);
 
     return CartMenuDto.of(saveCartMenu);

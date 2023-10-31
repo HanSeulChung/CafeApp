@@ -12,6 +12,8 @@ public interface CartMenusRepository extends JpaRepository<CartMenu, Long> {
   Optional<CartMenu> findByMenusId(long menuId);
   Optional<CartMenu> findByCartId(long cartId);
   List<CartMenu> findAllByCartId(long cartId);
+
+  boolean existsByMenusId(long menuId);
   @Transactional
   void deleteById(Long cartMenuId);
 
