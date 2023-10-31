@@ -2,19 +2,15 @@ package com.chs.cafeapp.menu.service.impl;
 
 import com.chs.cafeapp.menu.category.entity.Category;
 import com.chs.cafeapp.menu.category.repository.CategoryRepository;
+import com.chs.cafeapp.menu.dto.MenuChangeStockQuantity;
 import com.chs.cafeapp.menu.dto.MenuDto;
 import com.chs.cafeapp.menu.dto.MenuEditInput;
 import com.chs.cafeapp.menu.dto.MenuInput;
 import com.chs.cafeapp.menu.entity.Menus;
 import com.chs.cafeapp.menu.repository.MenuRepository;
 import com.chs.cafeapp.menu.service.MenuService;
-import com.querydsl.jpa.impl.JPAQueryFactory;
-import java.awt.Menu;
 import java.util.List;
-import java.util.Optional;
-import javax.persistence.EntityManager;
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @AllArgsConstructor
@@ -142,5 +138,27 @@ public class MenuServiceImpl implements MenuService {
 
     menuRepository.save(saveMenu);
     return menuDto;
+  }
+
+  @Override
+  public MenuDto changeStockQuantity(MenuChangeStockQuantity menuChangeStockQuantity) {
+    Menus menus = menuRepository.findById(menuChangeStockQuantity.getMenuId())
+        .orElseThrow(() -> new RuntimeException("메뉴가 존재하지 않습니다."));
+
+    if (menus.getStock() + menuChangeStockQuantity.getQuantity() < 0) {
+      throw new RuntimeException("메뉴의 재고보다 더 줄일 수는 없습니다.");
+    }
+
+    menus.addStock(menuChangeStockQuantity.getQuantity());
+
+    if (menus.getStock() == 0 && !menus.isSoldOut()) {
+      menus.setSoldOut(true);
+    }
+
+    if (menus.getStock() > 0 && menus.isSoldOut()) {
+      menus.setSoldOut(false);
+    }
+    Menus saveMenus = menuRepository.save(menus);
+    return MenuDto.of(saveMenus);
   }
 }
