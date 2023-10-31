@@ -5,13 +5,13 @@ import java.util.ArrayList;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 
-@AllArgsConstructor
-@NoArgsConstructor
+@Getter
 @Builder
-@Data
+@ToString
+@AllArgsConstructor
 public class CategoryDto {
   private long id;
 

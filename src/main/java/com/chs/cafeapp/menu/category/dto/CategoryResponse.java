@@ -1,17 +1,14 @@
 package com.chs.cafeapp.menu.category.dto;
 
-import com.chs.cafeapp.menu.category.entity.Category;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
 
-@AllArgsConstructor
-@NoArgsConstructor
+@Getter
 @Builder
-@Data
+@AllArgsConstructor
 public class CategoryResponse {
   private String superCategory;
   private String baseCategory;

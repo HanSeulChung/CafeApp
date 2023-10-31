@@ -5,13 +5,13 @@ import java.util.ArrayList;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 
-@AllArgsConstructor
-@NoArgsConstructor
+@Getter
 @Builder
-@Data
+@ToString
+@AllArgsConstructor
 public class MenuDto {
   private long id;
   private long categoryId;
@@ -25,6 +25,16 @@ public class MenuDto {
   private String superCategory;
   private String baseCategory;
 
+  public void setSuperCategory(String superCategory) {
+    this.superCategory = superCategory;
+  }
+  public void setBaseCategory(String baseCategory) {
+    this.baseCategory = baseCategory;
+  }
+
+  public void setSoldOut(boolean soldOut) {
+    this.isSoldOut = soldOut;
+  }
   public static List<MenuDto> of(List<Menus> menusList) {
 
     if(menusList != null) {

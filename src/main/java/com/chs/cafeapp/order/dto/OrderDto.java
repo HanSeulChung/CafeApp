@@ -5,12 +5,14 @@ import com.chs.cafeapp.order.type.OrderStatus;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
+import lombok.ToString;
 
 
-@AllArgsConstructor
+@Getter
 @Builder
-@Data
+@ToString
+@AllArgsConstructor
 public class OrderDto {
   private long id;
 
