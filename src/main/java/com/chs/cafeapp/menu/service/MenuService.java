@@ -1,5 +1,6 @@
 package com.chs.cafeapp.menu.service;
 
+import com.chs.cafeapp.menu.dto.MenuChangeStockQuantity;
 import com.chs.cafeapp.menu.dto.MenuDto;
 import com.chs.cafeapp.menu.dto.MenuEditInput;
 import com.chs.cafeapp.menu.dto.MenuInput;
@@ -45,4 +46,9 @@ public interface MenuService {
    * 판매중으로 상태 변경
    */
   MenuDto changeToSale(Long menuId);
+
+  /**
+   * 메뉴 수량 변경
+   */
+  MenuDto changeStockQuantity(MenuChangeStockQuantity menuChangeStockQuantity);
 }
