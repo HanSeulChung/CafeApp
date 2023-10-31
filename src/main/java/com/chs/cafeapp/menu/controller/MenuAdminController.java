@@ -1,5 +1,6 @@
 package com.chs.cafeapp.menu.controller;
 
+import com.chs.cafeapp.menu.dto.MenuChangeStockQuantity;
 import com.chs.cafeapp.menu.dto.MenuDto;
 import com.chs.cafeapp.menu.dto.MenuEditInput;
 import com.chs.cafeapp.menu.dto.MenuInput;
@@ -124,4 +125,8 @@ public class MenuAdminController {
     return ResponseEntity.ok(menuService.changeToSale(menuId));
   }
 
+  @PatchMapping("/stock")
+  public ResponseEntity<MenuDto> changeMenuStockQuantity(@RequestBody MenuChangeStockQuantity changeStockQuantity) {
+    return ResponseEntity.ok(menuService.changeStockQuantity(changeStockQuantity));
+  }
 }
