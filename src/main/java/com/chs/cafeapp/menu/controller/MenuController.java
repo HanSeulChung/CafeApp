@@ -12,41 +12,41 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/menu")
+@RequestMapping("/menus")
 public class MenuController {
   @Autowired
   private MenuService menuService;
 
   /**
-   * 메뉴 전체 조회
-   * @return 등록된 메뉴들 List 형식으로 반환
+   * 메뉴 전체 조회 Controller
+   * @return List<MenuResponse>: 등록된 메뉴들 List 형식으로 반환
    */
   @GetMapping()
-  public ResponseEntity<?> readAllMenus() {
+  public ResponseEntity<List<MenuResponse>> readAllMenus() {
     var result = MenuResponse.toResponse(menuService.viewAllMenus());
     return ResponseEntity.ok(result);
   }
 
   /**
-   * 메뉴 카테고리 대분류로 조회
+   * 메뉴 카테고리 대분류로 조회 Controller
    * @param superCategory: 대분류 카테고리 이름 ex) 음식, 음료, 굿즈
-   * @return 해당 카테고리에 설정되어있는 메뉴 List로 반환
+   * @return List<MenuResponse>: 해당 카테고리에 설정되어있는 메뉴 List로 반환
    * @throws Exception: 해당 대분류 카테고리 이름이 없을 경우 CustomException 발생
    */
   @GetMapping("/superCategory/{superCategory}")
-  public ResponseEntity<?> readAllMenusBySuperCategory(@PathVariable("superCategory") String superCategory) {
+  public ResponseEntity<List<MenuResponse>> readAllMenusBySuperCategory(@PathVariable("superCategory") String superCategory) {
     var result = MenuResponse.toResponse(menuService.viewAllBySuperCategory(superCategory));
     return ResponseEntity.ok(result);
   }
 
   /**
-   * 메뉴 카테고리 중분류로 조회
+   * 메뉴 카테고리 중분류로 조회 Controller
    * @param baseCategory: 중분류 카테고리 이름 ex) 케이크, 샌드위치, 에스프레소, 텀블러
-   * @return 해당 카테고리에 설정되어있는 메뉴들 List로 반환
+   * @return List<MenuResponse>: 해당 카테고리에 설정되어있는 메뉴들 List로 반환
    * @throws Exception: 해당 중분류 카테고리 이름이 없을 경우 CustomException 발생
    */
   @GetMapping("/baseCategory/{baseCategory}")
-  public ResponseEntity<?> readAllMenusByBaseCategory(@PathVariable("baseCategory") String baseCategory) {
+  public ResponseEntity<List<MenuResponse>> readAllMenusByBaseCategory(@PathVariable("baseCategory") String baseCategory) {
     var result = MenuResponse.toResponse(menuService.viewAllByBaseCategory(baseCategory));
     return ResponseEntity.ok(result);
   }
