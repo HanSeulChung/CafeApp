@@ -2,10 +2,10 @@ package com.chs.cafeapp.order.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 
+@Getter
 @Builder
-@Data
 @AllArgsConstructor
 public class OrderResponse {
   private long id;

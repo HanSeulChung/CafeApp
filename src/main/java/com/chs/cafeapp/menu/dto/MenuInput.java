@@ -2,13 +2,11 @@ package com.chs.cafeapp.menu.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
 
-@AllArgsConstructor
-@NoArgsConstructor
+@Getter
 @Builder
-@Data
+@AllArgsConstructor
 public class MenuInput {
   private String name;
   private int kcal;

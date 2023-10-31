@@ -5,10 +5,12 @@ import java.util.ArrayList;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
+import lombok.ToString;
 
-@Data
+@Getter
 @Builder
+@ToString
 @AllArgsConstructor
 public class CartMenuDto {
   private long id;

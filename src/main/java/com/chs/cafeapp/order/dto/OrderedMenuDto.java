@@ -5,11 +5,11 @@ import java.util.ArrayList;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 
-@AllArgsConstructor
+@Getter
 @Builder
-@Data
+@AllArgsConstructor
 public class OrderedMenuDto {
   private long id;
 

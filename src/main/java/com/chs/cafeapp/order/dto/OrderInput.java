@@ -2,12 +2,11 @@ package com.chs.cafeapp.order.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
 
-@AllArgsConstructor
+@Getter
 @Builder
-@Data
+@AllArgsConstructor
 public class OrderInput {
   private long menuId;
   private String menuName;
