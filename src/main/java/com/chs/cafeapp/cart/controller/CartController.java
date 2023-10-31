@@ -31,7 +31,12 @@ public class CartController {
   private final CartMenuService cartMenuService;
 
   /**
-   * 장바구니 수량 변경 (수정 예정)
+   * 장바구니 추가 Controller
+   * @param request: menuId와 장바구니에 담을 양(quantity)
+   * @param userId: 사용자 loginId
+   * @return CartResponse: 장바구니 메뉴 정보와 message 반환
+   * @throws CustomException: 해당 userId를 가진 사용자가 없을 경우, menuId를 가진 menu가 없을 경우,
+   *                          메뉴의 재고 양보다 더 많이 담을 경우 CustomException 발생
    */
   @PostMapping()
   public CartResponse addCart(@RequestBody CartInput request, @RequestParam String userId) {
@@ -40,9 +45,9 @@ public class CartController {
   }
 
   /**
-   * 장바구니 조회
-   * @param userId
-   * @return 해당 사용자의 장바구니에 등록된 CartMenu List 형식으로 반환, 장바구니가 비어있을 경우 빈 List 반환
+   * 장바구니 조회 Controller
+   * @param userId: 사용자 loginId
+   * @return List<CartMenuDto>: 해당 사용자의 장바구니에 등록된 CartMenu List 형식으로 반환, 장바구니가 비어있을 경우 빈 List 반환
    * @throws CustomException: 해당 userId를 가진 사용자가 없을 경우 CustomException 발생
    */
   @GetMapping()

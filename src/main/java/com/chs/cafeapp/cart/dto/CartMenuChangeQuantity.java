@@ -10,7 +10,7 @@ import lombok.Setter;
 @Builder
 @AllArgsConstructor
 public class CartMenuChangeQuantity {
-  private long id;
+  private long cartMenuId;
   private long menuId;
   private int quantity;
 }

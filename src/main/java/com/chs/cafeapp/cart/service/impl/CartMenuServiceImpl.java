@@ -69,16 +69,15 @@ public class CartMenuServiceImpl implements CartMenuService {
     cart.minusTotalPrice(cartMenu.getQuantity(), cartMenu.getMenus().getPrice());
     cart.minusTotalQuantity(cartMenu.getQuantity());
     cartRepository.save(cart);
-    cartMenusRepository.deleteById(cartMenuId);
   }
 
   @Override
   public CartMenuDto changeCartMenuQuantity(CartMenuChangeQuantity cartMenuChangeQuantity, String userId) {
-    User user = validationUser(cartMenuChangeQuantity.getId(), userId);
-    Cart cart = validationCart(cartMenuChangeQuantity.getId());
-
-    CartMenu cartMenu = cartMenusRepository.findById(cartMenuChangeQuantity.getId())
+    CartMenu cartMenu = cartMenusRepository.findById(cartMenuChangeQuantity.getCartMenuId())
         .orElseThrow(() -> new RuntimeException("장바구니에 해당 장바구니 메뉴가 존재하지 않습니다. 다시 확인해주세요."));
+
+    User user = validationUser(cartMenu.getCart().getId(), userId);
+    Cart cart = validationCart(cartMenu.getCart().getId());
 
     if (cartMenu.getCart().getId() != user.getCart().getId()) {
       throw new RuntimeException("사용자의 장바구니에 담겨있지 않습니다.");
@@ -88,6 +87,9 @@ public class CartMenuServiceImpl implements CartMenuService {
       throw new RuntimeException("해당 메뉴의 재고 이상 장바구니에 추가할 수 없습니다.");
     }
 
+    if (cartMenu.getQuantity() + cartMenuChangeQuantity.getQuantity() <=0) {
+      throw new RuntimeException("해당 장바구니 메뉴를 없애고 싶으면 삭제를 해주세요.");
+    }
     cart.getCartMenu().remove(cartMenu);
     cart.addTotalQuantity(cartMenuChangeQuantity.getQuantity());
     cart.addTotalPrice(cartMenuChangeQuantity.getQuantity(), cartMenu.getMenus().getPrice());
