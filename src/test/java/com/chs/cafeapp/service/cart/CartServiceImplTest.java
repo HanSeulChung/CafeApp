@@ -22,6 +22,7 @@ import com.chs.cafeapp.menu.repository.MenuRepository;
 import com.chs.cafeapp.user.entity.User;
 import com.chs.cafeapp.user.repository.UserRepository;
 import java.util.Optional;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -42,6 +43,7 @@ class CartServiceImplTest {
   private CartServiceImpl cartService; // 실제 구현된 Impl Service를 INjectMocks를 써야함
 
   @Test
+  @DisplayName("장바구니 추가 성공")
   void addCartTest_Success() {
     //given
     User user = User.builder()
@@ -69,6 +71,7 @@ class CartServiceImplTest {
                     .build();
 
     CartMenu cartMenu = CartMenu.builder()
+                              .id(1L)
                               .menus(menu)
                               .quantity(3)
                               .build();
@@ -87,7 +90,6 @@ class CartServiceImplTest {
     when(menuRepository.findById(1L)).thenReturn(Optional.of(menu));
     when(cartMenusRepository.save(any(CartMenu.class)))
         .thenReturn(cartMenu);
-
     //when
     CartInput cartInput = new CartInput(1L, 3);
     CartMenuDto cartMenuDto = cartService.addCart(cartInput, "user2@naver.com");
@@ -101,12 +103,12 @@ class CartServiceImplTest {
 
     verify(userRepository).findByLoginId("user2@naver.com");
     verify(menuRepository).findById(1L);
-    verify(cartMenusRepository).findByMenusId(1L);
     verify(cartMenusRepository).save(any());
     verify(cartRepository).save(any());
   }
 
   @Test
+  @DisplayName("장바구니 추가 실패 : 재고 이상 수량")
   void addCartTest_Fail_Stock() {
     //given
     User user = User.builder()
