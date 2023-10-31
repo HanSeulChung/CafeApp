@@ -66,10 +66,8 @@ public class OrderServiceImpl implements OrderService {
                       .build();
 
     Order saveOrder = orderRepository.save(order);
-    // 테스트 코드 진행시 이것을 주석을 풀면 order에 orderedMenu가 두번 저장된다.
-//    saveOrderedMenu.setOrder(saveOrder);
+    saveOrderedMenu.setOrder(saveOrder);
     saveOrder.setOrderStatus(OrderStatus.PaySuccess);
-    saveOrder.getOrderedMenus().add(saveOrderedMenu);
     orderedMenuRepository.save(saveOrderedMenu);
 
 
