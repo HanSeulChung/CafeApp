@@ -104,7 +104,7 @@ public class MenuAdminController {
   }
 
   /**
-   * 메뉴 품절 상태
+   * 메뉴 품절 상태 Controller
    * @param menuId: 품절한 메뉴 id
    * @return MenuDto: 품절시킨 MenuDto
    * @throws CustomException: 해당 id를 가진 메뉴가 없을 경우, 이미 품절 상태인 경우 CustomException 발생
@@ -115,7 +115,7 @@ public class MenuAdminController {
   }
 
   /**
-   * 품절된 메뉴 다시 판매
+   * 품절된 메뉴 다시 판매 Controller
    * @param menuId: 품절됐었던, 다시 판매할 메뉴 id
    * @return MenuDto: 다시 판매시킨 MenuDto
    * @throws CustomException: 해당 id를 가진 메뉴가 없을 경우, 이미 판매 중인 경우 CustomException 발생
@@ -125,6 +125,13 @@ public class MenuAdminController {
     return ResponseEntity.ok(menuService.changeToSale(menuId));
   }
 
+  /**
+   * 메뉴 수량 변경 Controller
+   * @param changeStockQuantity: 수량 변경할 menuId, quantity 양
+   * @return MenuDto: 수량 변경한 MenuDto
+   * @throws CustomException: menu id로 존재하는 menu가 없는 경우,
+   *                          수량을 줄일 때 재고양보다 더 많이 줄이려는 경우 CustomException 발생
+   */
   @PatchMapping("/stock")
   public ResponseEntity<MenuDto> changeMenuStockQuantity(@RequestBody MenuChangeStockQuantity changeStockQuantity) {
     return ResponseEntity.ok(menuService.changeStockQuantity(changeStockQuantity));

@@ -9,13 +9,8 @@ import com.chs.cafeapp.menu.dto.MenuInput;
 import com.chs.cafeapp.menu.entity.Menus;
 import com.chs.cafeapp.menu.repository.MenuRepository;
 import com.chs.cafeapp.menu.service.MenuService;
-import com.querydsl.jpa.impl.JPAQueryFactory;
-import java.awt.Menu;
 import java.util.List;
-import java.util.Optional;
-import javax.persistence.EntityManager;
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @AllArgsConstructor
