@@ -55,7 +55,7 @@ dependencies {
 	compileOnly("org.springframework.boot:spring-boot-starter-mail")
 
 	testImplementation 'com.h2database:h2'
-	testImplementation('org.springframework.boot:spring-boot-starter-test')
+	testImplementation('org.springframework.boot:spring-boot-starter-test:2.4.3')
 	testImplementation('org.junit.jupiter:junit-jupiter')
 	testImplementation('org.junit.jupiter:junit-jupiter-api')
 	testRuntimeOnly('org.junit.jupiter:junit-jupiter-engine')
