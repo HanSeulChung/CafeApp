@@ -33,7 +33,7 @@ public class OrderAdminController {
    * @param orderStatusNum: OrderStatus의 num값
    * @return List<OrderDto>: 해당 orderStatusNum에 해당되는 주문들 List로 반환
    */
-  @GetMapping("/order-status/{orderStatus}")
+  @GetMapping("/order-status/{orderStatusNum}")
   public ResponseEntity<List<OrderDto>> viewOrdersByOrderStatus(@PathVariable int orderStatusNum) {
     return ResponseEntity.ok(orderService.viewOrdersByOrderStatus(orderStatusNum));
   }
