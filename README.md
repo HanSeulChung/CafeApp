@@ -12,14 +12,16 @@
   * 스탬프가 10개 모두 적립되었을 경우 쿠폰 1장으로 전환 기능
 
 ## ERD
-10/26 ERD 수정 (이후 수정 있을 수도 있음)
-![image](https://github.com/HanSeulChung/CafeApp/assets/94779505/f17c72f3-18ca-409e-ac65-83b506fe70b0)
+11/01 ERD 수정 (이후 수정 있을 수도 있음)
+![image](https://github.com/HanSeulChung/CafeApp/assets/94779505/c0cd93f2-345f-43e4-9e03-70ccd2aeefa9)
 
 <details>
-<summary><h4>10/19 초기 ERD 셋팅</h4></summary>
+<summary><h4>이전 ERD 셋팅</h4></summary>
   <div markdown=1>
    
-   **변경됨**
+   10/26 ERD 수정 (이후 수정 있을 수도 있음)
+![image](https://github.com/HanSeulChung/CafeApp/assets/94779505/f17c72f3-18ca-409e-ac65-83b506fe70b0)
+   10/19 초기 **변경됨**
    
 ![image](https://github.com/HanSeulChung/CafeApp/assets/94779505/a2ba85b6-3a56-472d-8805-eb29615fced6)
   </div>
