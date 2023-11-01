@@ -21,4 +21,18 @@ public interface OrderService {
    */
   OrderDto orderAllFromCart(OrderAllFromCartInput orderAllFromCartInput, String userId);
 
+  /**
+   * 카페에서 주문 거절
+   */
+  OrderDto rejectOrder(long orderId);
+
+  /**
+   * 주문 상태 변경(주문 거절 미포함)
+   */
+  OrderDto changeOrderStatus(long orderId);
+
+  /**
+   * 주문 상태 설명 가져오기
+   */
+  String findOrderStatusMessage(long orderId);
 }
