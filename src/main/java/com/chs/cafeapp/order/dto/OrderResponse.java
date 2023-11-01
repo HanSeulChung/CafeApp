@@ -10,10 +10,10 @@ import lombok.Getter;
 public class OrderResponse {
   private long id;
   private String message;
-  public static OrderResponse toResponse(OrderDto orderDto) {
+  public static OrderResponse toResponse(OrderDto orderDto, String message) {
     return OrderResponse.builder()
                   .id(orderDto.getId())
-                  .message("주문이 완료되었습니다. 카페에서 상품 확인 중입니다.")
+                  .message(message)
                   .build();
   }
 }
