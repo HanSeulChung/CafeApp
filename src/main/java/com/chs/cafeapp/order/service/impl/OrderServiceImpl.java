@@ -19,7 +19,6 @@ import com.chs.cafeapp.order.service.OrderService;
 import com.chs.cafeapp.order.type.OrderStatus;
 import com.chs.cafeapp.user.entity.User;
 import com.chs.cafeapp.user.repository.UserRepository;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -193,5 +192,16 @@ public class OrderServiceImpl implements OrderService {
       }
     }
     return OrderDto.of(orderRepository.save(saveOrder));
+  }
+
+  @Override
+  public List<OrderDto> viewAllOrders() {
+    return OrderDto.of(orderRepository.findAll());
+  }
+
+  @Override
+  public List<OrderDto> viewOrdersByOrderStatus(int orderStatusNum) {
+    OrderStatus byNumOrderStatus = OrderStatus.findByNum(orderStatusNum);
+    return OrderDto.of(orderRepository.findAllByOrderStatus(byNumOrderStatus));
   }
 }
