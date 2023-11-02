@@ -1,10 +1,18 @@
 package com.chs.cafeapp.order.service.impl;
 
+import static com.chs.cafeapp.exception.type.ErrorCode.CAN_NOT_ORDER_THAN_STOCK;
+import static com.chs.cafeapp.exception.type.ErrorCode.CART_MENU_NOT_FOUND;
+import static com.chs.cafeapp.exception.type.ErrorCode.CART_NOT_FOUND;
+import static com.chs.cafeapp.exception.type.ErrorCode.MENU_NOT_FOUND;
+import static com.chs.cafeapp.exception.type.ErrorCode.USER_NOT_FOUND;
+
 import com.chs.cafeapp.cart.entity.Cart;
 import com.chs.cafeapp.cart.entity.CartMenu;
 import com.chs.cafeapp.cart.repository.CartMenusRepository;
 import com.chs.cafeapp.cart.repository.CartRepository;
 import com.chs.cafeapp.cart.service.CartMenuService;
+import com.chs.cafeapp.exception.CustomException;
+import com.chs.cafeapp.exception.type.ErrorCode;
 import com.chs.cafeapp.menu.entity.Menus;
 import com.chs.cafeapp.menu.repository.MenuRepository;
 import com.chs.cafeapp.order.dto.OrderAllFromCartInput;
@@ -41,9 +49,10 @@ public class OrderServiceImpl implements OrderService {
   public OrderDto orderIndividualMenu(OrderInput orderInput, String userId) {
 
     User user = userRepository.findByLoginId(userId)
-        .orElseThrow(() -> new RuntimeException("해당 사용자가 존재하지 않습니다."));
+        .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+
     Menus menus = menuRepository.findById(orderInput.getMenuId())
-        .orElseThrow(() -> new RuntimeException("해당 메뉴가 존재하지 않습니다."));
+        .orElseThrow(() ->  new CustomException(MENU_NOT_FOUND));
 
     if (!menus.getName().equals(orderInput.getMenuName())) {
       throw new RuntimeException("메뉴 id와 이름이 맞지않습니다.");
@@ -81,18 +90,17 @@ public class OrderServiceImpl implements OrderService {
 
   @Override
   public OrderDto orderFromCart(OrderFromCartInput orderFromCartInput, String userId) {
-
     User user = userRepository.findByLoginId(userId)
-        .orElseThrow(() -> new RuntimeException("해당 사용자가 존재하지 않습니다."));
+        .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
 
     Cart cart = cartRepository.findById(orderFromCartInput.getCartId())
-        .orElseThrow(() -> new RuntimeException("해당 장바구니가 존재하지 않습니다."));
+        .orElseThrow(() -> new CustomException(CART_NOT_FOUND));
 
     if (orderFromCartInput.getIdList().size() == 1) {
       CartMenu cartMenu = cartMenusRepository.findById(orderFromCartInput.getIdList().get(0))
-          .orElseThrow(() -> new RuntimeException("해당 되는 장바구니 메뉴가 없습니다."));
+          .orElseThrow(() -> new CustomException(CART_MENU_NOT_FOUND));
       Menus menus = menuRepository.findById(cartMenu.getMenus().getId())
-          .orElseThrow(() -> new RuntimeException("해당되는 메뉴가 메뉴 목록에 존재하지 않습니다."));
+          .orElseThrow(() -> new CustomException(MENU_NOT_FOUND));
 
       OrderInput orderInput = new OrderInput(
                                       menus.getId(), menus.getName(), menus.getPrice(),
@@ -111,13 +119,13 @@ public class OrderServiceImpl implements OrderService {
 
     for (Long cartMenuId : orderFromCartInput.getIdList()) {
       CartMenu cartMenu = cartMenusRepository.findById(cartMenuId)
-          .orElseThrow(() -> new RuntimeException("해당 되는 장바구니 메뉴가 없습니다."));
+          .orElseThrow(() -> new CustomException(CART_MENU_NOT_FOUND));
 
       Menus menus = menuRepository.findById(cartMenu.getMenus().getId())
-          .orElseThrow(() -> new RuntimeException("해당되는 메뉴가 존재하지 않습니다."));
+          .orElseThrow(() -> new CustomException(MENU_NOT_FOUND));
 
       if (menus.getStock() - cartMenu.getQuantity() < 0) {
-        throw new RuntimeException("메뉴의 재고이상 주문할 수 없습니다.");
+        throw new CustomException(CAN_NOT_ORDER_THAN_STOCK);
       }
 
       menusMap.put(menus, cartMenu.getQuantity());
@@ -148,10 +156,10 @@ public class OrderServiceImpl implements OrderService {
   @Override
   public OrderDto orderAllFromCart(OrderAllFromCartInput orderAllFromCartInput, String userId) {
     User user = userRepository.findByLoginId(userId)
-        .orElseThrow(() -> new RuntimeException("해당 사용자가 존재하지 않습니다."));
+        .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
 
     Cart cart = cartRepository.findById(orderAllFromCartInput.getCartId())
-        .orElseThrow(() -> new RuntimeException("해당 장바구니가 존재하지 않습니다."));
+        .orElseThrow(() -> new CustomException(CART_NOT_FOUND));
 
     Order order = Order.builder()
         .user(user)
@@ -163,10 +171,10 @@ public class OrderServiceImpl implements OrderService {
     for (CartMenu cartMenu : cart.getCartMenu()) {
 
       Menus menus = menuRepository.findById(cartMenu.getMenus().getId())
-          .orElseThrow(() -> new RuntimeException("해당되는 메뉴가 존재하지 않습니다."));
+          .orElseThrow(() -> new CustomException(MENU_NOT_FOUND));
 
       if (menus.getStock() - cartMenu.getQuantity() < 0) {
-        throw new RuntimeException("메뉴의 재고이상 주문할 수 없습니다.");
+        throw new CustomException(CAN_NOT_ORDER_THAN_STOCK);
       }
 
       menusMap.put(menus, cartMenu.getQuantity());

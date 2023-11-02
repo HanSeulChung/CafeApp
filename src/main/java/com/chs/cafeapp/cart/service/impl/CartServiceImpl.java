@@ -1,5 +1,9 @@
 package com.chs.cafeapp.cart.service.impl;
 
+import static com.chs.cafeapp.exception.type.ErrorCode.CAN_NOT_CART_MENU_THAN_STOCK;
+import static com.chs.cafeapp.exception.type.ErrorCode.MENU_NOT_FOUND;
+import static com.chs.cafeapp.exception.type.ErrorCode.USER_NOT_FOUND;
+
 import com.chs.cafeapp.cart.dto.CartInput;
 import com.chs.cafeapp.cart.dto.CartMenuChangeQuantity;
 import com.chs.cafeapp.cart.dto.CartMenuDto;
@@ -9,6 +13,7 @@ import com.chs.cafeapp.cart.repository.CartMenusRepository;
 import com.chs.cafeapp.cart.repository.CartRepository;
 import com.chs.cafeapp.cart.service.CartMenuService;
 import com.chs.cafeapp.cart.service.CartService;
+import com.chs.cafeapp.exception.CustomException;
 import com.chs.cafeapp.menu.entity.Menus;
 import com.chs.cafeapp.menu.repository.MenuRepository;
 import com.chs.cafeapp.user.entity.User;
@@ -34,12 +39,12 @@ public class CartServiceImpl implements CartService {
   public CartMenuDto addCart(CartInput cartInput, String userId) {
 
     User user = userRepository.findByLoginId(userId)
-        .orElseThrow(() -> new RuntimeException("해당 사용자가 없습니다."));
+        .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
     Menus menus = menuRepository.findById(cartInput.getMenuId())
-        .orElseThrow(() -> new RuntimeException("해당 메뉴가 존재하지 않습니다."));
+        .orElseThrow(() -> new CustomException(MENU_NOT_FOUND));
 
     if (menus.getStock() - cartInput.getQuantity() < 0) {
-      throw new RuntimeException("해당 메뉴의 재고 수량만큼만 장바구니에 담을 수 있습니다.");
+      throw new CustomException(CAN_NOT_CART_MENU_THAN_STOCK);
     }
 
     Cart cart = user.getCart();
@@ -86,7 +91,7 @@ public class CartServiceImpl implements CartService {
   @Override
   public List<CartMenuDto> viewAllCartMenuInCart(String userId) {
     User user = userRepository.findByLoginId(userId)
-        .orElseThrow(() -> new RuntimeException("해당 사용자가 존재하지 않습니다."));
+        .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
 
     if (user.getCart() == null) {
       Cart newCart = new Cart();

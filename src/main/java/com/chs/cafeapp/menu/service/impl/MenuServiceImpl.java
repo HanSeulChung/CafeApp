@@ -1,5 +1,13 @@
 package com.chs.cafeapp.menu.service.impl;
 
+import static com.chs.cafeapp.exception.type.ErrorCode.ALREADY_SALE;
+import static com.chs.cafeapp.exception.type.ErrorCode.ALREADY_SOLD_OUT;
+import static com.chs.cafeapp.exception.type.ErrorCode.CAN_NOT_MINUS_THAN_STOCK;
+import static com.chs.cafeapp.exception.type.ErrorCode.CATEGORY_NOT_FOUND;
+import static com.chs.cafeapp.exception.type.ErrorCode.EXIST_MENU_NAME;
+import static com.chs.cafeapp.exception.type.ErrorCode.MENU_NOT_FOUND;
+
+import com.chs.cafeapp.exception.CustomException;
 import com.chs.cafeapp.menu.category.entity.Category;
 import com.chs.cafeapp.menu.category.repository.CategoryRepository;
 import com.chs.cafeapp.menu.dto.MenuChangeStockQuantity;
@@ -24,18 +32,17 @@ public class MenuServiceImpl implements MenuService {
     boolean existMenus = menuRepository.existsByName(menuInput.getName());
 
     if (existMenus) {
-      throw new RuntimeException("이미 있는 메뉴 이름입니다.");
+      throw new CustomException(EXIST_MENU_NAME);
     }
 
     MenuDto menuDto = MenuDto.fromInput(menuInput);
     Category category = categoryRepository.findBySuperCategoryAndBaseCategory(
             menuInput.getSuperCategory(), menuInput.getBaseCategory())
-        .orElseThrow(() -> new RuntimeException("해당되는 카테고리가 없습니다. 카테고리 등록 후 메뉴를 등록해주세요."));
+        .orElseThrow(() -> new CustomException(CATEGORY_NOT_FOUND));
 
     Menus menu = Menus.toEntity(menuDto);
     menu.setCategory(category);
     menuRepository.save(menu);
-
     menuDto.setSuperCategory(menu.getCategory().getSuperCategory());
     menuDto.setBaseCategory(menu.getCategory().getBaseCategory());
 
@@ -45,16 +52,16 @@ public class MenuServiceImpl implements MenuService {
   @Override
   public MenuDto edit(MenuEditInput menuEditInput) {
     Menus menu = menuRepository.findById(menuEditInput.getId())
-                  .orElseThrow(() -> new RuntimeException("메뉴가 존재하지 않습니다."));
+                  .orElseThrow(() -> new CustomException(MENU_NOT_FOUND));
 
     Category category = categoryRepository.findBySuperCategoryAndBaseCategory(
             menuEditInput.getSuperCategory(), menuEditInput.getBaseCategory())
-        .orElseThrow(() -> new RuntimeException("해당되는 카테고리가 없습니다. 카테고리 등록 후 메뉴를 등록해주세요."));
+        .orElseThrow(() -> new CustomException(CATEGORY_NOT_FOUND));
 
     if (!menuEditInput.getName().equals(menu.getName())) {
       boolean existMenu = menuRepository.existsByName(menuEditInput.getName());
       if (existMenu) {
-        throw new RuntimeException("이미 존재하는 메뉴 이름입니다. 다시 확인 후 수정해주세요.");
+        throw new CustomException(EXIST_MENU_NAME);
       }
     }
 
@@ -74,8 +81,8 @@ public class MenuServiceImpl implements MenuService {
 
   @Override
   public void delete(Long menuId) {
-    Menus menu = menuRepository.findById(menuId)
-                                .orElseThrow(() -> new RuntimeException("존재하지 않는 메뉴입니다."));
+    menuRepository.findById(menuId)
+                    .orElseThrow(() -> new CustomException(MENU_NOT_FOUND));
     menuRepository.deleteById(menuId);
   }
 
@@ -88,7 +95,7 @@ public class MenuServiceImpl implements MenuService {
   public List<MenuDto> viewAllBySuperCategory(String superCategory) {
     List<Long> categoryIds = categoryRepository.findIdsBySuperCategory(superCategory);
     if (categoryIds == null) {
-      throw new RuntimeException("해당 카테고리가 존재하지 않습니다.");
+      throw new CustomException(CATEGORY_NOT_FOUND);
     }
     List<Menus> allByCategoryIdIn = menuRepository.findAllByCategoryIdIn(categoryIds);
     return MenuDto.of(allByCategoryIdIn);
@@ -99,7 +106,7 @@ public class MenuServiceImpl implements MenuService {
 
     List<Long> categoryIds = categoryRepository.findIdsByBaseCategory(baseCategory);
     if (categoryIds == null) {
-      throw new RuntimeException("해당 카테고리가 존재하지 않습니다.");
+      throw new CustomException(CATEGORY_NOT_FOUND);
     }
     List<Menus> allByCategoryIdIn = menuRepository.findAllByCategoryIdIn(categoryIds);
     return MenuDto.of(allByCategoryIdIn);
@@ -108,10 +115,10 @@ public class MenuServiceImpl implements MenuService {
   @Override
   public MenuDto changeToSoldOut(Long menuId) {
     Menus menu = menuRepository.findById(menuId)
-        .orElseThrow(() -> new RuntimeException("해당 메뉴가 존재하지 않습니다."));
+        .orElseThrow(() -> new CustomException(MENU_NOT_FOUND));
 
     if (menu.isSoldOut()) {
-      throw new RuntimeException("이미 품절된 메뉴입니다.");
+      throw new CustomException(ALREADY_SOLD_OUT);
     }
 
     MenuDto menuDto = MenuDto.of(menu);
@@ -125,10 +132,10 @@ public class MenuServiceImpl implements MenuService {
   @Override
   public MenuDto changeToSale(Long menuId) {
     Menus menu = menuRepository.findById(menuId)
-        .orElseThrow(() -> new RuntimeException("해당 메뉴가 존재하지 않습니다."));
+        .orElseThrow(() -> new CustomException(MENU_NOT_FOUND));
 
     if (!menu.isSoldOut()) {
-      throw new RuntimeException("이미 판매중인 메뉴입니다.");
+      throw new CustomException(ALREADY_SALE);
     }
 
     MenuDto menuDto = MenuDto.of(menu);
@@ -143,10 +150,10 @@ public class MenuServiceImpl implements MenuService {
   @Override
   public MenuDto changeStockQuantity(MenuChangeStockQuantity menuChangeStockQuantity) {
     Menus menus = menuRepository.findById(menuChangeStockQuantity.getMenuId())
-        .orElseThrow(() -> new RuntimeException("메뉴가 존재하지 않습니다."));
+        .orElseThrow(() -> new CustomException(MENU_NOT_FOUND));
 
     if (menus.getStock() + menuChangeStockQuantity.getQuantity() < 0) {
-      throw new RuntimeException("메뉴의 재고보다 더 줄일 수는 없습니다.");
+      throw new CustomException(CAN_NOT_MINUS_THAN_STOCK);
     }
 
     menus.addStock(menuChangeStockQuantity.getQuantity());
