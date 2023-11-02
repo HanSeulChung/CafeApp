@@ -2,6 +2,7 @@ package com.chs.cafeapp.user.entity;
 
 import com.chs.cafeapp.base.BaseEntity;
 import com.chs.cafeapp.cart.entity.Cart;
+import com.chs.cafeapp.stamp.entity.Stamp;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -37,7 +38,14 @@ public class User extends BaseEntity {
     @ToString.Exclude
     private Cart cart;
 
+    @OneToOne(cascade = CascadeType.ALL, mappedBy = "user")
+    @ToString.Exclude
+    private Stamp stamp;
+
     public void setCart(Cart cart) {
         this.cart = cart;
+    }
+    public void setStamp(Stamp stamp) {
+        this.stamp = stamp;
     }
 }

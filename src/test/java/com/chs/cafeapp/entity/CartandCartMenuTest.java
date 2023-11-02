@@ -3,7 +3,6 @@ package com.chs.cafeapp.entity;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.chs.cafeapp.cart.entity.Cart;
 import com.chs.cafeapp.cart.entity.CartMenu;
@@ -13,18 +12,14 @@ import com.chs.cafeapp.menu.entity.Menus;
 import com.chs.cafeapp.menu.repository.MenuRepository;
 import com.chs.cafeapp.user.entity.User;
 import com.chs.cafeapp.user.repository.UserRepository;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
+import javax.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.jdbc.EmbeddedDatabaseConnection;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase.Replace;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,8 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 public class CartandCartMenuTest {
   @Autowired
-  private TestEntityManager testEntityManager;
-
+  private EntityManager em;
   @Autowired
   private UserRepository userRepository;
   @Autowired
@@ -53,6 +47,11 @@ public class CartandCartMenuTest {
   void setUp() {
 
   }
+
+//  @AfterEach
+//  public void clearPersistenceContext() {
+//    em.clear();
+//  }
   @Test
   @DisplayName("CartMenu 저장")
   void saveCartMenu() {
@@ -66,16 +65,12 @@ public class CartandCartMenuTest {
         .price(10000)
         .isSoldOut(false)
         .build();
-
-    Menus save = menuRepository.save(menu1);
-
     // when
-
-
-
+    Menus save = menuRepository.save(menu1);
     // then
     assertEquals(save, menuRepository.findById(1L).get());
   }
+
   @Test
   @Transactional
   @DisplayName("CartMenu가 삭제되면 Cart에서도 cartMenu List가 삭제되는 것 확인")
@@ -123,21 +118,29 @@ public class CartandCartMenuTest {
     CartMenu cartMenu1 = CartMenu.builder()
         .id(1L)
         .menus(menu1)
-        .cart(cart)
         .quantity(3)
         .build();
 
-    cartRepository.save(cart);
+    Cart saveCart = cartRepository.save(cart);
 
     CartMenu cartMenu2 = CartMenu.builder()
         .id(2L)
         .menus(menu2)
-        .cart(cart)
         .quantity(3)
         .build();
 
+    cartMenu1.setCart(saveCart);
+    cartMenu2.setCart(saveCart);
+    cart.setCartMenu(cartMenu1);
+    cart.setCartMenu(cartMenu2);
+
     cartMenusRepository.save(cartMenu1);
     cartMenusRepository.save(cartMenu2);
+    cartRepository.save(saveCart);
+    em.clear();
+
+    assertNotNull(cartMenusRepository.findAllByCartId(1L));
+    assertEquals(cartRepository.findById(1L).get().getCartMenu().size(), 2);
 
     //when
     List<CartMenu> cartMenus = cartMenusRepository.findAllByCartId(1L);
@@ -146,15 +149,14 @@ public class CartandCartMenuTest {
       cartMenusRepository.save(cartMenu); // 변경 사항 저장
     }
 
-
-    cartMenusRepository.deleteAll(cartMenus); // CartMenu 삭제
+    cartMenusRepository.deleteAllByCartId(1L); // CartMenu 삭제
+    em.clear();
 
     //then
-//    assertEquals(cartRepository.findById(1L).get().getCartMenu().size(), 0);
+    assertEquals(cartRepository.findById(1L).get().getCartMenu().size(), 0);
     assertNull(cartMenusRepository.findByCartId(1L).orElse(null));
     assertEquals(cartRepository.findById(1L).get().getId(), 1L);
     assertEquals(cartRepository.findById(1L).get().getTotalPrice(), 0);
     assertEquals(cartRepository.findById(1L).get().getTotalPrice(), 0);
-    assertEquals(cartRepository.findById(1L).get().getCartMenu(), null);
   }
 }

@@ -2,6 +2,8 @@ package com.chs.cafeapp.service.order;
 
 import static org.hibernate.validator.internal.util.Contracts.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -29,6 +31,8 @@ import com.chs.cafeapp.user.repository.UserRepository;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import javax.validation.constraints.NotNull;
+import org.hibernate.type.NTextType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -376,4 +380,385 @@ class OrderServiceImplTest {
     assertEquals(result.getTotalPrice(), menu1.getPrice() * orderInput.getQuantity());
 
   }
+  
+  @Test
+  @DisplayName("주문 거절 성공")
+  void rejectOrderTest_Success() {
+    //given
+    User user = User.builder()
+        .id(1L)
+        .loginId("usertest1@naver.com")
+        .build();
+
+    Order order = Order.builder()
+        .id(1L)
+        .user(user)
+        .orderStatus(OrderStatus.PaySuccess)
+        .build();
+
+    orderRepository.save(order);
+    when(orderRepository.findById(1L)).thenReturn(Optional.of(order));
+    when(orderRepository.save(any(Order.class))).thenReturn(order);
+    //when
+    OrderDto orderDto = orderService.rejectOrder(1L);
+    //then
+    assertNotNull(orderDto);
+    assertEquals(orderDto.getOrderStatus(), OrderStatus.CancelByCafe);
+  }
+
+  @Test
+  @DisplayName("주문 상태 변경 성공: PaySuccess -> PreParingMenus")
+  void changeOrderStatusTest_Success1() {
+    //given
+    User user = User.builder()
+        .id(1L)
+        .loginId("usertest1@naver.com")
+        .build();
+
+    Order order = Order.builder()
+        .id(1L)
+        .user(user)
+        .orderStatus(OrderStatus.PaySuccess)
+        .build();
+
+    orderRepository.save(order);
+    when(orderRepository.findById(1L)).thenReturn(Optional.of(order));
+    when(orderRepository.save(any(Order.class))).thenReturn(order);
+    //when
+    OrderDto orderDto = orderService.changeOrderStatus(1L);
+    //then
+    assertNotNull(orderDto);
+    assertEquals(orderDto.getOrderStatus(), OrderStatus.PreParingMenus);
+  }
+
+  @Test
+  @DisplayName("주문 상태 변경 성공: PreParingMenus -> WaitingPickUp")
+  void changeOrderStatusTest_Success2() {
+    //given
+    User user = User.builder()
+        .id(1L)
+        .loginId("usertest1@naver.com")
+        .build();
+
+    Order order = Order.builder()
+        .id(1L)
+        .user(user)
+        .orderStatus(OrderStatus.PreParingMenus)
+        .build();
+
+    orderRepository.save(order);
+    when(orderRepository.findById(1L)).thenReturn(Optional.of(order));
+    when(orderRepository.save(any(Order.class))).thenReturn(order);
+    //when
+    OrderDto orderDto = orderService.changeOrderStatus(1L);
+    //then
+    assertNotNull(orderDto);
+    assertEquals(orderDto.getOrderStatus(), OrderStatus.WaitingPickUp);
+  }
+
+  @Test
+  @DisplayName("주문 상태 변경 성공: WaitingPickUp -> PickUpSuccess")
+  void changeOrderStatusTest_Success3() {
+    //given
+    User user = User.builder()
+        .id(1L)
+        .loginId("usertest1@naver.com")
+        .build();
+
+    Order order = Order.builder()
+        .id(1L)
+        .user(user)
+        .orderStatus(OrderStatus.WaitingPickUp)
+        .build();
+
+    orderRepository.save(order);
+    when(orderRepository.findById(1L)).thenReturn(Optional.of(order));
+    when(orderRepository.save(any(Order.class))).thenReturn(order);
+    //when
+    OrderDto orderDto = orderService.changeOrderStatus(1L);
+    //then
+    assertNotNull(orderDto);
+    assertEquals(orderDto.getOrderStatus(), OrderStatus.PickUpSuccess);
+  }
+  @Test
+  @DisplayName("주문 상태 변경 실패")
+  void changeOrderStatusTest_Fail() {
+    //given
+    User user = User.builder()
+        .id(1L)
+        .loginId("usertest1@naver.com")
+        .build();
+
+    Order order = Order.builder()
+        .id(1L)
+        .user(user)
+        .orderStatus(OrderStatus.PayFail)
+        .build();
+
+    orderRepository.save(order);
+    when(orderRepository.findById(1L)).thenReturn(Optional.of(order));
+    //when
+
+    //then
+    assertThrows(IllegalStateException.class, () -> orderService.changeOrderStatus(1L));
+
+  }
+
+  @DisplayName("PayFail만 조회")
+  void viewOrdersByOrderStatus_PayFail() {
+    //given
+    User user = User.builder()
+        .loginId("user2@naver.com")
+        .build();
+
+    Menus menus = Menus.builder()
+        .id(1L)
+        .build();
+
+    Order order1 = Order.builder()
+        .id(1L)
+        .user(user)
+        .orderStatus(OrderStatus.PayFail)
+        .build();
+
+    OrderedMenu orderedMenu1 = OrderedMenu.builder()
+        .quantity(3)
+        .totalPrice(1000 * 3)
+        .order(order1)  // Order와의 관계 설정
+        .menus(menus)
+        .build();
+
+    Order order2 = Order.builder()
+        .id(2L)
+        .user(user)
+        .orderStatus(OrderStatus.PaySuccess)
+        .build();
+
+    OrderedMenu orderedMenu2 = OrderedMenu.builder()
+        .quantity(4)
+        .totalPrice(2000 * 4)
+        .order(order2)  // Order와의 관계 설정
+        .menus(menus)
+        .build();
+
+    order1.getOrderedMenus().add(orderedMenu1);
+    order2.getOrderedMenus().add(orderedMenu2);
+    orderRepository.save(order1);
+    orderRepository.save(order2);
+    orderedMenuRepository.save(orderedMenu1);
+    orderedMenuRepository.save(orderedMenu2);
+
+    orderRepository.save(order1);
+    orderRepository.save(order2);
+    orderedMenuRepository.save(orderedMenu1);
+    orderedMenuRepository.save(orderedMenu2);
+
+    when(orderRepository.findAllByOrderStatus(OrderStatus.PayFail)).thenReturn(Arrays.asList(order1));
+    //when
+    List<OrderDto> orderDtos = orderService.viewOrdersByOrderStatus(1);
+
+    //then
+    assertEquals(1, orderDtos.size());
+    assertEquals(3, orderDtos.get(0).getOrderedMenus().get(0).getQuantity());
+  }
+
+  @Test
+  @DisplayName("PaySuccess만 조회")
+  void viewOrdersByOrderStatus_PaySuccess() {
+    //given
+    User user = User.builder()
+        .loginId("user2@naver.com")
+        .build();
+
+    Menus menus = Menus.builder()
+        .id(1L)
+        .build();
+
+    Order order1 = Order.builder()
+        .id(1L)
+        .user(user)
+        .orderStatus(OrderStatus.PayFail)
+        .build();
+
+    OrderedMenu orderedMenu1 = OrderedMenu.builder()
+        .quantity(3)
+        .totalPrice(1000 * 3)
+        .order(order1)  // Order와의 관계 설정
+        .menus(menus)
+        .build();
+
+    Order order2 = Order.builder()
+        .id(2L)
+        .user(user)
+        .orderStatus(OrderStatus.PaySuccess)
+        .build();
+
+    OrderedMenu orderedMenu2 = OrderedMenu.builder()
+        .quantity(4)
+        .totalPrice(2000 * 4)
+        .order(order2)  // Order와의 관계 설정
+        .menus(menus)
+        .build();
+
+    order1.getOrderedMenus().add(orderedMenu1);
+    order2.getOrderedMenus().add(orderedMenu2);
+    orderRepository.save(order1);
+    orderRepository.save(order2);
+    orderedMenuRepository.save(orderedMenu1);
+    orderedMenuRepository.save(orderedMenu2);
+
+    when(orderRepository.findAllByOrderStatus(OrderStatus.PaySuccess)).thenReturn(Arrays.asList(order2));
+    //when
+    List<OrderDto> orderDtos = orderService.viewOrdersByOrderStatus(2);
+    //then
+    System.out.println(orderDtos);
+    assertEquals(orderDtos.size(), 1);
+    assertEquals(orderDtos.get(0).getOrderedMenus().get(0).getQuantity(), 4);
+  }
+
+  @Test
+  @DisplayName("CancelByCafe만 조회")
+  void viewOrdersByOrderStatus_CancelByCafe() {
+    //given
+    User user = User.builder()
+        .loginId("user2@naver.com")
+        .build();
+
+    Menus menus = Menus.builder()
+        .id(1L)
+        .build();
+
+    Order order1 = Order.builder()
+        .id(1L)
+        .user(user)
+        .orderStatus(OrderStatus.CancelByCafe)
+        .build();
+
+    OrderedMenu orderedMenu1 = OrderedMenu.builder()
+        .quantity(3)
+        .totalPrice(1000 * 3)
+        .order(order1)  // Order와의 관계 설정
+        .menus(menus)
+        .build();
+
+    Order order2 = Order.builder()
+        .id(2L)
+        .user(user)
+        .orderStatus(OrderStatus.CancelByCafe)
+        .build();
+
+    OrderedMenu orderedMenu2 = OrderedMenu.builder()
+        .quantity(4)
+        .totalPrice(2000 * 4)
+        .order(order2)  // Order와의 관계 설정
+        .menus(menus)
+        .build();
+
+    order1.getOrderedMenus().add(orderedMenu1);
+    order2.getOrderedMenus().add(orderedMenu2);
+    orderRepository.save(order1);
+    orderRepository.save(order2);
+    orderedMenuRepository.save(orderedMenu1);
+    orderedMenuRepository.save(orderedMenu2);
+
+    when(orderRepository.findAllByOrderStatus(OrderStatus.CancelByCafe)).thenReturn(Arrays.asList(order1, order2));
+    //when
+    List<OrderDto> orderDtos = orderService.viewOrdersByOrderStatus(3);
+    //then
+    assertEquals(orderDtos.size(), 2);
+    assertEquals(orderDtos.get(0).getOrderedMenus().size(), 1);
+  }
+
+  @Test
+  @DisplayName("CancelByUser만 조회")
+  void viewOrdersByOrderStatus_CancelByUser() {
+    //given
+    User user = User.builder()
+        .loginId("user2@naver.com")
+        .build();
+
+    Menus menus = Menus.builder()
+        .id(1L)
+        .build();
+
+    Menus menus2 = Menus.builder()
+        .id(2L)
+        .build();
+
+    Order order1 = Order.builder()
+        .id(1L)
+        .user(user)
+        .orderStatus(OrderStatus.CancelByUser)
+        .build();
+
+    OrderedMenu orderedMenu1 = OrderedMenu.builder()
+        .quantity(3)
+        .totalPrice(1000 * 3)
+        .order(order1)  // Order와의 관계 설정
+        .menus(menus)
+        .build();
+
+    Order order2 = Order.builder()
+        .id(2L)
+        .user(user)
+        .orderStatus(OrderStatus.PaySuccess)
+        .build();
+
+    OrderedMenu orderedMenu2 = OrderedMenu.builder()
+        .quantity(4)
+        .totalPrice(2000 * 4)
+        .order(order1)  // Order와의 관계 설정
+        .menus(menus2)
+        .build();
+
+    OrderedMenu orderedMenu3 = OrderedMenu.builder()
+        .quantity(1)
+        .totalPrice(2000 * 1)
+        .order(order2)  // Order와의 관계 설정
+        .menus(menus)
+        .build();
+
+    order1.getOrderedMenus().add(orderedMenu1);
+    order1.getOrderedMenus().add(orderedMenu2);
+    order2.getOrderedMenus().add(orderedMenu3);
+    orderRepository.save(order1);
+    orderRepository.save(order2);
+    orderedMenuRepository.save(orderedMenu1);
+    orderedMenuRepository.save(orderedMenu2);
+
+    when(orderRepository.findAllByOrderStatus(OrderStatus.CancelByUser)).thenReturn(Arrays.asList(order1));
+    //when
+    List<OrderDto> orderDtos = orderService.viewOrdersByOrderStatus(4);
+    //then
+    assertEquals(orderDtos.size(), 1);
+    assertEquals(orderDtos.get(0).getOrderedMenus().size(), 2);
+  }
+
+  // TODO: 앞선 테스트 코드와 동일한 형식, 지울지 그래도 둬야하는지 일단 keep
+//  @Test
+//  @DisplayName("PreParingMenus만 조회")
+//  void viewOrdersByOrderStatus_PreParingMenus() {
+//    //given
+//
+//    //when
+//    //then
+//  }
+//
+//  @Test
+//  @DisplayName("WaitingPickUp만 조회")
+//  void viewOrdersByOrderStatus_WaitingPickUp() {
+//    //given
+//
+//    //when
+//    //then
+//  }
+//
+//  @Test
+//  @DisplayName("PickUpSuccess만 조회")
+//  void viewOrdersByOrderStatus_PickUpSuccess() {
+//    //given
+//
+//    //when
+//    //then
+//  }
 }
