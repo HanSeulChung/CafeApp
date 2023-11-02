@@ -239,4 +239,16 @@ public class OrderServiceImpl implements OrderService {
     // 추후 admin-orders-view 브랜치에서 가져온 OrderStatus에 맞게 가져오기
     return order.getOrderStatus().name();
   }
+  
+  @Override
+  public List<OrderDto> viewAllOrders() {
+    return OrderDto.of(orderRepository.findAll());
+  }
+
+  @Override
+  public List<OrderDto> viewOrdersByOrderStatus(int orderStatusNum) {
+    OrderStatus byNumOrderStatus = OrderStatus.findByNum(orderStatusNum);
+    return OrderDto.of(orderRepository.findAllByOrderStatus(byNumOrderStatus));
+
+  }
 }
