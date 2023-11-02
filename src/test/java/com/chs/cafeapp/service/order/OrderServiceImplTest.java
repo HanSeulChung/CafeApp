@@ -2,6 +2,8 @@ package com.chs.cafeapp.service.order;
 
 import static org.hibernate.validator.internal.util.Contracts.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -378,7 +380,130 @@ class OrderServiceImplTest {
     assertEquals(result.getTotalPrice(), menu1.getPrice() * orderInput.getQuantity());
 
   }
+  
   @Test
+  @DisplayName("주문 거절 성공")
+  void rejectOrderTest_Success() {
+    //given
+    User user = User.builder()
+        .id(1L)
+        .loginId("usertest1@naver.com")
+        .build();
+
+    Order order = Order.builder()
+        .id(1L)
+        .user(user)
+        .orderStatus(OrderStatus.PaySuccess)
+        .build();
+
+    orderRepository.save(order);
+    when(orderRepository.findById(1L)).thenReturn(Optional.of(order));
+    when(orderRepository.save(any(Order.class))).thenReturn(order);
+    //when
+    OrderDto orderDto = orderService.rejectOrder(1L);
+    //then
+    assertNotNull(orderDto);
+    assertEquals(orderDto.getOrderStatus(), OrderStatus.CancelByCafe);
+  }
+
+  @Test
+  @DisplayName("주문 상태 변경 성공: PaySuccess -> PreParingMenus")
+  void changeOrderStatusTest_Success1() {
+    //given
+    User user = User.builder()
+        .id(1L)
+        .loginId("usertest1@naver.com")
+        .build();
+
+    Order order = Order.builder()
+        .id(1L)
+        .user(user)
+        .orderStatus(OrderStatus.PaySuccess)
+        .build();
+
+    orderRepository.save(order);
+    when(orderRepository.findById(1L)).thenReturn(Optional.of(order));
+    when(orderRepository.save(any(Order.class))).thenReturn(order);
+    //when
+    OrderDto orderDto = orderService.changeOrderStatus(1L);
+    //then
+    assertNotNull(orderDto);
+    assertEquals(orderDto.getOrderStatus(), OrderStatus.PreParingMenus);
+  }
+
+  @Test
+  @DisplayName("주문 상태 변경 성공: PreParingMenus -> WaitingPickUp")
+  void changeOrderStatusTest_Success2() {
+    //given
+    User user = User.builder()
+        .id(1L)
+        .loginId("usertest1@naver.com")
+        .build();
+
+    Order order = Order.builder()
+        .id(1L)
+        .user(user)
+        .orderStatus(OrderStatus.PreParingMenus)
+        .build();
+
+    orderRepository.save(order);
+    when(orderRepository.findById(1L)).thenReturn(Optional.of(order));
+    when(orderRepository.save(any(Order.class))).thenReturn(order);
+    //when
+    OrderDto orderDto = orderService.changeOrderStatus(1L);
+    //then
+    assertNotNull(orderDto);
+    assertEquals(orderDto.getOrderStatus(), OrderStatus.WaitingPickUp);
+  }
+
+  @Test
+  @DisplayName("주문 상태 변경 성공: WaitingPickUp -> PickUpSuccess")
+  void changeOrderStatusTest_Success3() {
+    //given
+    User user = User.builder()
+        .id(1L)
+        .loginId("usertest1@naver.com")
+        .build();
+
+    Order order = Order.builder()
+        .id(1L)
+        .user(user)
+        .orderStatus(OrderStatus.WaitingPickUp)
+        .build();
+
+    orderRepository.save(order);
+    when(orderRepository.findById(1L)).thenReturn(Optional.of(order));
+    when(orderRepository.save(any(Order.class))).thenReturn(order);
+    //when
+    OrderDto orderDto = orderService.changeOrderStatus(1L);
+    //then
+    assertNotNull(orderDto);
+    assertEquals(orderDto.getOrderStatus(), OrderStatus.PickUpSuccess);
+  }
+  @Test
+  @DisplayName("주문 상태 변경 실패")
+  void changeOrderStatusTest_Fail() {
+    //given
+    User user = User.builder()
+        .id(1L)
+        .loginId("usertest1@naver.com")
+        .build();
+
+    Order order = Order.builder()
+        .id(1L)
+        .user(user)
+        .orderStatus(OrderStatus.PayFail)
+        .build();
+
+    orderRepository.save(order);
+    when(orderRepository.findById(1L)).thenReturn(Optional.of(order));
+    //when
+
+    //then
+    assertThrows(IllegalStateException.class, () -> orderService.changeOrderStatus(1L));
+
+  }
+=======
   @DisplayName("PayFail만 조회")
   void viewOrdersByOrderStatus_PayFail() {
     //given

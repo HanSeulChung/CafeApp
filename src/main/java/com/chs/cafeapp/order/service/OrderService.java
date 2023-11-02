@@ -22,7 +22,7 @@ public interface OrderService {
    */
   OrderDto orderAllFromCart(OrderAllFromCartInput orderAllFromCartInput, String userId);
 
-  /**
+  /**  
    * 주문 전체 조회 (for admin)
    */
   List<OrderDto> viewAllOrders();
@@ -31,5 +31,20 @@ public interface OrderService {
    * orderStatus에 따른 주문 조회
    */
   List<OrderDto> viewOrdersByOrderStatus(int orderStatus);
+  
+  /**
+   * 카페에서 주문 거절
+   */
+  OrderDto rejectOrder(long orderId);
+
+  /**
+   * 주문 상태 변경(주문 거절 미포함)
+   */
+  OrderDto changeOrderStatus(long orderId);
+
+  /**
+   * 주문 상태 설명 가져오기
+   */
+  String findOrderStatusMessage(long orderId);
 
 }

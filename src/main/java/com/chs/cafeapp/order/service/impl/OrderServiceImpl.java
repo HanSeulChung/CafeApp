@@ -20,8 +20,8 @@ import com.chs.cafeapp.order.type.OrderStatus;
 import com.chs.cafeapp.user.entity.User;
 import com.chs.cafeapp.user.repository.UserRepository;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -195,6 +195,52 @@ public class OrderServiceImpl implements OrderService {
   }
 
   @Override
+  public OrderDto rejectOrder(long orderId) {
+    Order order = orderRepository.findById(orderId)
+        .orElseThrow(() -> new NoSuchElementException());
+
+    if (!order.getOrderStatus().equals(OrderStatus.PaySuccess)) {
+      throw new IllegalArgumentException();
+    }
+
+    order.setOrderStatus(OrderStatus.CancelByCafe);
+
+    return OrderDto.of(orderRepository.save(order));
+  }
+
+  @Override
+  public OrderDto changeOrderStatus(long orderId) {
+    Order order = orderRepository.findById(orderId)
+        .orElseThrow(() -> new NoSuchElementException());
+    if (order.getOrderStatus().equals(OrderStatus.PayFail)) {
+      throw new IllegalStateException();
+    }
+    String orderStatusName = order.getOrderStatus().name();
+    switch (orderStatusName) {
+      case "PaySuccess":
+        order.setOrderStatus(OrderStatus.PreParingMenus);
+        break;
+      case "PreParingMenus":
+        order.setOrderStatus(OrderStatus.WaitingPickUp);
+        break;
+      case "WaitingPickUp":
+        order.setOrderStatus(OrderStatus.PickUpSuccess);
+        break;
+    }
+
+    return OrderDto.of(orderRepository.save(order));
+  }
+
+  @Override
+  public String findOrderStatusMessage(long orderId) {
+    Order order = orderRepository.findById(orderId)
+                    .orElseThrow(() -> new NoSuchElementException());
+
+    // 추후 admin-orders-view 브랜치에서 가져온 OrderStatus에 맞게 가져오기
+    return order.getOrderStatus().name();
+  }
+  
+  @Override
   public List<OrderDto> viewAllOrders() {
     return OrderDto.of(orderRepository.findAll());
   }
@@ -203,5 +249,6 @@ public class OrderServiceImpl implements OrderService {
   public List<OrderDto> viewOrdersByOrderStatus(int orderStatusNum) {
     OrderStatus byNumOrderStatus = OrderStatus.findByNum(orderStatusNum);
     return OrderDto.of(orderRepository.findAllByOrderStatus(byNumOrderStatus));
+
   }
 }
