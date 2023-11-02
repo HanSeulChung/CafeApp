@@ -40,7 +40,7 @@ public enum OrderStatus {
   /**
    * 픽업 완료
    */
-  PickUpSuccess(7, "픽업완료");
+  PickUpSuccess(7, "픽업 완료");
 
   private final int num;
   private final String description;

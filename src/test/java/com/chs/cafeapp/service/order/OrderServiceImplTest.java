@@ -503,7 +503,7 @@ class OrderServiceImplTest {
     assertThrows(IllegalStateException.class, () -> orderService.changeOrderStatus(1L));
 
   }
-=======
+
   @DisplayName("PayFail만 조회")
   void viewOrdersByOrderStatus_PayFail() {
     //given

@@ -35,17 +35,10 @@ public class CartServiceImpl implements CartService {
 
   private final CartMenuService cartMenuService;
 
-  @Override
-  public CartMenuDto addCart(CartInput cartInput, String userId) {
 
+  public Cart validationUserAndCart(String userId) {
     User user = userRepository.findByLoginId(userId)
         .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
-    Menus menus = menuRepository.findById(cartInput.getMenuId())
-        .orElseThrow(() -> new CustomException(MENU_NOT_FOUND));
-
-    if (menus.getStock() - cartInput.getQuantity() < 0) {
-      throw new CustomException(CAN_NOT_CART_MENU_THAN_STOCK);
-    }
 
     Cart cart = user.getCart();
     cart = Optional.ofNullable(cart).orElseGet(() -> {
@@ -55,6 +48,21 @@ public class CartServiceImpl implements CartService {
       cartRepository.save(newCart);
       return newCart;
     });
+
+    return cart;
+  }
+
+  @Override
+  public CartMenuDto addCart(CartInput cartInput, String userId) {
+
+    Cart cart = validationUserAndCart(userId);
+
+    Menus menus = menuRepository.findById(cartInput.getMenuId())
+        .orElseThrow(() -> new CustomException(MENU_NOT_FOUND));
+
+    if (menus.getStock() - cartInput.getQuantity() < 0) {
+      throw new CustomException(CAN_NOT_CART_MENU_THAN_STOCK);
+    }
 
     boolean existsCartMenu = cartMenusRepository.existsByMenusId(cartInput.getMenuId());
 
@@ -90,24 +98,12 @@ public class CartServiceImpl implements CartService {
 
   @Override
   public List<CartMenuDto> viewAllCartMenuInCart(String userId) {
-    User user = userRepository.findByLoginId(userId)
-        .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+    Cart cart = validationUserAndCart(userId);
 
-    if (user.getCart() == null) {
-      Cart newCart = new Cart();
-      user.setCart(newCart);
-      newCart.setUser(user);
-      cartRepository.save(newCart);
+    if (cart.getCartMenu().size() == 0) {
+      return new ArrayList<>();
     }
 
-    Cart cart = cartRepository.findById(user.getCart().getId())
-                                .orElse(null);
-
-    if (cart != null) {
-      List<CartMenuDto> cartMenuDtoList = CartMenuDto.of(cart.getCartMenu());
-      return cartMenuDtoList;
-    }
-
-    return new ArrayList<>();
+    return CartMenuDto.of(cart.getCartMenu());
   }
 }

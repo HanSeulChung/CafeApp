@@ -12,7 +12,6 @@ import com.chs.cafeapp.cart.repository.CartMenusRepository;
 import com.chs.cafeapp.cart.repository.CartRepository;
 import com.chs.cafeapp.cart.service.CartMenuService;
 import com.chs.cafeapp.exception.CustomException;
-import com.chs.cafeapp.exception.type.ErrorCode;
 import com.chs.cafeapp.menu.entity.Menus;
 import com.chs.cafeapp.menu.repository.MenuRepository;
 import com.chs.cafeapp.order.dto.OrderAllFromCartInput;
@@ -25,9 +24,11 @@ import com.chs.cafeapp.order.repository.OrderRepository;
 import com.chs.cafeapp.order.repository.OrderedMenuRepository;
 import com.chs.cafeapp.order.service.OrderService;
 import com.chs.cafeapp.order.type.OrderStatus;
+import com.chs.cafeapp.stamp.service.StampService;
 import com.chs.cafeapp.user.entity.User;
 import com.chs.cafeapp.user.repository.UserRepository;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import lombok.RequiredArgsConstructor;
@@ -44,6 +45,7 @@ public class OrderServiceImpl implements OrderService {
   private final OrderedMenuRepository orderedMenuRepository;
 
   private final CartMenuService cartMenuService;
+  private final StampService stampService;
 
   @Override
   public OrderDto orderIndividualMenu(OrderInput orderInput, String userId) {
@@ -233,19 +235,22 @@ public class OrderServiceImpl implements OrderService {
         break;
       case "WaitingPickUp":
         order.setOrderStatus(OrderStatus.PickUpSuccess);
+        long drinksCnt = order.getOrderedMenus().stream()
+            .filter(orderedMenu -> "음료".equals(orderedMenu.getMenus().getCategory().getSuperCategory()))
+            .mapToLong(orderedMenu -> orderedMenu.getQuantity()) // quantity 필드 추출
+            .sum();
+        stampService.addStampNumbers(drinksCnt, order.getUser().getLoginId());
         break;
     }
 
     return OrderDto.of(orderRepository.save(order));
   }
-
   @Override
   public String findOrderStatusMessage(long orderId) {
     Order order = orderRepository.findById(orderId)
                     .orElseThrow(() -> new NoSuchElementException());
 
-    // 추후 admin-orders-view 브랜치에서 가져온 OrderStatus에 맞게 가져오기
-    return order.getOrderStatus().name();
+    return order.getOrderStatus().getDescription();
   }
   
   @Override
