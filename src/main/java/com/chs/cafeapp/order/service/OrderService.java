@@ -43,8 +43,7 @@ public interface OrderService {
   OrderDto changeOrderStatus(long orderId);
 
   /**
-   * 주문 상태 설명 가져오기
+   * 주문 상태 변경 message
    */
-  String findOrderStatusMessage(long orderId);
-
+  String viewMessageChanges(long orderId);
 }

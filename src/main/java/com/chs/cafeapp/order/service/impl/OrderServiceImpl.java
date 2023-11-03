@@ -32,7 +32,6 @@ import com.chs.cafeapp.user.repository.UserRepository;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.NoSuchElementException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -57,10 +56,6 @@ public class OrderServiceImpl implements OrderService {
 
     Menus menus = menuRepository.findById(orderInput.getMenuId())
         .orElseThrow(() ->  new CustomException(MENU_NOT_FOUND));
-
-    if (!menus.getName().equals(orderInput.getMenuName())) {
-      throw new RuntimeException("메뉴 id와 이름이 맞지않습니다.");
-    }
 
     OrderedMenu saveOrderedMenu = orderedMenuRepository.save(
                                           OrderedMenu.builder()
@@ -220,10 +215,10 @@ public class OrderServiceImpl implements OrderService {
     return OrderDto.of(orderRepository.save(order));
   }
 
-  @Override
-  public OrderDto changeOrderStatus(long orderId) {
+  public Order validationOrder(long orderId) {
     Order order = orderRepository.findById(orderId)
         .orElseThrow(() -> new CustomException(ORDER_NOT_FOUND));
+
     if (order.getOrderStatus().equals(OrderStatus.PayFail)) {
       throw new IllegalStateException();
     }
@@ -231,6 +226,13 @@ public class OrderServiceImpl implements OrderService {
     if (order.getOrderStatus().equals(OrderStatus.PickUpSuccess)) {
       throw new CustomException(ALREADY_PICKUP_SUCCESS);
     }
+    return order;
+  }
+  @Override
+  public OrderDto changeOrderStatus(long orderId) {
+
+    Order order = validationOrder(orderId);
+
     String orderStatusName = order.getOrderStatus().name();
     switch (orderStatusName) {
       case "PaySuccess":
@@ -248,17 +250,19 @@ public class OrderServiceImpl implements OrderService {
         stampService.addStampNumbers(drinksCnt, order.getUser().getLoginId());
         break;
     }
-
     return OrderDto.of(orderRepository.save(order));
   }
-  @Override
-  public String findOrderStatusMessage(long orderId) {
-    Order order = orderRepository.findById(orderId)
-                    .orElseThrow(() -> new CustomException(ORDER_NOT_FOUND));
 
-    return order.getOrderStatus().getDescription();
+  @Override
+  public String viewMessageChanges(long orderId) {
+    Order order = validationOrder(orderId);
+    OrderStatus currOrderStatus = order.getOrderStatus();
+    OrderStatus beforeOrderStatus = OrderStatus.findByNum(currOrderStatus.getNum() - 1);
+    String message = beforeOrderStatus.getStatusName() + " 상태에서 ";
+    message += currOrderStatus.getStatusName() + " 상태로 변경 되었습니다.";
+    return message;
   }
-  
+
   @Override
   public List<OrderDto> viewAllOrders() {
     return OrderDto.of(orderRepository.findAll());
