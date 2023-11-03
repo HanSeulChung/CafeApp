@@ -44,7 +44,7 @@ main, dev, feature/기능, test/feature-test와 같이 두고 dev를 각 기능 
     assertEquals(cartRepository.findById(1L).get().getCartMenu().size(), 0);
 ```
 
-로 cartMenu를 참조 제거한뒤 삭제하면해당 연결되었던 cart의 cartMenuList가 null이아닌 0이여야한다.
+로 cartMenu를 참조 제거한뒤 삭제하면 해당 연결되었던 cart의 cartMenuList가 null이 아닌 0이여야한다.
 
 (Cart에서는 고아 객체 자동삭제로 셋팅해놨기 때문에 )
 
@@ -75,3 +75,10 @@ main, dev, feature/기능, test/feature-test와 같이 두고 dev를 각 기능 
     //then
     assertEquals(cartRepository.findById(1L).get().getCartMenu().size(), 0);
  ```
+
+### 5. 원격 저장소에 올라가있는 커밋일 경우 rebase merge 주의
+
+![image](https://github.com/HanSeulChung/CafeApp/assets/94779505/64324f22-dafc-4abe-b183-1a5885d223ec)
+<h3>문제 원인</h3>
+<h4>dev 브랜치에서 main 브랜치로 PR요청 후 rebase merge를 했을 때 해시값이 바뀐채로 rebase가 되기 때문에 같은 커밋 이력이라고 해도 해시값이 달라져 다른 커밋이라고 인식해서 중복 커밋이 발생하게 되었다. rebase로 깃 브랜치 이력이 깔끔해지는건 맞으나 보통 원격 저장소에 push 되어있는것은 함부로 rebase하지 말것. 협업시에는 병합도 조심히 하자. 더러워 지더라도 안전하고 만만한 일반 merge를 할 것..</h4>
+
