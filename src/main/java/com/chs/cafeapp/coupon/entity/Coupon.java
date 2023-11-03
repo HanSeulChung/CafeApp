@@ -35,7 +35,15 @@ public class Coupon extends BaseEntity {
   private boolean usedYn;
   private LocalDateTime expirationDateTime;
   private boolean expiredYn;
-  private void setUser(User user) {
+  public void setUser(User user) {
     this.user = user;
+  }
+
+  public void setUsedYn(boolean usedYn) {
+    this.usedYn = usedYn;
+  }
+
+  public void setExpiredYn(boolean expiredYn) {
+    this.expiredYn = expiredYn;
   }
 }

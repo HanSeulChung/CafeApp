@@ -1,8 +1,6 @@
 package com.chs.cafeapp.order.entity;
 
 import com.chs.cafeapp.base.BaseEntity;
-import com.chs.cafeapp.order.dto.OrderDto;
-import com.chs.cafeapp.order.dto.OrderInput;
 import com.chs.cafeapp.order.type.OrderStatus;
 import com.chs.cafeapp.user.entity.User;
 import java.util.ArrayList;
@@ -41,6 +39,7 @@ public class Order extends BaseEntity {
   private int totalPrice;
 
   private boolean couponUse;
+  private long couponId;
 
   @ManyToOne(fetch = FetchType.LAZY) // 다대일 단방향 매핑
   @JoinColumn(name = "user_id")
@@ -59,6 +58,10 @@ public class Order extends BaseEntity {
     }
     return orderedMenus;
   }
+
+  public void setCouponId(long couponId) {
+    this.couponId = couponId;
+  }
   public void setOrderStatus(OrderStatus orderStatus) {
     this.orderStatus = orderStatus;
   }
@@ -76,23 +79,7 @@ public class Order extends BaseEntity {
     }
   }
 
-  // TO-DO : 주문 기능 구현시 SRP, OCP 원칙 생각하기
-//  public static Order fromOrderInput(OrderInput orderInput) {
-//    return Order.builder()
-//                .totalQuantity(orderInput.getQuantity())
-//                .totalPrice(orderInput.getMenuPrice() * orderInput.getQuantity())
-//                .couponUse(orderInput.isCouponUse())
-//                .build();
-//  }
-//
-//  public static Order toEntity(OrderDto orderDto) {
-//    return Order.builder()
-//                .id(orderDto.getId())
-//                .orderStatus(orderDto.getOrderStatus())
-//                .couponUse(orderDto.isCouponUse())
-//                .totalQuantity(orderDto.getTotalQuantity())
-//                .totalPrice(orderDto.getTotalPrice())
-//                .orderedMenus(OrderedMenu.fromDto(orderDto.getOrderedMenus()))
-//                .build();
-//  }
+  public void minusTotalPriceByCouponUse(int discountPrice) {
+    this.totalPrice -= discountPrice;
+  }
 }
