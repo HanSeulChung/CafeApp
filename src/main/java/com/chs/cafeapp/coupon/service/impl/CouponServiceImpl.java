@@ -21,8 +21,8 @@ public class CouponServiceImpl implements CouponService {
   private final UserRepository userRepository;
   private final CouponRepository couponRepository;
 
-  private final String CouponNameByStamp = "스탬프 10회 적립 아메리카노 교환 쿠폰";
-  private final int CouponPriceByStamp = 4100;
+  private final String COUPON_NAME_BY_STAMP = "스탬프 10회 적립 아메리카노 교환 쿠폰";
+  private final int COUPON_PRICE_BY_STAMP = 4100;
   public Coupon validationUserAndCoupon(String userId, long couponId) {
     User user = userRepository.findByLoginId(userId)
         .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
@@ -46,8 +46,8 @@ public class CouponServiceImpl implements CouponService {
     LocalDateTime expirationDateTime = now.plusMonths(2);
 
     Coupon couponByStamp = Coupon.builder()
-        .couponName(CouponNameByStamp)
-        .price(CouponPriceByStamp)
+        .couponName(COUPON_NAME_BY_STAMP)
+        .price(COUPON_PRICE_BY_STAMP)
         .usedYn(false)
         .user(user)
         .expirationDateTime(expirationDateTime)
