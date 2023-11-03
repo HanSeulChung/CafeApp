@@ -2,9 +2,8 @@ package com.chs.cafeapp.stamp.service.impl;
 
 import static com.chs.cafeapp.exception.type.ErrorCode.USER_NOT_FOUND;
 
+import com.chs.cafeapp.coupon.service.CouponService;
 import com.chs.cafeapp.exception.CustomException;
-import com.chs.cafeapp.order.repository.OrderRepository;
-import com.chs.cafeapp.order.repository.OrderedMenuRepository;
 import com.chs.cafeapp.stamp.dto.StampDto;
 import com.chs.cafeapp.stamp.entity.Stamp;
 import com.chs.cafeapp.stamp.repository.StampRepository;
@@ -22,8 +21,8 @@ public class StampServiceImpl implements StampService {
 
   private final UserRepository userRepository;
   private final StampRepository stampRepository;
-  private final OrderRepository orderRepository;
-  private final OrderedMenuRepository orderedMenuRepository;
+
+  private final CouponService couponService;
 
   public Stamp validationUserAndStamp(String userId) {
     User user = userRepository.findByLoginId(userId)
@@ -53,13 +52,14 @@ public class StampServiceImpl implements StampService {
     Stamp stamp = validationUserAndStamp(userId);
 
     if (stamp.getStampNumbers() + stampNumbers >= MAX_STAMP_COUNT) {
-      // TODO: 스탬프가 다 채워졌을 경우 쿠폰 1개 발급
       long newStampCnt = stamp.getStampNumbers() + stampNumbers - MAX_STAMP_COUNT;
-
+      stamp.reCalculateStamp(newStampCnt);
+      couponService.createCouponByStamp(userId);
+      return StampDto.of(stampRepository.save(stamp));
     }
 
     stamp.addStamp(stampNumbers);
-    stampRepository.save(stamp);
+
     return StampDto.of(stampRepository.save(stamp));
   }
 }

@@ -1,5 +1,6 @@
 package com.chs.cafeapp.order.service.impl;
 
+import static com.chs.cafeapp.exception.type.ErrorCode.ALREADY_PICKUP_SUCCESS;
 import static com.chs.cafeapp.exception.type.ErrorCode.CAN_NOT_ORDER_THAN_STOCK;
 import static com.chs.cafeapp.exception.type.ErrorCode.CART_MENU_NOT_FOUND;
 import static com.chs.cafeapp.exception.type.ErrorCode.CART_NOT_FOUND;
@@ -225,6 +226,10 @@ public class OrderServiceImpl implements OrderService {
     if (order.getOrderStatus().equals(OrderStatus.PayFail)) {
       throw new IllegalStateException();
     }
+
+    if (order.getOrderStatus().equals(OrderStatus.PickUpSuccess)) {
+      throw new CustomException(ALREADY_PICKUP_SUCCESS);
+    }
     String orderStatusName = order.getOrderStatus().name();
     switch (orderStatusName) {
       case "PaySuccess":
@@ -237,7 +242,7 @@ public class OrderServiceImpl implements OrderService {
         order.setOrderStatus(OrderStatus.PickUpSuccess);
         long drinksCnt = order.getOrderedMenus().stream()
             .filter(orderedMenu -> "음료".equals(orderedMenu.getMenus().getCategory().getSuperCategory()))
-            .mapToLong(orderedMenu -> orderedMenu.getQuantity()) // quantity 필드 추출
+            .mapToLong(orderedMenu -> orderedMenu.getQuantity())
             .sum();
         stampService.addStampNumbers(drinksCnt, order.getUser().getLoginId());
         break;

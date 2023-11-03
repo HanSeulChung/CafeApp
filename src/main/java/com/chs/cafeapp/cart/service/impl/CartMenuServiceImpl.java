@@ -4,7 +4,7 @@ import static com.chs.cafeapp.exception.type.ErrorCode.CAN_NOT_CART_MENU_THAN_ST
 import static com.chs.cafeapp.exception.type.ErrorCode.CAN_NOT_MINUS_THAN_CART_MENU_QUANTITY;
 import static com.chs.cafeapp.exception.type.ErrorCode.CART_MENU_NOT_FOUND;
 import static com.chs.cafeapp.exception.type.ErrorCode.CART_NOT_FOUND;
-import static com.chs.cafeapp.exception.type.ErrorCode.NOT_MATCH_USER_CART;
+import static com.chs.cafeapp.exception.type.ErrorCode.NOT_MATCH_USER_AND_CART;
 import static com.chs.cafeapp.exception.type.ErrorCode.USER_NOT_FOUND;
 import static com.chs.cafeapp.exception.type.ErrorCode.ZERO_CART_MENU_IN_CART;
 
@@ -33,7 +33,7 @@ public class CartMenuServiceImpl implements CartMenuService {
     User user = userRepository.findByLoginId(userId)
         .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
     if (user.getCart().getId() != cartId) {
-      throw new CustomException(NOT_MATCH_USER_CART);
+      throw new CustomException(NOT_MATCH_USER_AND_CART);
     }
     return user;
   }
@@ -89,7 +89,7 @@ public class CartMenuServiceImpl implements CartMenuService {
     Cart cart = validationCart(cartMenu.getCart().getId());
 
     if (cartMenu.getCart().getId() != user.getCart().getId()) {
-      throw new CustomException(NOT_MATCH_USER_CART);
+      throw new CustomException(NOT_MATCH_USER_AND_CART);
     }
 
     if (cartMenu.getQuantity() + cartMenuChangeQuantity.getQuantity() > cartMenu.getMenus().getStock()) {
