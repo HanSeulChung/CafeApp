@@ -5,6 +5,7 @@ import static com.chs.cafeapp.exception.type.ErrorCode.CAN_NOT_ORDER_THAN_STOCK;
 import static com.chs.cafeapp.exception.type.ErrorCode.CART_MENU_NOT_FOUND;
 import static com.chs.cafeapp.exception.type.ErrorCode.CART_NOT_FOUND;
 import static com.chs.cafeapp.exception.type.ErrorCode.MENU_NOT_FOUND;
+import static com.chs.cafeapp.exception.type.ErrorCode.ORDER_NOT_FOUND;
 import static com.chs.cafeapp.exception.type.ErrorCode.USER_NOT_FOUND;
 
 import com.chs.cafeapp.cart.entity.Cart;
@@ -208,7 +209,7 @@ public class OrderServiceImpl implements OrderService {
   @Override
   public OrderDto rejectOrder(long orderId) {
     Order order = orderRepository.findById(orderId)
-        .orElseThrow(() -> new NoSuchElementException());
+        .orElseThrow(() -> new CustomException(ORDER_NOT_FOUND));
 
     if (!order.getOrderStatus().equals(OrderStatus.PaySuccess)) {
       throw new IllegalArgumentException();
@@ -222,7 +223,7 @@ public class OrderServiceImpl implements OrderService {
   @Override
   public OrderDto changeOrderStatus(long orderId) {
     Order order = orderRepository.findById(orderId)
-        .orElseThrow(() -> new NoSuchElementException());
+        .orElseThrow(() -> new CustomException(ORDER_NOT_FOUND));
     if (order.getOrderStatus().equals(OrderStatus.PayFail)) {
       throw new IllegalStateException();
     }
@@ -253,7 +254,7 @@ public class OrderServiceImpl implements OrderService {
   @Override
   public String findOrderStatusMessage(long orderId) {
     Order order = orderRepository.findById(orderId)
-                    .orElseThrow(() -> new NoSuchElementException());
+                    .orElseThrow(() -> new CustomException(ORDER_NOT_FOUND));
 
     return order.getOrderStatus().getDescription();
   }
@@ -267,6 +268,5 @@ public class OrderServiceImpl implements OrderService {
   public List<OrderDto> viewOrdersByOrderStatus(int orderStatusNum) {
     OrderStatus byNumOrderStatus = OrderStatus.findByNum(orderStatusNum);
     return OrderDto.of(orderRepository.findAllByOrderStatus(byNumOrderStatus));
-
   }
 }
