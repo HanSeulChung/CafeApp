@@ -64,10 +64,11 @@ public class CouponServiceImpl implements CouponService {
         .expiredYn(false)
         .build();
 
-    user.setCoupons(couponByStamp);
+    Coupon saveCoupon = couponRepository.save(couponByStamp);
+    user.setCoupons(saveCoupon);
     userRepository.save(user);
 
-    return CouponDto.of(couponRepository.save(couponByStamp));
+    return CouponDto.of(saveCoupon);
   }
 
   @Override

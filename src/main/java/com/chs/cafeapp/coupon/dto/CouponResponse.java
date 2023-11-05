@@ -4,7 +4,6 @@ import static com.chs.cafeapp.coupon.type.CouponStatus.ALREADY_USED_COUPON;
 import static com.chs.cafeapp.coupon.type.CouponStatus.CAN_USE_COUPON;
 import static com.chs.cafeapp.coupon.type.CouponStatus.EXPIRED_COUPON;
 
-import com.chs.cafeapp.coupon.type.CouponStatus;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,11 +38,11 @@ public class CouponResponse {
         if (!couponResponse.usedYn && !couponResponse.expiredYn) {
           couponResponse.setCouponStatus(CAN_USE_COUPON.getStatusName());
         }
-        if (couponResponse.usedYn) {
-          couponResponse.setCouponStatus(ALREADY_USED_COUPON.getStatusName());
-        }
         if (couponResponse.expiredYn) {
           couponResponse.setCouponStatus(EXPIRED_COUPON.getStatusName());
+        }
+        if (couponResponse.usedYn) {
+          couponResponse.setCouponStatus(ALREADY_USED_COUPON.getStatusName());
         }
         couponResponseList.add(couponResponse);
       }
