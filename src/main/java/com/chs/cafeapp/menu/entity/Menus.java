@@ -1,6 +1,9 @@
 package com.chs.cafeapp.menu.entity;
 
+import static com.chs.cafeapp.exception.type.ErrorCode.CAN_NOT_ORDER_THAN_STOCK;
+
 import com.chs.cafeapp.base.BaseEntity;
+import com.chs.cafeapp.exception.CustomException;
 import com.chs.cafeapp.menu.category.entity.Category;
 import com.chs.cafeapp.menu.dto.MenuDto;
 import javax.persistence.Entity;
@@ -59,10 +62,13 @@ public class Menus extends BaseEntity {
     this.stock -= stockAmount;
     if (this.stock < 0) {
       this.stock += stockAmount;
-      throw new RuntimeException("해당 개수를 구매할 수 없습니다");
+      throw new CustomException(CAN_NOT_ORDER_THAN_STOCK);
     }
   }
 
+  public void plusStockByCancel(int stockAmount) {
+    this.stock += stockAmount;
+  }
   public void setSoldOut(boolean isSoldOut) {
     this.isSoldOut = isSoldOut;
   }

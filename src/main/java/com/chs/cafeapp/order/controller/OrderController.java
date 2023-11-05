@@ -37,8 +37,7 @@ public class OrderController {
   @PostMapping()
   public OrderResponse addOrder(@RequestBody OrderInput request, @RequestParam String userId) {
     OrderDto orderDto = orderService.orderIndividualMenu(request, userId);
-    String message = "주문이 완료되었습니다. 카페에서 상품 확인 중입니다.";
-    return OrderResponse.toResponse(orderDto, message);
+    return OrderResponse.toResponse(orderDto, orderDto.getOrderStatus().getDescription());
   }
 
 
@@ -55,8 +54,7 @@ public class OrderController {
   @PostMapping("/shopping-basket/select-items/{selectItemCount}")
   public OrderResponse addOrderFromBasket(@PathVariable int selectItemCount, @RequestBody OrderFromCartInput request, @RequestParam String userId) {
     OrderDto orderDto = orderService.orderFromCart(request, userId);
-    String message = "주문이 완료되었습니다. 카페에서 상품 확인 중입니다.";
-    return OrderResponse.toResponse(orderDto, message);
+    return OrderResponse.toResponse(orderDto, orderDto.getOrderStatus().getDescription());
   }
 
   /**
@@ -72,7 +70,6 @@ public class OrderController {
   @PostMapping("/shopping-basket")
   public OrderResponse addOrderFromBasket(@RequestBody OrderAllFromCartInput reqeust, @RequestParam String userId) {
     OrderDto orderDto = orderService.orderAllFromCart(reqeust, userId);
-    String message = "주문이 완료되었습니다. 카페에서 상품 확인 중입니다.";
-    return OrderResponse.toResponse(orderDto, message);
+    return OrderResponse.toResponse(orderDto, orderDto.getOrderStatus().getDescription());
   }
 }

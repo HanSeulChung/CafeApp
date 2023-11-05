@@ -1,13 +1,24 @@
 package com.chs.cafeapp.order.dto;
 
+import javax.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 @Getter
-@Builder
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class OrderAllFromCartInput {
+  @NotNull
   private long cartId;
+  @NotNull
   private boolean couponUse;
+
+  private Long couponId;
+
+  @Builder
+  public OrderAllFromCartInput(long cartId, boolean couponUse) {
+    this.cartId = cartId;
+    this.couponUse = couponUse;
+  }
 }

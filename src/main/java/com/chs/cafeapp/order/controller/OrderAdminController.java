@@ -3,14 +3,11 @@ package com.chs.cafeapp.order.controller;
 import com.chs.cafeapp.order.dto.OrderDto;
 import com.chs.cafeapp.order.dto.OrderResponse;
 import com.chs.cafeapp.order.service.OrderService;
-import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PatchMapping;
-import com.chs.cafeapp.order.service.OrderService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -51,8 +48,7 @@ public class OrderAdminController {
   @PatchMapping("/rejections/{orderId}")
   public ResponseEntity<OrderResponse> rejectOrderStatus(@PathVariable long orderId) {
     OrderDto orderDto = orderService.rejectOrder(orderId);
-    String message = "카페에서 주문이 거절되었습니다.";
-    return ResponseEntity.ok(OrderResponse.toResponse(orderDto, message));
+    return ResponseEntity.ok(OrderResponse.toResponse(orderDto, orderDto.getOrderStatus().getDescription()));
   }
 
   /**
@@ -62,10 +58,9 @@ public class OrderAdminController {
    */
   @PatchMapping("/order-status/{orderId}")
   public ResponseEntity<OrderResponse> changeOrderStatus(@PathVariable long orderId) {
-    String message = orderService.findOrderStatusMessage(orderId);
-    OrderDto orderDto = orderService.changeOrderStatus(orderId);
-    message += " 상태에서 " + orderService.findOrderStatusMessage(orderId) + " 상태로 변경되었습니다.";
 
+    OrderDto orderDto = orderService.changeOrderStatus(orderId);
+    String message = orderService.viewMessageChanges(orderId);
     return ResponseEntity.ok(OrderResponse.toResponse(orderDto, message));
   }  
 }

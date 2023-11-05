@@ -1,6 +1,9 @@
 package com.chs.cafeapp.cart.entity;
 
+import static com.chs.cafeapp.exception.type.ErrorCode.REMAIN_CART_MENU_IN_CART;
+
 import com.chs.cafeapp.base.BaseEntity;
+import com.chs.cafeapp.exception.CustomException;
 import com.chs.cafeapp.user.entity.User;
 import java.util.ArrayList;
 import java.util.List;
@@ -68,7 +71,7 @@ public class Cart extends BaseEntity {
     if (this.cartMenu.isEmpty()) {
       this.totalPrice = 0;
     } else {
-      throw new RuntimeException("장바구니에 메뉴가 남아있습니다.");
+      throw new CustomException(REMAIN_CART_MENU_IN_CART);
     }
   }
 
@@ -76,7 +79,7 @@ public class Cart extends BaseEntity {
     if (this.cartMenu.isEmpty()) {
       this.totalQuantity = 0;
     } else {
-      throw new RuntimeException("장바구니에 메뉴가 남아있습니다.");
+      throw new CustomException(REMAIN_CART_MENU_IN_CART);
     }
   }
 }

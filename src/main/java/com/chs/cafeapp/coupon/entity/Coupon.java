@@ -1,14 +1,16 @@
-package com.chs.cafeapp.stamp.entity;
+package com.chs.cafeapp.coupon.entity;
 
 
 import com.chs.cafeapp.base.BaseEntity;
 import com.chs.cafeapp.user.entity.User;
+import java.time.LocalDateTime;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
+import javax.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -19,26 +21,29 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Stamp extends BaseEntity {
+public class Coupon extends BaseEntity {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private long id;
 
-  private long stampNumbers;
-
-  @OneToOne
+  @ManyToOne(fetch = FetchType.LAZY) // 다대일 양방향 매핑
   @JoinColumn(name = "user_id")
   private User user;
 
+  private String couponName;
+  private int price;
+  private boolean usedYn;
+  private LocalDateTime expirationDateTime;
+  private boolean expiredYn;
   public void setUser(User user) {
     this.user = user;
   }
 
-  public void addStamp(long stampCnt) {
-    this.stampNumbers += stampCnt;
+  public void setUsedYn(boolean usedYn) {
+    this.usedYn = usedYn;
   }
 
-  public void reCalculateStamp(long newStampCnt) {
-    this.stampNumbers = newStampCnt;
+  public void setExpiredYn(boolean expiredYn) {
+    this.expiredYn = expiredYn;
   }
 }
