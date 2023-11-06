@@ -46,4 +46,9 @@ public interface OrderService {
    * 주문 상태 변경 message
    */
   String viewMessageChanges(long orderId);
+
+  /**
+   * 사용자가 결제 취소(주문 취소)
+   */
+  OrderDto cancelOrder(long orderId, String userId);
 }
