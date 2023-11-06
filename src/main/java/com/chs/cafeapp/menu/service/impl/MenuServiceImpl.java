@@ -11,9 +11,11 @@ import com.chs.cafeapp.exception.CustomException;
 import com.chs.cafeapp.menu.category.entity.Category;
 import com.chs.cafeapp.menu.category.repository.CategoryRepository;
 import com.chs.cafeapp.menu.dto.MenuChangeStockQuantity;
+import com.chs.cafeapp.menu.dto.MenuDetail;
 import com.chs.cafeapp.menu.dto.MenuDto;
 import com.chs.cafeapp.menu.dto.MenuEditInput;
 import com.chs.cafeapp.menu.dto.MenuInput;
+import com.chs.cafeapp.menu.dto.MenuResponse;
 import com.chs.cafeapp.menu.entity.Menus;
 import com.chs.cafeapp.menu.repository.MenuRepository;
 import com.chs.cafeapp.menu.service.MenuService;
@@ -27,6 +29,17 @@ public class MenuServiceImpl implements MenuService {
 
   private final MenuRepository menuRepository;
   private final CategoryRepository categoryRepository;
+
+  public Menus validationMenus(Long menuId) {
+    Menus menus = menuRepository.findById(menuId)
+        .orElseThrow(() -> new CustomException(MENU_NOT_FOUND));
+
+    Category category = categoryRepository.findById(menus.getCategory().getId())
+        .orElseThrow(() -> new CustomException(CATEGORY_NOT_FOUND));
+
+    return menus;
+  }
+
   @Override
   public MenuDto add(MenuInput menuInput) {
     boolean existMenus = menuRepository.existsByName(menuInput.getName());
@@ -51,8 +64,7 @@ public class MenuServiceImpl implements MenuService {
 
   @Override
   public MenuDto edit(MenuEditInput menuEditInput) {
-    Menus menu = menuRepository.findById(menuEditInput.getId())
-                  .orElseThrow(() -> new CustomException(MENU_NOT_FOUND));
+    Menus menu = validationMenus(menuEditInput.getId());
 
     Category category = categoryRepository.findBySuperCategoryAndBaseCategory(
             menuEditInput.getSuperCategory(), menuEditInput.getBaseCategory())
@@ -67,14 +79,13 @@ public class MenuServiceImpl implements MenuService {
 
     Menus buildMenu = Menus.builder()
         .id(menu.getId())
+        .category(category)
         .name(menuEditInput.getName())
         .kcal(menuEditInput.getKcal())
         .description(menuEditInput.getDescription())
         .stock(menuEditInput.getStock())
         .price(menuEditInput.getPrice())
         .build();
-
-    buildMenu.setCategory(category);
 
     return MenuDto.of(menuRepository.save(buildMenu));
   }
@@ -87,35 +98,41 @@ public class MenuServiceImpl implements MenuService {
   }
 
   @Override
-  public List<MenuDto> viewAllMenus() {
-    return MenuDto.of(menuRepository.findAll());
+  public List<MenuResponse> viewAllMenus() {
+    return MenuResponse.toResponse(MenuDto.of(menuRepository.findAll()));
   }
 
   @Override
-  public List<MenuDto> viewAllBySuperCategory(String superCategory) {
+  public List<MenuResponse> viewAllBySuperCategory(String superCategory) {
     List<Long> categoryIds = categoryRepository.findIdsBySuperCategory(superCategory);
     if (categoryIds == null) {
       throw new CustomException(CATEGORY_NOT_FOUND);
     }
     List<Menus> allByCategoryIdIn = menuRepository.findAllByCategoryIdIn(categoryIds);
-    return MenuDto.of(allByCategoryIdIn);
+    return MenuResponse.toResponse(MenuDto.of(allByCategoryIdIn));
   }
 
   @Override
-  public List<MenuDto> viewAllByBaseCategory(String baseCategory) {
+  public List<MenuResponse> viewAllByBaseCategory(String baseCategory) {
 
     List<Long> categoryIds = categoryRepository.findIdsByBaseCategory(baseCategory);
     if (categoryIds == null) {
       throw new CustomException(CATEGORY_NOT_FOUND);
     }
     List<Menus> allByCategoryIdIn = menuRepository.findAllByCategoryIdIn(categoryIds);
-    return MenuDto.of(allByCategoryIdIn);
+    return MenuResponse.toResponse(MenuDto.of(allByCategoryIdIn));
+  }
+
+  @Override
+  public MenuDetail viewDetailMenu(Long menuId) {
+    Menus menus = validationMenus(menuId);
+
+    return MenuDetail.toDetail(MenuDto.of(menus));
   }
 
   @Override
   public MenuDto changeToSoldOut(Long menuId) {
-    Menus menu = menuRepository.findById(menuId)
-        .orElseThrow(() -> new CustomException(MENU_NOT_FOUND));
+    Menus menu = validationMenus(menuId);
 
     if (menu.isSoldOut()) {
       throw new CustomException(ALREADY_SOLD_OUT);
@@ -131,8 +148,7 @@ public class MenuServiceImpl implements MenuService {
 
   @Override
   public MenuDto changeToSale(Long menuId) {
-    Menus menu = menuRepository.findById(menuId)
-        .orElseThrow(() -> new CustomException(MENU_NOT_FOUND));
+    Menus menu = validationMenus(menuId);
 
     if (!menu.isSoldOut()) {
       throw new CustomException(ALREADY_SALE);
@@ -149,8 +165,7 @@ public class MenuServiceImpl implements MenuService {
 
   @Override
   public MenuDto changeStockQuantity(MenuChangeStockQuantity menuChangeStockQuantity) {
-    Menus menus = menuRepository.findById(menuChangeStockQuantity.getMenuId())
-        .orElseThrow(() -> new CustomException(MENU_NOT_FOUND));
+    Menus menus = validationMenus(menuChangeStockQuantity.getMenuId());
 
     if (menus.getStock() + menuChangeStockQuantity.getQuantity() < 0) {
       throw new CustomException(CAN_NOT_MINUS_THAN_STOCK);
