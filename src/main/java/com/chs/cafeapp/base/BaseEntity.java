@@ -17,8 +17,8 @@ import java.time.LocalDateTime;
 public abstract class BaseEntity {
     @CreatedDate
     @Column(updatable = false) // 업데이트 후 null 되는 것 방지
-    private LocalDateTime createDate;
+    private LocalDateTime createDateTime;
 
     @LastModifiedDate
-    private LocalDateTime updateDate;
+    private LocalDateTime updateDateTime;
 }

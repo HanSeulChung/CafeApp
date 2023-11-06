@@ -1,9 +1,11 @@
 package com.chs.cafeapp.menu.service;
 
 import com.chs.cafeapp.menu.dto.MenuChangeStockQuantity;
+import com.chs.cafeapp.menu.dto.MenuDetail;
 import com.chs.cafeapp.menu.dto.MenuDto;
 import com.chs.cafeapp.menu.dto.MenuEditInput;
 import com.chs.cafeapp.menu.dto.MenuInput;
+import com.chs.cafeapp.menu.dto.MenuResponse;
 import java.util.List;
 
 public interface MenuService {
@@ -25,17 +27,22 @@ public interface MenuService {
   /**
    * 메뉴 전체 조회
    */
-  List<MenuDto> viewAllMenus();
+  List<MenuResponse> viewAllMenus();
 
   /**
    * 메뉴 카테고리 대분류로 조회
    */
-  List<MenuDto> viewAllBySuperCategory(String superCategory);
+  List<MenuResponse> viewAllBySuperCategory(String superCategory);
 
   /**
    * 메뉴 카테고리 중분류로 조회
    */
-  List<MenuDto> viewAllByBaseCategory(String baseCategory);
+  List<MenuResponse> viewAllByBaseCategory(String baseCategory);
+
+  /**
+   * 메뉴 자세히 조회
+   */
+  MenuDetail viewDetailMenu(Long menuId);
 
   /**
    * 품절으로 상태 변경

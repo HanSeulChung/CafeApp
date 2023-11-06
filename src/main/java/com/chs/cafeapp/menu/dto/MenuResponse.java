@@ -31,7 +31,7 @@ public class MenuResponse {
       }
       return menuResponses;
     }
-    return null;
+    return new ArrayList<>();
   }
   public static MenuResponse toResponse(MenuDto menuDto) {
     return MenuResponse.builder()

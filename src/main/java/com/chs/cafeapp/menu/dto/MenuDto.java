@@ -1,6 +1,7 @@
 package com.chs.cafeapp.menu.dto;
 
 import com.chs.cafeapp.menu.entity.Menus;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -25,6 +26,9 @@ public class MenuDto {
   private String superCategory;
   private String baseCategory;
 
+  private LocalDateTime createdDateTime;
+  private LocalDateTime updatedDateTime;
+
   public void setSuperCategory(String superCategory) {
     this.superCategory = superCategory;
   }
@@ -45,7 +49,7 @@ public class MenuDto {
       return menuDtoList;
     }
 
-    return null;
+    return new ArrayList<>();
   }
 
   public static MenuDto of(Menus menu) {
@@ -60,6 +64,8 @@ public class MenuDto {
                 .isSoldOut(menu.isSoldOut())
                 .superCategory(menu.getCategory().getSuperCategory())
                 .baseCategory(menu.getCategory().getBaseCategory())
+                .createdDateTime(menu.getCreateDateTime())
+                .updatedDateTime(menu.getUpdateDateTime())
                 .build();
   }
 
