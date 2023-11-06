@@ -2,12 +2,16 @@ package com.chs.cafeapp.coupon.dto;
 
 import com.chs.cafeapp.coupon.entity.Coupon;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.ToString;
 
 @Getter
 @Builder
+@ToString
 @AllArgsConstructor
 public class CouponDto {
   private long id;
@@ -18,6 +22,16 @@ public class CouponDto {
   private LocalDateTime expirationDateTime;
   private boolean expiredYn;
 
+  public static List<CouponDto> of(List<Coupon> couponList) {
+    if (couponList != null) {
+      List<CouponDto> couponDtoList = new ArrayList<>();
+      for (Coupon coupon : couponList) {
+        couponDtoList.add(CouponDto.of(coupon));
+      }
+      return couponDtoList;
+    }
+    return new ArrayList<>();
+  }
   public static CouponDto of(Coupon coupon) {
     return CouponDto.builder()
         .id(coupon.getId())

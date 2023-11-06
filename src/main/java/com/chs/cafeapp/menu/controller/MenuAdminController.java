@@ -7,6 +7,7 @@ import com.chs.cafeapp.menu.dto.MenuInput;
 import com.chs.cafeapp.menu.dto.MenuResponse;
 import com.chs.cafeapp.menu.service.MenuService;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -25,11 +26,11 @@ import com.chs.cafeapp.exception.CustomException;
  * 메뉴 CRUD Controller
  */
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/admin/menus")
 public class MenuAdminController {
 
-  @Autowired
-  private MenuService menuService;
+  private final MenuService menuService;
 
   /**
    * 메뉴 생성 Controller
