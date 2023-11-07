@@ -381,9 +381,6 @@ public class OrderServiceImpl implements OrderService {
       throw new IllegalStateException();
     }
 
-    if (order.getOrderStatus().equals(OrderStatus.PickUpSuccess)) {
-      throw new CustomException(ALREADY_PICKUP_SUCCESS);
-    }
     return order;
   }
   @Override
@@ -407,6 +404,8 @@ public class OrderServiceImpl implements OrderService {
             .sum();
         stampService.addStampNumbers(drinksCnt, order.getUser().getLoginId());
         break;
+      case "PickUpSuccess":
+        throw new CustomException(ALREADY_PICKUP_SUCCESS);
     }
     return OrderDto.of(orderRepository.save(order));
   }
