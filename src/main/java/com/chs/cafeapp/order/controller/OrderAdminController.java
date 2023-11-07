@@ -1,5 +1,6 @@
 package com.chs.cafeapp.order.controller;
 
+import com.chs.cafeapp.kafka.service.KafkaProducerService;
 import com.chs.cafeapp.order.dto.OrderDto;
 import com.chs.cafeapp.order.dto.OrderResponse;
 import com.chs.cafeapp.order.service.OrderService;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/admin/orders")
 public class OrderAdminController {
   private final OrderService orderService;
+  private final KafkaProducerService producerService;
 
   /**
    * 전체 주문 조회 Controller
@@ -61,6 +63,9 @@ public class OrderAdminController {
 
     OrderDto orderDto = orderService.changeOrderStatus(orderId);
     String message = orderService.viewMessageChanges(orderId);
-    return ResponseEntity.ok(OrderResponse.toResponse(orderDto, message));
+
+    OrderResponse response = OrderResponse.toResponse(orderDto, message);
+    producerService.sendMessage(orderId, orderDto.getOrderStatus().getStatusName());
+    return ResponseEntity.ok(response);
   }  
 }
