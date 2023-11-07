@@ -1,8 +1,11 @@
 package com.chs.cafeapp.order.service.impl;
 
+import static com.chs.cafeapp.exception.type.ErrorCode.ALREADY_CANCEL_BY_CAFE;
+import static com.chs.cafeapp.exception.type.ErrorCode.ALREADY_CANCEL_BY_USER;
 import static com.chs.cafeapp.exception.type.ErrorCode.ALREADY_EXPIRED_COUPON;
 import static com.chs.cafeapp.exception.type.ErrorCode.ALREADY_PICKUP_SUCCESS;
 import static com.chs.cafeapp.exception.type.ErrorCode.ALREADY_USED_COUPON;
+import static com.chs.cafeapp.exception.type.ErrorCode.CAN_NOT_ORDER_CANCEL;
 import static com.chs.cafeapp.exception.type.ErrorCode.CAN_NOT_ORDER_THAN_STOCK;
 import static com.chs.cafeapp.exception.type.ErrorCode.CART_MENU_NOT_FOUND;
 import static com.chs.cafeapp.exception.type.ErrorCode.CART_NOT_FOUND;
@@ -10,8 +13,12 @@ import static com.chs.cafeapp.exception.type.ErrorCode.COUPON_NOT_FOUND;
 import static com.chs.cafeapp.exception.type.ErrorCode.EMPTY_SELECTED_CART_MENU;
 import static com.chs.cafeapp.exception.type.ErrorCode.INVALID_REQUEST;
 import static com.chs.cafeapp.exception.type.ErrorCode.MENU_NOT_FOUND;
+import static com.chs.cafeapp.exception.type.ErrorCode.NOT_MATCH_USER_AND_ORDER;
 import static com.chs.cafeapp.exception.type.ErrorCode.ORDER_NOT_FOUND;
 import static com.chs.cafeapp.exception.type.ErrorCode.USER_NOT_FOUND;
+import static com.chs.cafeapp.order.type.OrderStatus.CancelByCafe;
+import static com.chs.cafeapp.order.type.OrderStatus.CancelByUser;
+import static com.chs.cafeapp.order.type.OrderStatus.PaySuccess;
 
 import com.chs.cafeapp.cart.entity.Cart;
 import com.chs.cafeapp.cart.entity.CartMenu;
@@ -119,7 +126,16 @@ public class OrderServiceImpl implements OrderService {
                       .totalPrice(saveOrderedMenu.getTotalPrice())
                       .build();
 
-    Order order = orderRepository.save(buildOrder);
+
+    if (orderInput.isCouponUse()) {
+      Long couponId = orderInput.getCouponId();
+      Coupon coupon = validationCoupon(couponId);
+      int discountPrice = coupon.getPrice();
+      buildOrder.minusTotalPriceByCouponUse(discountPrice);
+      coupon.setUsedYn(true);
+      couponRepository.save(coupon);
+      buildOrder.setCouponId(couponId);
+    }
 
     menus.minusStock(orderInput.getQuantity());
     if(menus.getStock() == 0) {
@@ -127,17 +143,9 @@ public class OrderServiceImpl implements OrderService {
     }
     menuRepository.save(menus);
 
-    order.setOrderStatus(OrderStatus.PaySuccess);
-    if (orderInput.isCouponUse()) {
-      Long couponId = orderInput.getCouponId();
-      Coupon coupon = validationCoupon(couponId);
-      int discountPrice = coupon.getPrice();
-      order.minusTotalPriceByCouponUse(discountPrice);
-      coupon.setUsedYn(true);
-      couponRepository.save(coupon);
-      order.setCouponId(couponId);
-    }
-    Order saveOrder = orderRepository.save(order);
+    buildOrder.setOrderStatus(PaySuccess);
+
+    Order saveOrder = orderRepository.save(buildOrder);
     saveOrderedMenu.setOrder(saveOrder);
     orderedMenuRepository.save(saveOrderedMenu);
     return OrderDto.of(saveOrder);
@@ -215,7 +223,7 @@ public class OrderServiceImpl implements OrderService {
 
     order.setTotalPrice(order.getOrderedMenus());
     order.setTotalQuantity(order.getOrderedMenus());
-    order.setOrderStatus(OrderStatus.PaySuccess);
+    order.setOrderStatus(PaySuccess);
 
     if (orderFromCartInput.isCouponUse()) {
       Long couponId = orderFromCartInput.getCouponId();
@@ -264,7 +272,7 @@ public class OrderServiceImpl implements OrderService {
 
     order.setTotalPrice(order.getOrderedMenus());
     order.setTotalQuantity(order.getOrderedMenus());
-    order.setOrderStatus(OrderStatus.PaySuccess);
+    order.setOrderStatus(PaySuccess);
 
     for (Menus menus : menusMap.keySet()) {
       menus.minusStock(menusMap.get(menus));
@@ -286,16 +294,64 @@ public class OrderServiceImpl implements OrderService {
     return OrderDto.of(orderRepository.save(order));
   }
 
-  @Override
-  public OrderDto rejectOrder(long orderId) {
+  public Order validationOrder(long orderId) {
     Order order = orderRepository.findById(orderId)
         .orElseThrow(() -> new CustomException(ORDER_NOT_FOUND));
 
-    if (!order.getOrderStatus().equals(OrderStatus.PaySuccess)) {
-      throw new IllegalArgumentException();
+    if (order.getOrderStatus().equals(CancelByCafe)) {
+      throw new CustomException(ALREADY_CANCEL_BY_CAFE);
     }
 
-    order.setOrderStatus(OrderStatus.CancelByCafe);
+    if (order.getOrderStatus().equals(CancelByUser)) {
+      throw new CustomException(ALREADY_CANCEL_BY_USER);
+    }
+
+    if (!order.getOrderStatus().equals(PaySuccess)) {
+      throw new CustomException(CAN_NOT_ORDER_CANCEL);
+    }
+    return order;
+  }
+
+  public void validationOrderAndUser(Order order, String userId) {
+    User user = userRepository.findByLoginId(userId)
+        .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+
+    if (!order.getUser().equals(user)) {
+      throw new CustomException(NOT_MATCH_USER_AND_ORDER);
+    }
+  }
+  @Override
+  public OrderDto rejectOrder(long orderId) {
+    Order order = validationOrder(orderId);
+
+    order.setOrderStatus(CancelByCafe);
+    if (order.isCouponUse()) {
+      long couponId = order.getCouponId();
+      Coupon coupon = couponRepository.findById(couponId)
+          .orElseThrow(() -> new CustomException(COUPON_NOT_FOUND));
+      coupon.setUsedYn(false);
+      couponRepository.save(coupon);
+    }
+    List<OrderedMenu> orderedMenus = order.getOrderedMenus();
+
+    for (OrderedMenu orderedMenu : orderedMenus) {
+      Menus menus = orderedMenu.getMenus();
+      menus.plusStockByCancel(orderedMenu.getQuantity());
+      menuRepository.save(menus);
+    }
+    // TODO: 소비자가 결제한 금액 환불 로직
+
+    // TODO: orderMenu만 삭제할지, order도 삭제할지 고려,
+
+    return OrderDto.of(orderRepository.save(order));
+  }
+
+  @Override
+  public OrderDto cancelOrder(long orderId, String userId) {
+    Order order = validationOrder(orderId);
+    validationOrderAndUser(order, userId);
+
+    order.setOrderStatus(CancelByUser);
     if (order.isCouponUse()) {
       long couponId = order.getCouponId();
       Coupon coupon = couponRepository.findById(couponId)

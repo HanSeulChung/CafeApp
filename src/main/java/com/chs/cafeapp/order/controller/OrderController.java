@@ -7,7 +7,11 @@ import com.chs.cafeapp.order.dto.OrderFromCartInput;
 import com.chs.cafeapp.order.dto.OrderInput;
 import com.chs.cafeapp.order.dto.OrderResponse;
 import com.chs.cafeapp.order.service.OrderService;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -15,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import com.chs.cafeapp.exception.CustomException;
+import org.w3c.dom.stylesheets.LinkStyle;
 
 /**
  * 주문 Controller
@@ -72,4 +77,16 @@ public class OrderController {
     OrderDto orderDto = orderService.orderAllFromCart(reqeust, userId);
     return OrderResponse.toResponse(orderDto, orderDto.getOrderStatus().getDescription());
   }
+
+  /**
+   * 결제 취소 Controller
+   * @param orderId: 사용자가 결제 취소할 주문 id
+   * @return OrderResponse: 거절한 order id와 message
+   */
+  @PatchMapping("/cancels/{orderId}")
+  public ResponseEntity<OrderResponse> rejectOrderStatus(@PathVariable long orderId, @RequestParam String userId) {
+    OrderDto orderDto = orderService.cancelOrder(orderId, userId);
+    return ResponseEntity.ok(OrderResponse.toResponse(orderDto, orderDto.getOrderStatus().getDescription()));
+  }
+
 }

@@ -76,8 +76,7 @@ public class MenuAdminController {
    */
   @GetMapping()
   public ResponseEntity<List<MenuResponse>> readAllMenus() {
-    var result = MenuResponse.toResponse(menuService.viewAllMenus());
-    return ResponseEntity.ok(result);
+    return ResponseEntity.ok(menuService.viewAllMenus());
   }
 
   /**
@@ -88,8 +87,7 @@ public class MenuAdminController {
    */
   @GetMapping("superCategory/{superCategory}")
   public ResponseEntity<List<MenuResponse>> readAllMenusBySuperCategory(@PathVariable("superCategory") String superCategory) {
-    var result = MenuResponse.toResponse(menuService.viewAllBySuperCategory(superCategory));
-    return ResponseEntity.ok(result);
+    return ResponseEntity.ok(menuService.viewAllBySuperCategory(superCategory));
   }
 
   /**
@@ -100,8 +98,7 @@ public class MenuAdminController {
    */
   @GetMapping("/baseCategory/{baseCategory}")
   public ResponseEntity<List<MenuResponse>> readAllMenusByBaseCategory(@PathVariable("baseCategory") String baseCategory) {
-    var result = MenuResponse.toResponse(menuService.viewAllByBaseCategory(baseCategory));
-    return ResponseEntity.ok(result);
+    return ResponseEntity.ok(menuService.viewAllByBaseCategory(baseCategory));
   }
 
   /**
