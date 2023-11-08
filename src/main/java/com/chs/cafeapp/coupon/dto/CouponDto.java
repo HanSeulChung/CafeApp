@@ -26,6 +26,11 @@ public class CouponDto {
 
   public static List<CouponDto> convertListDtofromPageEntity(Page<Coupon> coupons) {
     List<Coupon> couponList = coupons.getContent();
+
+    if (couponList == null) {
+      return new ArrayList<>();
+    }
+
     return couponList.stream()
         .map(CouponDto::of)
         .collect(Collectors.toList());

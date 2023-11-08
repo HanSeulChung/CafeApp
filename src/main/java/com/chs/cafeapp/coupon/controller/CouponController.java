@@ -31,14 +31,7 @@ public class CouponController {
   @GetMapping()
   public ResponseEntity<Page<CouponResponse>> viewAllCoupons(
       @RequestParam("userId") String userId,
-      @RequestParam(name = "page", defaultValue = "0") int page,  // 페이지 번호
-      @RequestParam(name = "size", defaultValue = "10") int size,  // 페이지 크기
-      @RequestParam(name = "sortBy", defaultValue = "createDateTime") String[] sortBy, // 정렬 조건
-      @RequestParam(name = "direction", defaultValue = "asc") String direction  // 정렬 방향
-  ) {
-    Sort sort = Sort.by(Sort.Direction.fromString(direction), sortBy);
-    Pageable pageable = PageRequest.of(page, size, sort);
-
+      Pageable pageable) {
     return ResponseEntity.ok(couponService.viewAllCoupons(userId, pageable));
   }
 
@@ -51,14 +44,7 @@ public class CouponController {
   @GetMapping("/usable-coupons")
   public ResponseEntity<Page<CouponResponse>> viewAllCanUseCoupons(
       @RequestParam("userId") String userId,
-      @RequestParam(name = "page", defaultValue = "0") int page,
-      @RequestParam(name = "size", defaultValue = "10") int size,
-      @RequestParam(name = "sortBy", defaultValue = "createDateTime") String[] sortBy,
-      @RequestParam(name = "direction", defaultValue = "asc") String direction
-  ) {
-    Sort sort = Sort.by(Sort.Direction.fromString(direction), sortBy);
-    Pageable pageable = PageRequest.of(page, size, sort);
-
+      Pageable pageable) {
     return ResponseEntity.ok(couponService.viewAllCanUseCoupons(userId, pageable));
   }
 
@@ -71,14 +57,8 @@ public class CouponController {
   @GetMapping("/un-usable")
   public ResponseEntity<Page<CouponResponse>> viewAllCanNotUseCoupons(
       @RequestParam("userId") String userId,
-      @RequestParam(name = "page", defaultValue = "0") int page,  // 페이지 번호
-      @RequestParam(name = "size", defaultValue = "10") int size,  // 페이지 크기
-      @RequestParam(name = "sortBy", defaultValue = "createDateTime") String[] sortBy, // 정렬 조건
-      @RequestParam(name = "direction", defaultValue = "asc") String direction  // 정렬 방향
+      Pageable pageable
   ) {
-    Sort sort = Sort.by(Sort.Direction.fromString(direction), sortBy);
-    Pageable pageable = PageRequest.of(page, size, sort);
-
     return ResponseEntity.ok(couponService.viewAllCanNotUseCoupons(userId, pageable));
   }
 }
