@@ -21,6 +21,9 @@ import com.chs.cafeapp.menu.repository.MenuRepository;
 import com.chs.cafeapp.menu.service.MenuService;
 import java.util.List;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @AllArgsConstructor
@@ -98,35 +101,43 @@ public class MenuServiceImpl implements MenuService {
   }
 
   @Override
-  public List<MenuResponse> viewAllMenus() {
-    return MenuResponse.toResponse(MenuDto.of(menuRepository.findAll()));
+  public Page<MenuResponse> viewAllMenus(Pageable pageable) {
+    Page<Menus> menusPage = menuRepository.findAll(pageable);
+    List<MenuDto> menuDtoList = MenuDto.convertListDtoFromPageEntity(menusPage);
+    List<MenuResponse> responseList = MenuResponse.toResponse(menuDtoList);
+    return new PageImpl<>(responseList, menusPage.getPageable(), menusPage.getTotalElements());
   }
 
   @Override
-  public List<MenuResponse> viewAllBySuperCategory(String superCategory) {
+  public Page<MenuResponse> viewAllBySuperCategory(String superCategory, Pageable pageable) {
     List<Long> categoryIds = categoryRepository.findIdsBySuperCategory(superCategory);
     if (categoryIds == null) {
       throw new CustomException(CATEGORY_NOT_FOUND);
     }
-    List<Menus> allByCategoryIdIn = menuRepository.findAllByCategoryIdIn(categoryIds);
-    return MenuResponse.toResponse(MenuDto.of(allByCategoryIdIn));
+
+    Page<Menus> allByCategoryIdIn = menuRepository.findAllByCategoryIdIn(categoryIds, pageable);
+    List<MenuDto> menuDtoList = MenuDto.convertListDtoFromPageEntity(allByCategoryIdIn);
+    List<MenuResponse> responseList = MenuResponse.toResponse(menuDtoList);
+    return new PageImpl<>(responseList, allByCategoryIdIn.getPageable(), allByCategoryIdIn.getTotalElements());
   }
 
   @Override
-  public List<MenuResponse> viewAllByBaseCategory(String baseCategory) {
+  public Page<MenuResponse> viewAllByBaseCategory(String baseCategory, Pageable pageable) {
 
     List<Long> categoryIds = categoryRepository.findIdsByBaseCategory(baseCategory);
     if (categoryIds == null) {
       throw new CustomException(CATEGORY_NOT_FOUND);
     }
-    List<Menus> allByCategoryIdIn = menuRepository.findAllByCategoryIdIn(categoryIds);
-    return MenuResponse.toResponse(MenuDto.of(allByCategoryIdIn));
+
+    Page<Menus> allByCategoryIdIn = menuRepository.findAllByCategoryIdIn(categoryIds, pageable);
+    List<MenuDto> menuDtoList = MenuDto.convertListDtoFromPageEntity(allByCategoryIdIn);
+    List<MenuResponse> responseList = MenuResponse.toResponse(menuDtoList);
+    return new PageImpl<>(responseList, allByCategoryIdIn.getPageable(), allByCategoryIdIn.getTotalElements());
   }
 
   @Override
   public MenuDetail viewDetailMenu(Long menuId) {
     Menus menus = validationMenus(menuId);
-
     return MenuDetail.toDetail(MenuDto.of(menus));
   }
 

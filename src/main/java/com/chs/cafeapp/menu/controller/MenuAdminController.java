@@ -9,6 +9,8 @@ import com.chs.cafeapp.menu.service.MenuService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -72,33 +74,37 @@ public class MenuAdminController {
 
   /**
    * 메뉴 전체 조회 Controller
-   * @return List<MenuResponse>: 등록된 메뉴들 List 형식으로 반환
+   * @return Page<MenuResponse>: 등록된 메뉴들 Page 형식으로 반환
    */
   @GetMapping()
-  public ResponseEntity<List<MenuResponse>> readAllMenus() {
-    return ResponseEntity.ok(menuService.viewAllMenus());
+  public ResponseEntity<Page<MenuResponse>> readAllMenus(Pageable pageable) {
+    return ResponseEntity.ok(menuService.viewAllMenus(pageable));
   }
 
   /**
    * 메뉴 카테고리 대분류로 조회 Controller
    * @param superCategory: 대분류 카테고리 이름 ex) 음식, 음료, 굿즈
-   * @return 해당 카테고리에 설정되어있는 메뉴 List로 반환
+   * @return Page<MenuResponse>: 해당 카테고리에 설정되어있는 메뉴 Page 반환
    * @throws CustomException: 해당 대분류 카테고리 이름이 없을 경우 CustomException 발생
    */
   @GetMapping("superCategory/{superCategory}")
-  public ResponseEntity<List<MenuResponse>> readAllMenusBySuperCategory(@PathVariable("superCategory") String superCategory) {
-    return ResponseEntity.ok(menuService.viewAllBySuperCategory(superCategory));
+  public ResponseEntity<Page<MenuResponse>> readAllMenusBySuperCategory(
+      @PathVariable("superCategory") String superCategory,
+      Pageable pageable) {
+    return ResponseEntity.ok(menuService.viewAllBySuperCategory(superCategory, pageable));
   }
 
   /**
    * 메뉴 카테고리 중분류로 조회 Controller
    * @param baseCategory: 중분류 카테고리 이름 ex) 케이크, 샌드위치, 에스프레소, 텀블러
-   * @return 해당 카테고리에 설정되어있는 메뉴들 List로 반환
+   * @return Page<MenuResponse>: 해당 카테고리에 설정되어있는 메뉴들 Page로 반환
    * @throws CustomException: 해당 중분류 카테고리 이름이 없을 경우 CustomException 발생
    */
   @GetMapping("/baseCategory/{baseCategory}")
-  public ResponseEntity<List<MenuResponse>> readAllMenusByBaseCategory(@PathVariable("baseCategory") String baseCategory) {
-    return ResponseEntity.ok(menuService.viewAllByBaseCategory(baseCategory));
+  public ResponseEntity<Page<MenuResponse>> readAllMenusByBaseCategory(
+      @PathVariable("baseCategory") String baseCategory,
+      Pageable pageable) {
+    return ResponseEntity.ok(menuService.viewAllByBaseCategory(baseCategory, pageable));
   }
 
   /**
