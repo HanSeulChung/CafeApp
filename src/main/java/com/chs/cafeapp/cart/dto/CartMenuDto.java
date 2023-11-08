@@ -1,12 +1,16 @@
 package com.chs.cafeapp.cart.dto;
 
 import com.chs.cafeapp.cart.entity.CartMenu;
+import com.chs.cafeapp.coupon.dto.CouponDto;
+import com.chs.cafeapp.coupon.entity.Coupon;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
+import org.springframework.data.domain.Page;
 
 @Getter
 @Builder
@@ -19,6 +23,15 @@ public class CartMenuDto {
   private String menuName;
   private int quantity;
 
+  public static List<CartMenuDto> convertListDtofromPageEntity(Page<CartMenu> cartMenus) {
+    List<CartMenu> cartMenuList = cartMenus.getContent();
+    if (cartMenuList == null) {
+      return new ArrayList<>();
+    }
+    return cartMenuList.stream()
+        .map(CartMenuDto::of)
+        .collect(Collectors.toList());
+  }
 
   public static List<CartMenuDto> of(List<CartMenu> cartMenuList) {
 

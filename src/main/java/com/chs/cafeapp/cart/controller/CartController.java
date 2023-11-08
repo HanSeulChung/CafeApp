@@ -8,6 +8,12 @@ import com.chs.cafeapp.cart.service.CartMenuService;
 import com.chs.cafeapp.cart.service.CartService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.data.web.SortDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -47,12 +53,20 @@ public class CartController {
   /**
    * 장바구니 조회 Controller
    * @param userId: 사용자 loginId
-   * @return List<CartMenuDto>: 해당 사용자의 장바구니에 등록된 CartMenu List 형식으로 반환, 장바구니가 비어있을 경우 빈 List 반환
+   * @return Page<CartMenuDto>: 해당 사용자의 장바구니에 등록된 CartMenu List 형식으로 반환, 장바구니가 비어있을 경우 빈 List 반환
    * @throws CustomException: 해당 userId를 가진 사용자가 없을 경우 CustomException 발생
    */
   @GetMapping()
-  public ResponseEntity<List<CartMenuDto>> viewCart(@RequestParam String userId) {
-    List<CartMenuDto> cartMenuDtos = cartService.viewAllCartMenuInCart(userId);
+  public ResponseEntity<Page<CartMenuDto>> viewCart(
+      @RequestParam("userId") String userId,
+//      @PageableDefault(page = 0, size = 10) Pageable pageable,
+//      @SortDefault(sort = "createDateTime", direction = Sort.Direction.ASC) Sort sort
+  Pageable pageable
+  ) {
+//    Sort sort = Sort.by(Sort.Direction.fromString(direction), sortBy);
+//    Pageable pageable = PageRequest.of(page, size, sort);
+//    pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort);
+    Page<CartMenuDto> cartMenuDtos = cartService.viewAllCartMenuInCart(userId, pageable);
     return ResponseEntity.ok(cartMenuDtos);
   }
 
