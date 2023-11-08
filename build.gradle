@@ -37,6 +37,9 @@ dependencies {
 //    implementation 'javax.mail:javax.mail-api:1.7.3'
 //    implementation 'com.sun.mail:javax.mail:1.7.3'
 
+	// kfaka
+	implementation 'org.springframework.kafka:spring-kafka'
+
 	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
 	implementation 'com.h2database:h2:1.4.200'
 	implementation 'io.springfox:springfox-boot-starter:3.0.0'
@@ -58,8 +61,10 @@ dependencies {
 	testImplementation('org.springframework.boot:spring-boot-starter-test:2.4.3')
 	testImplementation('org.junit.jupiter:junit-jupiter')
 	testImplementation('org.junit.jupiter:junit-jupiter-api')
+	testImplementation 'org.springframework.kafka:spring-kafka-test'
 	testRuntimeOnly('org.junit.jupiter:junit-jupiter-engine')
 	testRuntimeOnly 'com.h2database:h2'
+
 }
 
 tasks.named('test') {
