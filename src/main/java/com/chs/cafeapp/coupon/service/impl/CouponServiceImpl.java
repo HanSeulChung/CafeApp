@@ -78,7 +78,7 @@ public class CouponServiceImpl implements CouponService {
   public Page<CouponResponse> viewAllCoupons(String userId, Pageable pageable) {
     User user = validationUser(userId);
     Page<Coupon> coupons = couponRepository.findAllByUserId(user.getId(), pageable);
-    List<CouponDto> couponDtoList = CouponDto.convertListDtofromPageEntity(coupons);
+    List<CouponDto> couponDtoList = CouponDto.convertListDtoFromPageEntity(coupons);
     List<CouponResponse> responseList = CouponResponse.toResponse(couponDtoList);
     return new PageImpl<>(responseList, coupons.getPageable(), coupons.getTotalElements());
   }
@@ -87,7 +87,7 @@ public class CouponServiceImpl implements CouponService {
   public Page<CouponResponse> viewAllCanUseCoupons(String userId, Pageable pageable) {
     User user = validationUser(userId);
     Page<Coupon> coupons = couponRepository.findAllByUserIdAndUsedYnFalseAndExpiredYnFalse(user.getId(), pageable);
-    List<CouponDto> couponDtoList = CouponDto.convertListDtofromPageEntity(coupons);
+    List<CouponDto> couponDtoList = CouponDto.convertListDtoFromPageEntity(coupons);
     List<CouponResponse> responseList = CouponResponse.toResponse(couponDtoList,  CAN_USE_COUPON.getStatusName());
     return new PageImpl<>(responseList, coupons.getPageable(), coupons.getTotalElements());
   }
@@ -96,7 +96,7 @@ public class CouponServiceImpl implements CouponService {
   public Page<CouponResponse> viewAllCanNotUseCoupons(String userId, Pageable pageable) {
     User user = validationUser(userId);
     Page<Coupon> coupons = couponRepository.findAllByUserIdAndUsedYnTrueOrUserIdAndExpiredYnTrue(user.getId(), user.getId(), pageable);
-    List<CouponDto> couponDtoList = CouponDto.convertListDtofromPageEntity(coupons);
+    List<CouponDto> couponDtoList = CouponDto.convertListDtoFromPageEntity(coupons);
     List<CouponResponse> responseList = CouponResponse.toResponse(couponDtoList);
     return new PageImpl<>(responseList, coupons.getPageable(), coupons.getTotalElements());
   }

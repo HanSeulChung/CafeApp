@@ -24,9 +24,7 @@ import java.util.Optional;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -110,7 +108,7 @@ public class CartServiceImpl implements CartService {
     }
     Page<CartMenu> cartMenuPage = cartMenusRepository.findAllByCartId(cart.getId(), pageable);
 
-    List<CartMenuDto> cartMenuDtoList = CartMenuDto.convertListDtofromPageEntity(cartMenuPage);
+    List<CartMenuDto> cartMenuDtoList = CartMenuDto.convertListDtoFromPageEntity(cartMenuPage);
 
     return new PageImpl<>(cartMenuDtoList, pageable, cartMenuPage.getTotalElements());
   }

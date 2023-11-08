@@ -24,7 +24,7 @@ public class CouponDto {
   private LocalDateTime expirationDateTime;
   private boolean expiredYn;
 
-  public static List<CouponDto> convertListDtofromPageEntity(Page<Coupon> coupons) {
+  public static List<CouponDto> convertListDtoFromPageEntity(Page<Coupon> coupons) {
     List<Coupon> couponList = coupons.getContent();
 
     if (couponList == null) {

@@ -1,8 +1,6 @@
 package com.chs.cafeapp.cart.dto;
 
 import com.chs.cafeapp.cart.entity.CartMenu;
-import com.chs.cafeapp.coupon.dto.CouponDto;
-import com.chs.cafeapp.coupon.entity.Coupon;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -23,7 +21,7 @@ public class CartMenuDto {
   private String menuName;
   private int quantity;
 
-  public static List<CartMenuDto> convertListDtofromPageEntity(Page<CartMenu> cartMenus) {
+  public static List<CartMenuDto> convertListDtoFromPageEntity(Page<CartMenu> cartMenus) {
     List<CartMenu> cartMenuList = cartMenus.getContent();
     if (cartMenuList == null) {
       return new ArrayList<>();
