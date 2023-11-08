@@ -19,6 +19,9 @@ import static com.chs.cafeapp.exception.type.ErrorCode.USER_NOT_FOUND;
 import static com.chs.cafeapp.order.type.OrderStatus.CancelByCafe;
 import static com.chs.cafeapp.order.type.OrderStatus.CancelByUser;
 import static com.chs.cafeapp.order.type.OrderStatus.PaySuccess;
+import static com.chs.cafeapp.order.type.OrderStatus.PickUpSuccess;
+import static com.chs.cafeapp.order.type.OrderStatus.PreParingMenus;
+import static com.chs.cafeapp.order.type.OrderStatus.WaitingPickUp;
 
 import com.chs.cafeapp.cart.entity.Cart;
 import com.chs.cafeapp.cart.entity.CartMenu;
@@ -388,23 +391,23 @@ public class OrderServiceImpl implements OrderService {
 
     Order order = validationChangeOrderStatus(orderId);
 
-    String orderStatusName = order.getOrderStatus().name();
-    switch (orderStatusName) {
-      case "PaySuccess":
-        order.setOrderStatus(OrderStatus.PreParingMenus);
+    OrderStatus orderStatus = order.getOrderStatus();
+    switch (orderStatus) {
+      case PaySuccess:
+        order.setOrderStatus(PreParingMenus);
         break;
-      case "PreParingMenus":
-        order.setOrderStatus(OrderStatus.WaitingPickUp);
+      case PreParingMenus:
+        order.setOrderStatus(WaitingPickUp);
         break;
-      case "WaitingPickUp":
-        order.setOrderStatus(OrderStatus.PickUpSuccess);
+      case WaitingPickUp:
+        order.setOrderStatus(PickUpSuccess);
         long drinksCnt = order.getOrderedMenus().stream()
             .filter(orderedMenu -> "음료".equals(orderedMenu.getMenus().getCategory().getSuperCategory()))
             .mapToLong(orderedMenu -> orderedMenu.getQuantity())
             .sum();
         stampService.addStampNumbers(drinksCnt, order.getUser().getLoginId());
         break;
-      case "PickUpSuccess":
+      case PickUpSuccess:
         throw new CustomException(ALREADY_PICKUP_SUCCESS);
     }
     return OrderDto.of(orderRepository.save(order));
