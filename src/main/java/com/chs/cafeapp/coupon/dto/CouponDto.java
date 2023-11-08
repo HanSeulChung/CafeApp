@@ -4,10 +4,12 @@ import com.chs.cafeapp.coupon.entity.Coupon;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
+import org.springframework.data.domain.Page;
 
 @Getter
 @Builder
@@ -22,6 +24,12 @@ public class CouponDto {
   private LocalDateTime expirationDateTime;
   private boolean expiredYn;
 
+  public static List<CouponDto> convertListDtofromPageEntity(Page<Coupon> coupons) {
+    List<Coupon> couponList = coupons.getContent();
+    return couponList.stream()
+        .map(CouponDto::of)
+        .collect(Collectors.toList());
+  }
   public static List<CouponDto> of(List<Coupon> couponList) {
     if (couponList != null) {
       List<CouponDto> couponDtoList = new ArrayList<>();
