@@ -77,7 +77,7 @@ public class ValidationCheck {
     return cart;
   }
 
-  public CartMenu validtaionCartMenu(long cartMenuId) {
+  public CartMenu validationCartMenu(long cartMenuId) {
     CartMenu cartMenu = cartMenusRepository.findById(cartMenuId)
         .orElseThrow(() -> new CustomException(CART_MENU_NOT_FOUND));
 

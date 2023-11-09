@@ -1,7 +1,6 @@
 package com.chs.cafeapp.order.service.impl;
 
 import static com.chs.cafeapp.exception.type.ErrorCode.CAN_NOT_ORDER_THAN_STOCK;
-import static com.chs.cafeapp.exception.type.ErrorCode.CART_MENU_NOT_FOUND;
 import static com.chs.cafeapp.exception.type.ErrorCode.COUPON_NOT_FOUND;
 import static com.chs.cafeapp.exception.type.ErrorCode.EMPTY_SELECTED_CART_MENU;
 import static com.chs.cafeapp.exception.type.ErrorCode.INVALID_REQUEST;
@@ -118,7 +117,7 @@ public class OrderServiceForUserImpl implements OrderServiceForUser {
     }
 
     if (orderFromCartInput.getIdList().size() == 1) {
-      CartMenu cartMenu = validationCheck.validtaionCartMenu(orderFromCartInput.getIdList().get(0));
+      CartMenu cartMenu = validationCheck.validationCartMenu(orderFromCartInput.getIdList().get(0));
       Menus menus = validationCheck.validationMenus(cartMenu.getMenus().getId());
 
       OrderInput orderInput = OrderInput.builder()
@@ -151,8 +150,7 @@ public class OrderServiceForUserImpl implements OrderServiceForUser {
     Map<Menus, Integer> menusMap = new HashMap<>();
 
     for (Long cartMenuId : orderFromCartInput.getIdList()) {
-      CartMenu cartMenu = cartMenusRepository.findById(cartMenuId)
-          .orElseThrow(() -> new CustomException(CART_MENU_NOT_FOUND));
+      CartMenu cartMenu = validationCheck.validationCartMenu(cartMenuId);
 
       Menus menus = validationCheck.validationMenus(cartMenu.getMenus().getId());
 

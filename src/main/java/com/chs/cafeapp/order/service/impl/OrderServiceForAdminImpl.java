@@ -39,7 +39,7 @@ public class OrderServiceForAdminImpl implements OrderServiceForAdmin {
 
   private final StampService stampService;
 
-  private ValidationCheck validationCheck;
+  private final ValidationCheck validationCheck;
   @Override
   public OrderDto rejectOrder(long orderId) {
     Order order = validationCheck.validationOrder(orderId);
