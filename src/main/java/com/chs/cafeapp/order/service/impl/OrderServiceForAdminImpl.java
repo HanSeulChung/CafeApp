@@ -435,6 +435,14 @@ public class OrderServiceImpl implements OrderService {
   }
 
   @Override
+  public Slice<OrderDto> viewAllOrders(String userId, Pageable pageable) {
+    User user = validationUser(userId);
+    Slice<Order> orderSlice = orderRepository.findAllByUserId(pageable, user.getId());
+    List<OrderDto> orderDtoList = OrderDto.convertListDtoFromPageEntity(orderSlice);
+    return new SliceImpl<>(orderDtoList, pageable, orderSlice.hasNext());
+  }
+
+  @Override
   public Slice<OrderDto> viewOrdersByOrderStatus(int orderStatusNum, Pageable pageable) {
     OrderStatus byNumOrderStatus = OrderStatus.findByNum(orderStatusNum);
     Slice<Order> orderSlice = orderRepository.findAllByOrderStatus(byNumOrderStatus, pageable);

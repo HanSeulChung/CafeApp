@@ -30,6 +30,11 @@ public interface OrderService {
   Slice<OrderDto> viewAllOrders(Pageable pageable);
 
   /**
+   * 주문 전체 조회 (for user)
+   */
+  Slice<OrderDto> viewAllOrders(String userId, Pageable pageable);
+
+  /**
    * orderStatus에 따른 주문 조회
    */
   Slice<OrderDto> viewOrdersByOrderStatus(int orderStatus, Pageable pageable);
