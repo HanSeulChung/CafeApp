@@ -26,7 +26,7 @@ public class OrderAdminController {
 
   /**
    * 전체 주문 조회 Controller
-   * @param pageable: defalut -> page = 0, size = 10이고 수정 가능,
+   * @param pageable: default -> page = 0, size = 10이고 수정 가능,
    *                + 정렬 기능 >sortBy=정렬할 기준 column-asc
    * @return Slice<OrderDto>: 전체 주문 Slice 반환
    */
@@ -37,7 +37,7 @@ public class OrderAdminController {
 
   /**
    * 하루 전체 주문 조회 Controller
-   * @param pageable: defalut -> page = 0, size = 10이고 수정 가능,
+   * @param pageable: default -> page = 0, size = 10이고 수정 가능,
    *                + 정렬 기능 >sortBy=정렬할 기준 column-asc
    * @return Slice<OrderDto>: 하루 전체 주문 Slice로 반환
    */
@@ -48,7 +48,7 @@ public class OrderAdminController {
 
   /**
    * 일주일 전체 주문 조회 Controller
-   * @param pageable: defalut -> page = 0, size = 10이고 수정 가능,
+   * @param pageable: default -> page = 0, size = 10이고 수정 가능,
    *                + 정렬 기능 >sortBy=정렬할 기준 column-asc
    * @return Slice<OrderDto>: 일주일 전체 주문 Slice로 반환
    */
@@ -59,7 +59,7 @@ public class OrderAdminController {
 
   /**
    * 한달 전체 주문 조회 Controller
-   * @param pageable: defalut -> page = 0, size = 10이고 수정 가능,
+   * @param pageable: default -> page = 0, size = 10이고 수정 가능,
    *                + 정렬 기능 >sortBy=정렬할 기준 column-asc
    * @return Slice<OrderDto>: 한달 전체 주문 Slice로 반환
    */
@@ -70,7 +70,7 @@ public class OrderAdminController {
 
   /**
    * 3개월 전체 주문 조회 Controller
-   * @param pageable: defalut -> page = 0, size = 10이고 수정 가능,
+   * @param pageable: default -> page = 0, size = 10이고 수정 가능,
    *                + 정렬 기능 >sortBy=정렬할 기준 column-asc
    * @return Slice<OrderDto>: 3개월 전체 주문 Slice로 반환
    */
@@ -81,7 +81,7 @@ public class OrderAdminController {
 
   /**
    * 6개월 전체 주문 조회 Controller
-   * @param pageable: defalut -> page = 0, size = 10이고 수정 가능,
+   * @param pageable: default -> page = 0, size = 10이고 수정 가능,
    *                + 정렬 기능 >sortBy=정렬할 기준 column-asc
    * @return Slice<OrderDto>: 6개월 전체 주문 Slice로 반환
    */
@@ -92,7 +92,7 @@ public class OrderAdminController {
 
   /**
    * 1년 전체 주문 조회 Controller
-   * @param pageable: defalut -> page = 0, size = 10이고 수정 가능,
+   * @param pageable: default -> page = 0, size = 10이고 수정 가능,
    *                + 정렬 기능 >sortBy=정렬할 기준 column-asc
    * @return Slice<OrderDto>: 1년 전체 주문 Slice로 반환
    */
@@ -104,7 +104,7 @@ public class OrderAdminController {
   /**
    * 주문 상태별로 주문 전체 조회 Controller
    * @param orderStatusNum: OrderStatus의 num값
-   * @param pageable: defalut -> page = 0, size = 10이고 수정 가능,
+   * @param pageable: default -> page = 0, size = 10이고 수정 가능,
    *                + 정렬 기능 >sortBy=정렬할 기준 column-asc
    * @return Slice<OrderDto>: 해당 orderStatusNum에 해당되는 주문들 Slice로 반환
    */
@@ -116,7 +116,7 @@ public class OrderAdminController {
   /**
    * 주문 상태별로 주문 하루 전체 조회 Controller
    * @param orderStatusNum: OrderStatus의 num값
-   * @param pageable: defalut -> page = 0, size = 10이고 수정 가능,
+   * @param pageable: default -> page = 0, size = 10이고 수정 가능,
    *                + 정렬 기능 >sortBy=정렬할 기준 column-asc
    * @return Slice<OrderDto>: 해당 orderStatusNum에 해당되는 주문들 Slice로 반환
    */
@@ -128,7 +128,7 @@ public class OrderAdminController {
   /**
    * 주문 상태별로 주문 일주일 전체 조회 Controller
    * @param orderStatusNum: OrderStatus의 num값
-   * @param pageable: defalut -> page = 0, size = 10이고 수정 가능,
+   * @param pageable: default -> page = 0, size = 10이고 수정 가능,
    *                + 정렬 기능 >sortBy=정렬할 기준 column-asc
    * @return Slice<OrderDto>: 해당 orderStatusNum에 해당되는 주문들 Slice로 반환
    */
@@ -140,7 +140,7 @@ public class OrderAdminController {
   /**
    * 주문 상태별로 주문 한달 전체 조회 Controller
    * @param orderStatusNum: OrderStatus의 num값
-   * @param pageable: defalut -> page = 0, size = 10이고 수정 가능,
+   * @param pageable: default -> page = 0, size = 10이고 수정 가능,
    *                + 정렬 기능 >sortBy=정렬할 기준 column-asc
    * @return Slice<OrderDto>: 해당 orderStatusNum에 해당되는 주문들 Slice로 반환
    */
@@ -152,7 +152,7 @@ public class OrderAdminController {
   /**
    * 주문 상태별로 주문 3개월 전체 조회 Controller
    * @param orderStatusNum: OrderStatus의 num값
-   * @param pageable: defalut -> page = 0, size = 10이고 수정 가능,
+   * @param pageable: default -> page = 0, size = 10이고 수정 가능,
    *                + 정렬 기능 >sortBy=정렬할 기준 column-asc
    * @return Slice<OrderDto>: 해당 orderStatusNum에 해당되는 주문들 Slice로 반환
    */
@@ -164,7 +164,7 @@ public class OrderAdminController {
   /**
    * 주문 상태별로 주문 6개월 전체 조회 Controller
    * @param orderStatusNum: OrderStatus의 num값
-   * @param pageable: defalut -> page = 0, size = 10이고 수정 가능,
+   * @param pageable: default -> page = 0, size = 10이고 수정 가능,
    *                + 정렬 기능 >sortBy=정렬할 기준 column-asc
    * @return Slice<OrderDto>: 해당 orderStatusNum에 해당되는 주문들 Slice로 반환
    */
@@ -176,7 +176,7 @@ public class OrderAdminController {
   /**
    * 주문 상태별로 주문 6개월 전체 조회 Controller
    * @param orderStatusNum: OrderStatus의 num값
-   * @param pageable: defalut -> page = 0, size = 10이고 수정 가능,
+   * @param pageable: default -> page = 0, size = 10이고 수정 가능,
    *                + 정렬 기능 >sortBy=정렬할 기준 column-asc
    * @return Slice<OrderDto>: 해당 orderStatusNum에 해당되는 주문들 Slice로 반환
    */

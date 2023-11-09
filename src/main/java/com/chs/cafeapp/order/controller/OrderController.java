@@ -93,7 +93,7 @@ public class OrderController {
   /**
    * 전체 주문 조회 Controller
    * @param userId: 주문한 사용자 loginId
-   * @param pageable: defalut -> page = 0, size = 10이고 수정 가능,
+   * @param pageable: default -> page = 0, size = 10이고 수정 가능,
    *                + 정렬 기능 >sortBy=정렬할 기준 column-asc
    * @return Slice<OrderDto>: 전체 주문 Slice로 반환
    */
@@ -105,7 +105,7 @@ public class OrderController {
   /**
    * 하루 전체 주문 조회 Controller
    * @param userId: 주문한 사용자 loginId
-   * @param pageable: defalut -> page = 0, size = 10이고 수정 가능,
+   * @param pageable: default -> page = 0, size = 10이고 수정 가능,
    *                + 정렬 기능 >sortBy=정렬할 기준 column-asc
    * @return Slice<OrderDto>: 하루 전체 주문 Slice로 반환
    */
@@ -120,7 +120,7 @@ public class OrderController {
   /**
    * 일주일 전체 주문 조회 Controller
    * @param userId: 주문한 사용자 loginId
-   * @param pageable: defalut -> page = 0, size = 10이고 수정 가능,
+   * @param pageable: default -> page = 0, size = 10이고 수정 가능,
    *                + 정렬 기능 >sortBy=정렬할 기준 column-asc
    * @return Slice<OrderDto>: 일주일 전체 주문 Slice로 반환
    */
@@ -135,7 +135,7 @@ public class OrderController {
   /**
    * 한달 전체 주문 조회 Controller
    * @param userId: 주문한 사용자 loginId
-   * @param pageable: defalut -> page = 0, size = 10이고 수정 가능,
+   * @param pageable: default -> page = 0, size = 10이고 수정 가능,
    *                + 정렬 기능 >sortBy=정렬할 기준 column-asc
    * @return Slice<OrderDto>: 한달 전체 주문 Slice로 반환
    */
@@ -150,7 +150,7 @@ public class OrderController {
   /**
    * 3개월 전체 주문 조회 Controller
    * @param userId: 주문한 사용자 loginId
-   * @param pageable: defalut -> page = 0, size = 10이고 수정 가능,
+   * @param pageable: default -> page = 0, size = 10이고 수정 가능,
    *                + 정렬 기능 >sortBy=정렬할 기준 column-asc
    * @return Slice<OrderDto>: 3개월 전체 주문 Slice로 반환
    */
@@ -165,7 +165,7 @@ public class OrderController {
   /**
    * 6개월 전체 주문 조회 Controller
    * @param userId: 주문한 사용자 loginId
-   * @param pageable: defalut -> page = 0, size = 10이고 수정 가능,
+   * @param pageable: default -> page = 0, size = 10이고 수정 가능,
    *                + 정렬 기능 >sortBy=정렬할 기준 column-asc
    * @return Slice<OrderDto>: 6개월 전체 주문 Slice로 반환
    */
@@ -180,7 +180,7 @@ public class OrderController {
   /**
    * 1년 전체 주문 조회 Controller
    * @param userId: 주문한 사용자 loginId
-   * @param pageable: defalut -> page = 0, size = 10이고 수정 가능,
+   * @param pageable: default -> page = 0, size = 10이고 수정 가능,
    *                + 정렬 기능 >sortBy=정렬할 기준 column-asc
    * @return Slice<OrderDto>: 1년 전체 주문 Slice로 반환
    */
