@@ -1,8 +1,8 @@
 package com.chs.cafeapp.service.order;
 
+import static com.chs.cafeapp.order.type.OrderStatus.CancelByCafe;
 import static org.hibernate.validator.internal.util.Contracts.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
@@ -14,6 +14,7 @@ import com.chs.cafeapp.cart.entity.CartMenu;
 import com.chs.cafeapp.cart.repository.CartMenusRepository;
 import com.chs.cafeapp.cart.repository.CartRepository;
 import com.chs.cafeapp.cart.service.impl.CartMenuServiceImpl;
+import com.chs.cafeapp.menu.category.entity.Category;
 import com.chs.cafeapp.menu.entity.Menus;
 import com.chs.cafeapp.menu.repository.MenuRepository;
 import com.chs.cafeapp.order.dto.OrderAllFromCartInput;
@@ -26,26 +27,30 @@ import com.chs.cafeapp.order.repository.OrderRepository;
 import com.chs.cafeapp.order.repository.OrderedMenuRepository;
 import com.chs.cafeapp.order.service.impl.OrderServiceImpl;
 import com.chs.cafeapp.order.type.OrderStatus;
+import com.chs.cafeapp.stamp.service.impl.StampServiceImpl;
 import com.chs.cafeapp.user.entity.User;
 import com.chs.cafeapp.user.repository.UserRepository;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import javax.validation.constraints.NotNull;
-import org.hibernate.type.NTextType;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.SliceImpl;
+import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
 
 @ExtendWith(MockitoExtension.class)
 class OrderServiceImplTest {
   @Mock
   private UserRepository userRepository;
-
   @Mock
   private MenuRepository menuRepository;
   @Mock
@@ -59,15 +64,21 @@ class OrderServiceImplTest {
 
   @InjectMocks
   private OrderServiceImpl orderService;
-
+  @Mock
+  private StampServiceImpl stampService;
   @Mock
   private CartMenuServiceImpl cartMenuService;
-  @Test
-  @Transactional
-  @DisplayName("장바구니 전체 메뉴 주문 성공")
-  void orderAllFromCart_Success() {
-    // given
-    User user = User.builder()
+
+  static User user;
+  static Menus menu1;
+  static Menus menu2;
+  static Menus menu3;
+  static Category category;
+  static OrderedMenu orderedMenu1;
+  static OrderedMenu orderedMenu10;
+  @BeforeEach
+  public void setUp() {
+    user = User.builder()
         .id(4L)
         .loginId("user2@naver.com")
         .password("user2비밀번호")
@@ -77,7 +88,7 @@ class OrderServiceImplTest {
         .age(32)
         .build();
 
-    Menus menu1 = Menus.builder()
+    menu1 = Menus.builder()
         .id(1L)
         .name("맛있는 닭가슴살 샌드위치")
         .kcal(500)
@@ -87,7 +98,12 @@ class OrderServiceImplTest {
         .isSoldOut(false)
         .build();
 
-    Menus menu2 = Menus.builder()
+    category = Category.builder()
+        .superCategory("음료")
+        .baseCategory("에스프레소")
+        .build();
+
+    menu2 = Menus.builder()
         .id(2L)
         .name("시원한 아이스 아메리카노")
         .kcal(8)
@@ -95,8 +111,39 @@ class OrderServiceImplTest {
         .stock(10)
         .price(4100)
         .isSoldOut(false)
+        .category(category)
         .build();
 
+    menu3 = Menus.builder()
+        .id(3L)
+        .name("따뜻한 핫 아메리카노")
+        .kcal(8)
+        .description("고소한 원두가 특징인 핫 카페 아메리카노 입니다.")
+        .stock(10)
+        .price(4100)
+        .isSoldOut(false)
+        .build();
+
+    orderedMenu1 = OrderedMenu.builder()
+        .userId(user.getLoginId())
+        .quantity(3)
+        .totalPrice(menu1.getPrice() * 3)
+        .menus(menu1)
+        .build();
+
+    orderedMenu10 = OrderedMenu.builder()
+        .userId(user.getLoginId())
+        .quantity(3)
+        .totalPrice(menu2.getPrice() * 3)
+        .menus(menu2)
+        .build();
+  }
+
+  @Test
+  @Transactional
+  @DisplayName("장바구니 전체 메뉴 주문 성공")
+  void orderAllFromCart_Success() {
+    // given
     CartMenu cartMenu1 = CartMenu.builder()
         .id(1L)
         .menus(menu1)
@@ -123,13 +170,6 @@ class OrderServiceImplTest {
     cartMenu1.setCart(cart);
     cartMenu2.setCart(cart);
     user.setCart(cart);
-
-//    userRepository.save(user);
-//    menuRepository.save(menu1);
-//    menuRepository.save(menu2);
-//    cartRepository.save(cart);
-//    cartMenusRepository.save(cartMenu1);
-//    cartMenusRepository.save(cartMenu2);
 
     when(userRepository.findByLoginId("user2@naver.com")).thenReturn(Optional.of(user));
     when(cartRepository.findById(1L)).thenReturn(Optional.of(cart)).thenReturn(any());
@@ -184,45 +224,6 @@ class OrderServiceImplTest {
   @DisplayName("장바구니 선택 메뉴 주문 성공")
   void orderFromCart_Success() {
       //given
-    User user = User.builder()
-        .id(4L)
-        .loginId("user2@naver.com")
-        .password("user2비밀번호")
-        .userName("user2 이름")
-        .nickName("user2 닉네임")
-        .sex("Male")
-        .age(32)
-        .build();
-
-    Menus menu1 = Menus.builder()
-        .id(1L)
-        .name("맛있는 닭가슴살 샌드위치")
-        .kcal(500)
-        .description("특제 비법 소스를 넣어 굉장히 맛있고 건강한 샌드위치 입니다.")
-        .stock(10)
-        .price(10000)
-        .isSoldOut(false)
-        .build();
-
-    Menus menu2 = Menus.builder()
-        .id(2L)
-        .name("시원한 아이스 아메리카노")
-        .kcal(8)
-        .description("고소한 원두가 특징인 아이스 카페 아메리카노 입니다.")
-        .stock(10)
-        .price(4100)
-        .isSoldOut(false)
-        .build();
-
-    Menus menu3 = Menus.builder()
-        .id(3L)
-        .name("따뜻한 핫 아메리카노")
-        .kcal(8)
-        .description("고소한 원두가 특징인 핫 카페 아메리카노 입니다.")
-        .stock(10)
-        .price(4100)
-        .isSoldOut(false)
-        .build();
 
     CartMenu cartMenu1 = CartMenu.builder()
         .id(1L)
@@ -312,57 +313,23 @@ class OrderServiceImplTest {
   @DisplayName("개별 메뉴 주문 성공")
   void orderIndividualMenu_Success() {
     //given
-    User user = User.builder()
-        .id(4L)
-        .loginId("user2@naver.com")
-        .password("user2비밀번호")
-        .userName("user2 이름")
-        .nickName("user2 닉네임")
-        .sex("Male")
-        .age(32)
-        .build();
-
-    Menus menu1 = Menus.builder()
-        .id(1L)
-        .name("맛있는 닭가슴살 샌드위치")
-        .kcal(500)
-        .description("특제 비법 소스를 넣어 굉장히 맛있고 건강한 샌드위치 입니다.")
-        .stock(10)
-        .price(10000)
-        .isSoldOut(false)
-        .build();
-
-    Menus menu2 = Menus.builder()
-        .id(2L)
-        .name("시원한 아이스 아메리카노")
-        .kcal(8)
-        .description("고소한 원두가 특징인 아이스 카페 아메리카노 입니다.")
-        .stock(10)
-        .price(4100)
-        .isSoldOut(false)
-        .build();
-
     Order order = Order.builder()
         .id(1L)
         .user(user)
+        .orderStatus(OrderStatus.PaySuccess)
         .build();
 
-    OrderedMenu orderedMenu1 = OrderedMenu.builder()
-        .userId(user.getLoginId())
-        .quantity(3)
-        .totalPrice(menu1.getPrice() * 3)
-        .menus(menu1)
-        .order(order)
-        .build();
+    orderedMenu10.setOrder(order);
+    order.setOrderedMenus(orderedMenu10);
+    order.setTotalQuantity(Arrays.asList(orderedMenu10));
+    order.setTotalPrice(Arrays.asList(orderedMenu10));
 
-    order.setTotalQuantity(Arrays.asList(orderedMenu1));
-    order.setTotalPrice(Arrays.asList(orderedMenu1));
-
+    orderRepository.save(order);
+    orderedMenuRepository.save(orderedMenu10);
     when(userRepository.findByLoginId("user2@naver.com")).thenReturn(Optional.of(user));
-    when(menuRepository.findById(1L)).thenReturn(Optional.of(menu1));
+    when(menuRepository.findById(1L)).thenReturn(Optional.of(menu2));
     when(orderRepository.save(any(Order.class))).thenReturn(order);
-    when(orderedMenuRepository.save(any(OrderedMenu.class))).thenReturn(orderedMenu1);
-
+    when(orderedMenuRepository.save(any(OrderedMenu.class))).thenReturn(orderedMenu10);
     // when
     OrderInput orderInput = new OrderInput(1L, "맛있는 닭가슴살 샌드위치", 10000, 3, false);
     OrderDto result = orderService.orderIndividualMenu(orderInput, "user2@naver.com");
@@ -371,13 +338,12 @@ class OrderServiceImplTest {
     assertNotNull(result);
     System.out.println(result);
     assertEquals(result.getOrderedMenus().size(), 1);
-//    assertEquals(result.getOrderedMenus(), Arrays.asList(orderedMenu1));
     assertEquals(result.getId(), 1L);
-    assertEquals(menu1.getStock(), 10 - 3);
-    assertEquals(menu2.getStock(), 10);
+    assertEquals(menu2.getStock(), 10 - 3);
+    assertEquals(menu1.getStock(), 10);
     assertEquals(order.getOrderStatus(), OrderStatus.PaySuccess);
     assertEquals(result.getTotalQuantity(), 3);
-    assertEquals(result.getTotalPrice(), menu1.getPrice() * orderInput.getQuantity());
+    assertEquals(result.getTotalPrice(), menu2.getPrice() * orderInput.getQuantity());
 
   }
   
@@ -385,10 +351,6 @@ class OrderServiceImplTest {
   @DisplayName("주문 거절 성공")
   void rejectOrderTest_Success() {
     //given
-    User user = User.builder()
-        .id(1L)
-        .loginId("usertest1@naver.com")
-        .build();
 
     Order order = Order.builder()
         .id(1L)
@@ -403,7 +365,7 @@ class OrderServiceImplTest {
     OrderDto orderDto = orderService.rejectOrder(1L);
     //then
     assertNotNull(orderDto);
-    assertEquals(orderDto.getOrderStatus(), OrderStatus.CancelByCafe);
+    assertEquals(orderDto.getOrderStatus(), CancelByCafe);
   }
 
   @Test
@@ -460,23 +422,22 @@ class OrderServiceImplTest {
   @DisplayName("주문 상태 변경 성공: WaitingPickUp -> PickUpSuccess")
   void changeOrderStatusTest_Success3() {
     //given
-    User user = User.builder()
-        .id(1L)
-        .loginId("usertest1@naver.com")
-        .build();
-
     Order order = Order.builder()
         .id(1L)
         .user(user)
         .orderStatus(OrderStatus.WaitingPickUp)
+        .orderedMenus(Arrays.asList(orderedMenu10))
         .build();
 
+    orderedMenu10.setOrder(order);
     orderRepository.save(order);
+
     when(orderRepository.findById(1L)).thenReturn(Optional.of(order));
     when(orderRepository.save(any(Order.class))).thenReturn(order);
     //when
     OrderDto orderDto = orderService.changeOrderStatus(1L);
     //then
+    verify(stampService, times(1)).addStampNumbers(orderedMenu10.getQuantity(), "user2@naver.com");
     assertNotNull(orderDto);
     assertEquals(orderDto.getOrderStatus(), OrderStatus.PickUpSuccess);
   }
@@ -484,11 +445,6 @@ class OrderServiceImplTest {
   @DisplayName("주문 상태 변경 실패")
   void changeOrderStatusTest_Fail() {
     //given
-    User user = User.builder()
-        .id(1L)
-        .loginId("usertest1@naver.com")
-        .build();
-
     Order order = Order.builder()
         .id(1L)
         .user(user)
@@ -507,10 +463,6 @@ class OrderServiceImplTest {
   @DisplayName("PayFail만 조회")
   void viewOrdersByOrderStatus_PayFail() {
     //given
-    User user = User.builder()
-        .loginId("user2@naver.com")
-        .build();
-
     Menus menus = Menus.builder()
         .id(1L)
         .build();
@@ -553,13 +505,15 @@ class OrderServiceImplTest {
     orderedMenuRepository.save(orderedMenu1);
     orderedMenuRepository.save(orderedMenu2);
 
-    when(orderRepository.findAllByOrderStatus(OrderStatus.PayFail)).thenReturn(Arrays.asList(order1));
-    //when
-    List<OrderDto> orderDtos = orderService.viewOrdersByOrderStatus(1);
+    Pageable pageable = PageRequest.of(0, 4, Sort.unsorted());
+    when(orderRepository.findAllByOrderStatus(any(OrderStatus.class), any(Pageable.class))).thenReturn(new SliceImpl<>(Arrays.asList(order1), pageable, false));
 
+    //when
+    Slice<OrderDto> orderDtos = orderService.viewOrdersByOrderStatus(1, pageable);
+    List<OrderDto> orderDtoList = orderDtos.getContent();
     //then
-    assertEquals(1, orderDtos.size());
-    assertEquals(3, orderDtos.get(0).getOrderedMenus().get(0).getQuantity());
+    assertEquals(1, orderDtoList.size());
+    assertEquals(3, orderDtoList.get(0).getOrderedMenus().get(0).getQuantity());
   }
 
   @Test
@@ -607,23 +561,22 @@ class OrderServiceImplTest {
     orderedMenuRepository.save(orderedMenu1);
     orderedMenuRepository.save(orderedMenu2);
 
-    when(orderRepository.findAllByOrderStatus(OrderStatus.PaySuccess)).thenReturn(Arrays.asList(order2));
+    Pageable pageable = PageRequest.of(0, 4, Sort.unsorted());
+    when(orderRepository.findAllByOrderStatus(any(OrderStatus.class), any(Pageable.class))).thenReturn(new SliceImpl<>(Arrays.asList(order2), pageable, false));
+
     //when
-    List<OrderDto> orderDtos = orderService.viewOrdersByOrderStatus(2);
+    Slice<OrderDto> orderDtos = orderService.viewOrdersByOrderStatus(2, pageable);
+    List<OrderDto> orderDtoList = orderDtos.getContent();
     //then
     System.out.println(orderDtos);
-    assertEquals(orderDtos.size(), 1);
-    assertEquals(orderDtos.get(0).getOrderedMenus().get(0).getQuantity(), 4);
+    assertEquals(orderDtoList.size(), 1);
+    assertEquals(orderDtoList.get(0).getOrderedMenus().get(0).getQuantity(), 4);
   }
 
   @Test
   @DisplayName("CancelByCafe만 조회")
   void viewOrdersByOrderStatus_CancelByCafe() {
     //given
-    User user = User.builder()
-        .loginId("user2@naver.com")
-        .build();
-
     Menus menus = Menus.builder()
         .id(1L)
         .build();
@@ -631,7 +584,7 @@ class OrderServiceImplTest {
     Order order1 = Order.builder()
         .id(1L)
         .user(user)
-        .orderStatus(OrderStatus.CancelByCafe)
+        .orderStatus(CancelByCafe)
         .build();
 
     OrderedMenu orderedMenu1 = OrderedMenu.builder()
@@ -644,7 +597,7 @@ class OrderServiceImplTest {
     Order order2 = Order.builder()
         .id(2L)
         .user(user)
-        .orderStatus(OrderStatus.CancelByCafe)
+        .orderStatus(CancelByCafe)
         .build();
 
     OrderedMenu orderedMenu2 = OrderedMenu.builder()
@@ -661,12 +614,15 @@ class OrderServiceImplTest {
     orderedMenuRepository.save(orderedMenu1);
     orderedMenuRepository.save(orderedMenu2);
 
-    when(orderRepository.findAllByOrderStatus(OrderStatus.CancelByCafe)).thenReturn(Arrays.asList(order1, order2));
+    Pageable pageable = PageRequest.of(0, 4, Sort.unsorted());
+    when(orderRepository.findAllByOrderStatus(any(OrderStatus.class), any(Pageable.class))).thenReturn(new SliceImpl<>(Arrays.asList(order1, order2), pageable, false));
+
     //when
-    List<OrderDto> orderDtos = orderService.viewOrdersByOrderStatus(3);
+    Slice<OrderDto> orderDtos = orderService.viewOrdersByOrderStatus(3, pageable);
+    List<OrderDto> orderDtoList = orderDtos.getContent();
     //then
-    assertEquals(orderDtos.size(), 2);
-    assertEquals(orderDtos.get(0).getOrderedMenus().size(), 1);
+    assertEquals(orderDtoList.size(), 2);
+    assertEquals(orderDtoList.get(0).getOrderedMenus().size(), 1);
   }
 
   @Test
@@ -726,12 +682,15 @@ class OrderServiceImplTest {
     orderedMenuRepository.save(orderedMenu1);
     orderedMenuRepository.save(orderedMenu2);
 
-    when(orderRepository.findAllByOrderStatus(OrderStatus.CancelByUser)).thenReturn(Arrays.asList(order1));
+    Pageable pageable = PageRequest.of(0, 4, Sort.unsorted());
+    when(orderRepository.findAllByOrderStatus(any(OrderStatus.class), any(Pageable.class))).thenReturn(new SliceImpl<>(Arrays.asList(order1), pageable, false));
+
     //when
-    List<OrderDto> orderDtos = orderService.viewOrdersByOrderStatus(4);
+    Slice<OrderDto> orderDtos = orderService.viewOrdersByOrderStatus(4, pageable);
+    List<OrderDto> orderDtoList = orderDtos.getContent();
     //then
-    assertEquals(orderDtos.size(), 1);
-    assertEquals(orderDtos.get(0).getOrderedMenus().size(), 2);
+    assertEquals(orderDtoList.size(), 1);
+    assertEquals(orderDtoList.get(0).getOrderedMenus().size(), 2);
   }
 
   // TODO: 앞선 테스트 코드와 동일한 형식, 지울지 그래도 둬야하는지 일단 keep
