@@ -11,10 +11,13 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface OrderRepository extends JpaRepository<Order, Long> {
 
-  // TODO: orderStatus의 num값으로 바로 찾을 수 있나?
-//  List<Order> findAllByOrderStatusNum(int orderStatusNum);
   List<Order> findAllByOrderStatus(OrderStatus orderStatus);
 
   Slice<Order> findAllByCreateDateTimeBetween(LocalDateTime startDateTime, LocalDateTime endDateTime, Pageable pageable);
   Slice<Order> findAllByOrderStatus(OrderStatus orderStatus, Pageable pageable);
+  Slice<Order> findAllByOrderStatusAndCreateDateTimeBetween(OrderStatus orderStatus, LocalDateTime startDateTime, LocalDateTime endDateTime, Pageable pageable);
+
+  Slice<Order> findAllByUserId(Pageable pageable, long userId);
+  Slice<Order> findAllByUserIdAndCreateDateTimeBetween(long userId, LocalDateTime startDateTime, LocalDateTime endDateTime, Pageable pageable);
+
 }

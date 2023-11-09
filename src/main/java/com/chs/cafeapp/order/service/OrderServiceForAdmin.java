@@ -4,41 +4,80 @@ import com.chs.cafeapp.order.dto.OrderAllFromCartInput;
 import com.chs.cafeapp.order.dto.OrderDto;
 import com.chs.cafeapp.order.dto.OrderFromCartInput;
 import com.chs.cafeapp.order.dto.OrderInput;
-import java.util.List;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 
-public interface OrderService {
+public interface OrderServiceForAdmin {
   /**
-   * 개별 상품 주문
-   */
-  OrderDto orderIndividualMenu(OrderInput orderInput, String userId);
-
-  /**
-   * 장바구니에서 여러 상품 주문(선택)
-   */
-  OrderDto orderFromCart(OrderFromCartInput orderFromCartInput, String userId);
-
-  /**
-   * 장바구니 메뉴 전체 주문
-   */
-  OrderDto orderAllFromCart(OrderAllFromCartInput orderAllFromCartInput, String userId);
-
-  /**  
-   * 주문 전체 조회 (for admin)
+   * 주문 전체 조회
    */
   Slice<OrderDto> viewAllOrders(Pageable pageable);
 
   /**
-   * 주문 전체 조회 (for user)
+   * 하루 전체 주문 조회
    */
-  Slice<OrderDto> viewAllOrders(String userId, Pageable pageable);
+  Slice<OrderDto> viewAllOrdersDuringDays(Pageable pageable);
 
   /**
-   * orderStatus에 따른 주문 조회
+   * 일주일 전체 주문 조회
+   */
+  Slice<OrderDto> viewAllOrdersDuringWeeks(Pageable pageable);
+
+  /**
+   * 1개월 전체 주문 조회
+   */
+  Slice<OrderDto> viewAllOrdersDuringMonths(Pageable pageable);
+
+  /**
+   * 3개월 전체 주문 조회
+   */
+  Slice<OrderDto> viewAllOrdersDuringThreeMonths(Pageable pageable);
+
+  /**
+   * 6개월 전체 주문 조회
+   */
+  Slice<OrderDto> viewAllOrdersDuringSixMonths(Pageable pageable);
+
+  /**
+   * 1년 전체 주문 조회
+   */
+  Slice<OrderDto> viewAllOrdersDuringYears(Pageable pageable);
+
+  /**
+   * orderStatus에 따른 주문 전체 조회
    */
   Slice<OrderDto> viewOrdersByOrderStatus(int orderStatus, Pageable pageable);
-  
+
+  /**
+   * orderStatus에 따른 주문 하루 전체 조회
+   */
+  Slice<OrderDto> viewOrdersByOrderStatusDuringDays(int orderStatus, Pageable pageable);
+
+  /**
+   * orderStatus에 따른 주문 일주일 전체 조회
+   */
+  Slice<OrderDto> viewOrdersByOrderStatusDuringWeeks(int orderStatus, Pageable pageable);
+
+  /**
+   * orderStatus에 따른 주문 한달 전체 조회
+   */
+  Slice<OrderDto> viewOrdersByOrderStatusDuringMonths(int orderStatus, Pageable pageable);
+
+  /**
+   * orderStatus에 따른 주문 3개월 전체 조회
+   */
+  Slice<OrderDto> viewOrdersByOrderStatusDuringThreeMonths(int orderStatus, Pageable pageable);
+
+  /**
+   * orderStatus에 따른 주문 6개월 전체 조회
+   */
+  Slice<OrderDto> viewOrdersByOrderStatusDuringSixMonths(int orderStatus, Pageable pageable);
+
+  /**
+   * orderStatus에 따른 주문 1년 전체 조회
+   */
+  Slice<OrderDto> viewOrdersByOrderStatusDuringYears(int orderStatus, Pageable pageable);
+
   /**
    * 카페에서 주문 거절
    */
@@ -54,8 +93,4 @@ public interface OrderService {
    */
   String viewMessageChanges(long orderId);
 
-  /**
-   * 사용자가 결제 취소(주문 취소)
-   */
-  OrderDto cancelOrder(long orderId, String userId);
 }
