@@ -51,6 +51,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.SliceImpl;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -147,6 +150,7 @@ public class OrderServiceImpl implements OrderService {
     menuRepository.save(menus);
 
     buildOrder.setOrderStatus(PaySuccess);
+    buildOrder.setOrderedMenus(saveOrderedMenu);
 
     Order saveOrder = orderRepository.save(buildOrder);
     saveOrderedMenu.setOrder(saveOrder);
@@ -424,13 +428,17 @@ public class OrderServiceImpl implements OrderService {
   }
 
   @Override
-  public List<OrderDto> viewAllOrders() {
-    return OrderDto.of(orderRepository.findAll());
+  public Slice<OrderDto> viewAllOrders(Pageable pageable) {
+    Slice<Order> orderSlice = orderRepository.findAll(pageable);
+    List<OrderDto> orderDtoList = OrderDto.convertListDtoFromPageEntity(orderSlice);
+    return new SliceImpl<>(orderDtoList, pageable, orderSlice.hasNext());
   }
 
   @Override
-  public List<OrderDto> viewOrdersByOrderStatus(int orderStatusNum) {
+  public Slice<OrderDto> viewOrdersByOrderStatus(int orderStatusNum, Pageable pageable) {
     OrderStatus byNumOrderStatus = OrderStatus.findByNum(orderStatusNum);
-    return OrderDto.of(orderRepository.findAllByOrderStatus(byNumOrderStatus));
+    Slice<Order> orderSlice = orderRepository.findAllByOrderStatus(byNumOrderStatus, pageable);
+    List<OrderDto> orderDtoList = OrderDto.convertListDtoFromPageEntity(orderSlice);
+    return new SliceImpl<>(orderDtoList, pageable, orderSlice.hasNext());
   }
 }

@@ -7,6 +7,8 @@ import com.chs.cafeapp.menu.dto.MenuEditInput;
 import com.chs.cafeapp.menu.dto.MenuInput;
 import com.chs.cafeapp.menu.dto.MenuResponse;
 import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface MenuService {
   /**
@@ -27,17 +29,17 @@ public interface MenuService {
   /**
    * 메뉴 전체 조회
    */
-  List<MenuResponse> viewAllMenus();
+  Page<MenuResponse> viewAllMenus(Pageable pageable);
 
   /**
    * 메뉴 카테고리 대분류로 조회
    */
-  List<MenuResponse> viewAllBySuperCategory(String superCategory);
+  Page<MenuResponse> viewAllBySuperCategory(String superCategory, Pageable pageable);
 
   /**
    * 메뉴 카테고리 중분류로 조회
    */
-  List<MenuResponse> viewAllByBaseCategory(String baseCategory);
+  Page<MenuResponse> viewAllByBaseCategory(String baseCategory, Pageable pageable);
 
   /**
    * 메뉴 자세히 조회

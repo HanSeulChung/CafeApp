@@ -22,6 +22,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -97,13 +100,16 @@ public class CartServiceImpl implements CartService {
   }
 
   @Override
-  public List<CartMenuDto> viewAllCartMenuInCart(String userId) {
+  public Page<CartMenuDto> viewAllCartMenuInCart(String userId, Pageable pageable) {
     Cart cart = validationUserAndCart(userId);
 
-    if (cart.getCartMenu().size() == 0) {
-      return new ArrayList<>();
+    if (cart.getCartMenu().isEmpty()) {
+      return Page.empty();
     }
+    Page<CartMenu> cartMenuPage = cartMenusRepository.findAllByCartId(cart.getId(), pageable);
 
-    return CartMenuDto.of(cart.getCartMenu());
+    List<CartMenuDto> cartMenuDtoList = CartMenuDto.convertListDtoFromPageEntity(cartMenuPage);
+
+    return new PageImpl<>(cartMenuDtoList, pageable, cartMenuPage.getTotalElements());
   }
 }

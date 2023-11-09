@@ -1,13 +1,17 @@
 package com.chs.cafeapp.menu.dto;
 
+import com.chs.cafeapp.coupon.dto.CouponDto;
+import com.chs.cafeapp.coupon.entity.Coupon;
 import com.chs.cafeapp.menu.entity.Menus;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
+import org.springframework.data.domain.Page;
 
 @Getter
 @Builder
@@ -38,6 +42,18 @@ public class MenuDto {
 
   public void setSoldOut(boolean soldOut) {
     this.isSoldOut = soldOut;
+  }
+
+  public static List<MenuDto> convertListDtoFromPageEntity(Page<Menus> menus) {
+    List<Menus> menusList = menus.getContent();
+
+    if (menusList == null) {
+      return new ArrayList<>();
+    }
+
+    return menusList.stream()
+        .map(MenuDto::of)
+        .collect(Collectors.toList());
   }
   public static List<MenuDto> of(List<Menus> menusList) {
 

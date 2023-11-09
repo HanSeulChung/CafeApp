@@ -6,6 +6,8 @@ import com.chs.cafeapp.order.dto.OrderResponse;
 import com.chs.cafeapp.order.service.OrderService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -28,8 +30,8 @@ public class OrderAdminController {
    * @return List<OrderDto>: 전체 주문 List로 반환
    */
   @GetMapping()
-  public ResponseEntity<List<OrderDto>> viewAllOrders() {
-    return ResponseEntity.ok(orderService.viewAllOrders());
+  public ResponseEntity<Slice<OrderDto>> viewAllOrders(Pageable pageable) {
+    return ResponseEntity.ok(orderService.viewAllOrders(pageable));
   }
 
   /**
@@ -38,8 +40,8 @@ public class OrderAdminController {
    * @return List<OrderDto>: 해당 orderStatusNum에 해당되는 주문들 List로 반환
    */
   @GetMapping("/order-status/{orderStatusNum}")
-  public ResponseEntity<List<OrderDto>> viewOrdersByOrderStatus(@PathVariable int orderStatusNum) {
-    return ResponseEntity.ok(orderService.viewOrdersByOrderStatus(orderStatusNum));
+  public ResponseEntity<Slice<OrderDto>> viewOrdersByOrderStatus(@PathVariable int orderStatusNum, Pageable pageable) {
+    return ResponseEntity.ok(orderService.viewOrdersByOrderStatus(orderStatusNum, pageable));
   }
   
   /**

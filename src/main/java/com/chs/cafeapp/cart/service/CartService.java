@@ -3,6 +3,8 @@ package com.chs.cafeapp.cart.service;
 import com.chs.cafeapp.cart.dto.CartInput;
 import com.chs.cafeapp.cart.dto.CartMenuDto;
 import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface CartService {
 
@@ -14,5 +16,5 @@ public interface CartService {
   /**
    * 장바구니 조회
    */
-  List<CartMenuDto> viewAllCartMenuInCart(String userId);
+  Page<CartMenuDto> viewAllCartMenuInCart(String userId, Pageable pageable);
 }

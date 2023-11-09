@@ -16,6 +16,9 @@ import com.chs.cafeapp.user.repository.UserRepository;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -72,23 +75,29 @@ public class CouponServiceImpl implements CouponService {
   }
 
   @Override
-  public List<CouponResponse> viewAllCoupons(String userId) {
+  public Page<CouponResponse> viewAllCoupons(String userId, Pageable pageable) {
     User user = validationUser(userId);
-    List<Coupon> coupons = couponRepository.findAllByUserId(user.getId());
-    return CouponResponse.toResponse(CouponDto.of(coupons));
+    Page<Coupon> coupons = couponRepository.findAllByUserId(user.getId(), pageable);
+    List<CouponDto> couponDtoList = CouponDto.convertListDtoFromPageEntity(coupons);
+    List<CouponResponse> responseList = CouponResponse.toResponse(couponDtoList);
+    return new PageImpl<>(responseList, coupons.getPageable(), coupons.getTotalElements());
   }
 
   @Override
-  public List<CouponResponse> viewAllCanUseCoupons(String userId) {
+  public Page<CouponResponse> viewAllCanUseCoupons(String userId, Pageable pageable) {
     User user = validationUser(userId);
-    List<Coupon> coupons = couponRepository.findAllByUserIdAndUsedYnFalseAndExpiredYnFalse(user.getId());
-    return CouponResponse.toResponse(CouponDto.of(coupons), CAN_USE_COUPON.getStatusName());
+    Page<Coupon> coupons = couponRepository.findAllByUserIdAndUsedYnFalseAndExpiredYnFalse(user.getId(), pageable);
+    List<CouponDto> couponDtoList = CouponDto.convertListDtoFromPageEntity(coupons);
+    List<CouponResponse> responseList = CouponResponse.toResponse(couponDtoList,  CAN_USE_COUPON.getStatusName());
+    return new PageImpl<>(responseList, coupons.getPageable(), coupons.getTotalElements());
   }
 
   @Override
-  public List<CouponResponse> viewAllCanNotUseCoupons(String userId) {
+  public Page<CouponResponse> viewAllCanNotUseCoupons(String userId, Pageable pageable) {
     User user = validationUser(userId);
-    List<Coupon> coupons = couponRepository.findAllByUserIdAndUsedYnTrueOrUserIdAndExpiredYnTrue(user.getId(), user.getId());
-    return CouponResponse.toResponse(CouponDto.of(coupons));
+    Page<Coupon> coupons = couponRepository.findAllByUserIdAndUsedYnTrueOrUserIdAndExpiredYnTrue(user.getId(), user.getId(), pageable);
+    List<CouponDto> couponDtoList = CouponDto.convertListDtoFromPageEntity(coupons);
+    List<CouponResponse> responseList = CouponResponse.toResponse(couponDtoList);
+    return new PageImpl<>(responseList, coupons.getPageable(), coupons.getTotalElements());
   }
 }
