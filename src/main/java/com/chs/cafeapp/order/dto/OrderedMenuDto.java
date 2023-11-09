@@ -31,7 +31,7 @@ public class OrderedMenuDto {
       }
       return orderedMenuDtos;
     }
-    return null;
+    return new ArrayList<>();
   }
 
   public static OrderedMenuDto of(OrderedMenu orderedMenu) {

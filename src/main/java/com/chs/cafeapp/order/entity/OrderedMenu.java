@@ -43,7 +43,6 @@ public class OrderedMenu extends BaseEntity {
 
   public void setOrder(Order order) {
     this.order = order;
-    order.getOrderedMenus().add(this);
   }
 
   public void setMenus(Menus menus) {

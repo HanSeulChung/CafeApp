@@ -5,6 +5,8 @@ import com.chs.cafeapp.order.dto.OrderDto;
 import com.chs.cafeapp.order.dto.OrderFromCartInput;
 import com.chs.cafeapp.order.dto.OrderInput;
 import java.util.List;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 
 public interface OrderService {
   /**
@@ -25,12 +27,12 @@ public interface OrderService {
   /**  
    * 주문 전체 조회 (for admin)
    */
-  List<OrderDto> viewAllOrders();
+  Slice<OrderDto> viewAllOrders(Pageable pageable);
 
   /**
    * orderStatus에 따른 주문 조회
    */
-  List<OrderDto> viewOrdersByOrderStatus(int orderStatus);
+  Slice<OrderDto> viewOrdersByOrderStatus(int orderStatus, Pageable pageable);
   
   /**
    * 카페에서 주문 거절

@@ -51,7 +51,12 @@ public class Order extends BaseEntity {
   public void setUser(User user) {
     this.user = user;
   }
-
+  public void setOrderedMenus(OrderedMenu orderedMenu) {
+    if (this.getOrderedMenus() == null) {
+      this.orderedMenus = new ArrayList<>();
+    }
+    this.orderedMenus.add(orderedMenu);
+  }
   public List<OrderedMenu> getOrderedMenus() {
     if (orderedMenus == null) {
       orderedMenus = new ArrayList<>();
