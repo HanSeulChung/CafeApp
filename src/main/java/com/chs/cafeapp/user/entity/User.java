@@ -5,16 +5,21 @@ import com.chs.cafeapp.cart.entity.Cart;
 import com.chs.cafeapp.cart.entity.CartMenu;
 import com.chs.cafeapp.coupon.entity.Coupon;
 import com.chs.cafeapp.stamp.entity.Stamp;
+import com.chs.cafeapp.user.type.UserStatus;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
+import javax.persistence.UniqueConstraint;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -30,14 +35,20 @@ public class User extends BaseEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @Column
+    @Column(unique = true)
     private String loginId; // 이메일
     private String password;
-
     private String userName;
+
+    @Column(unique = true)
     private String nickName;
     private String sex;
     private int age;
+
+    @Enumerated(EnumType.STRING)
+    private UserStatus userStatus; //이용 가능한상태, 정지상태
+
+    private LocalDateTime lastLoginDateTime;
 
     @OneToOne(cascade = CascadeType.ALL, mappedBy = "user")
     @ToString.Exclude
