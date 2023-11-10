@@ -5,6 +5,8 @@ import static org.hibernate.validator.internal.util.Contracts.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -25,7 +27,9 @@ import com.chs.cafeapp.order.entity.Order;
 import com.chs.cafeapp.order.entity.OrderedMenu;
 import com.chs.cafeapp.order.repository.OrderRepository;
 import com.chs.cafeapp.order.repository.OrderedMenuRepository;
-import com.chs.cafeapp.order.service.impl.OrderServiceImpl;
+import com.chs.cafeapp.order.service.impl.OrderServiceForAdminImpl;
+import com.chs.cafeapp.order.service.impl.OrderServiceForUserImpl;
+import com.chs.cafeapp.order.service.validation.ValidationCheck;
 import com.chs.cafeapp.order.type.OrderStatus;
 import com.chs.cafeapp.stamp.service.impl.StampServiceImpl;
 import com.chs.cafeapp.user.entity.User;
@@ -48,7 +52,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
 
 @ExtendWith(MockitoExtension.class)
-class OrderServiceImplTest {
+class OrderServiceForAdminImplTest {
   @Mock
   private UserRepository userRepository;
   @Mock
@@ -63,11 +67,17 @@ class OrderServiceImplTest {
   private CartMenusRepository cartMenusRepository;
 
   @InjectMocks
-  private OrderServiceImpl orderService;
+  private OrderServiceForAdminImpl orderServiceForAdmin;
+
+  @InjectMocks
+  private OrderServiceForUserImpl orderServiceForUser;
   @Mock
   private StampServiceImpl stampService;
   @Mock
   private CartMenuServiceImpl cartMenuService;
+
+  @Mock
+  private ValidationCheck validationCheck;
 
   static User user;
   static Menus menu1;
@@ -165,17 +175,13 @@ class OrderServiceImplTest {
     Order order = Order.builder()
         .id(1L)
         .user(user)
+        .couponUse(false)
         .build();
+
 
     cartMenu1.setCart(cart);
     cartMenu2.setCart(cart);
     user.setCart(cart);
-
-    when(userRepository.findByLoginId("user2@naver.com")).thenReturn(Optional.of(user));
-    when(cartRepository.findById(1L)).thenReturn(Optional.of(cart)).thenReturn(any());
-    when(menuRepository.findById(1L)).thenReturn(Optional.of(menu1));
-    when(menuRepository.findById(2L)).thenReturn(Optional.of(menu2));
-    when(orderRepository.save(any(Order.class))).thenReturn(order);
 
     OrderedMenu orderedMenu1 = OrderedMenu.builder()
         .userId(cartMenu1.getCart().getUser().getLoginId())
@@ -194,14 +200,19 @@ class OrderServiceImplTest {
 
     System.out.println(order.getOrderStatus());
 
+
     // orderedMenuRepository를 Mock 객체로 생성합니다.
     when(orderedMenuRepository.save(any(OrderedMenu.class)))
         .thenReturn(orderedMenu1) // 첫 번째 호출에 대한 반환 값
         .thenReturn(orderedMenu2); // 두 번째 호출에 대한 반환 값
+    when(validationCheck.validationUser(anyString())).thenReturn(user);
+    when(validationCheck.validationCart(anyLong())).thenReturn(cart);
+    when(validationCheck.validationMenus(anyLong())).thenReturn(menu1).thenReturn(menu2);
+    when(orderRepository.save(any())).thenReturn(order);
 
     // When
     OrderAllFromCartInput orderAllFromCartInput = new OrderAllFromCartInput(1L, false);
-    OrderDto result = orderService.orderAllFromCart(orderAllFromCartInput, "user2@naver.com");
+    OrderDto result = orderServiceForUser.orderAllFromCart(orderAllFromCartInput, "user2@naver.com");
 
     // Then
     verify(cartMenuService, times(1)).deleteAllCartMenu(1L, "user2@naver.com");
@@ -259,13 +270,9 @@ class OrderServiceImplTest {
     cartMenu3.setCart(cart);
     user.setCart(cart);
 
-    when(userRepository.findByLoginId("user2@naver.com")).thenReturn(Optional.of(user));
-    when(cartRepository.findById(1L)).thenReturn(Optional.of(cart));
-    when(cartMenusRepository.findById(1L)).thenReturn(Optional.of(cartMenu1));
-    when(cartMenusRepository.findById(3L)).thenReturn(Optional.of(cartMenu3));
-    when(menuRepository.findById(1L)).thenReturn(Optional.of(menu1));
-    when(menuRepository.findById(3L)).thenReturn(Optional.of(menu3));
+
     when(orderRepository.save(any(Order.class))).thenReturn(order);
+
 
     OrderedMenu orderedMenu1 = OrderedMenu.builder()
         .userId(cartMenu1.getCart().getUser().getLoginId())
@@ -289,9 +296,13 @@ class OrderServiceImplTest {
         .thenReturn(orderedMenu1)
         .thenReturn(orderedMenu2);
 
+    when(validationCheck.validationUser(anyString())).thenReturn(user);
+    when(validationCheck.validationCart(anyLong())).thenReturn(cart);
+    when(validationCheck.validationCartMenu(anyLong())).thenReturn(cartMenu1).thenReturn(cartMenu3);
+    when(validationCheck.validationMenus(anyLong())).thenReturn(menu1).thenReturn(menu3);
     // when
     OrderFromCartInput orderFromCartInput = new OrderFromCartInput(1L, Arrays.asList(1L, 3L), false);
-    OrderDto result = orderService.orderFromCart(orderFromCartInput, "user2@naver.com");
+    OrderDto result = orderServiceForUser.orderFromCart(orderFromCartInput, "user2@naver.com");
 
     // then
     verify(cartMenuService, times(1)).deleteSpecificCartMenu(1L, 1L, "user2@naver.com");
@@ -326,13 +337,14 @@ class OrderServiceImplTest {
 
     orderRepository.save(order);
     orderedMenuRepository.save(orderedMenu10);
-    when(userRepository.findByLoginId("user2@naver.com")).thenReturn(Optional.of(user));
-    when(menuRepository.findById(1L)).thenReturn(Optional.of(menu2));
     when(orderRepository.save(any(Order.class))).thenReturn(order);
     when(orderedMenuRepository.save(any(OrderedMenu.class))).thenReturn(orderedMenu10);
+    when(validationCheck.validationUser(any())).thenReturn(user);
+    when(validationCheck.validationMenus(anyLong())).thenReturn(menu2);
+
     // when
     OrderInput orderInput = new OrderInput(1L, "맛있는 닭가슴살 샌드위치", 10000, 3, false);
-    OrderDto result = orderService.orderIndividualMenu(orderInput, "user2@naver.com");
+    OrderDto result = orderServiceForUser.orderIndividualMenu(orderInput, "user2@naver.com");
 
     // then
     assertNotNull(result);
@@ -351,7 +363,6 @@ class OrderServiceImplTest {
   @DisplayName("주문 거절 성공")
   void rejectOrderTest_Success() {
     //given
-
     Order order = Order.builder()
         .id(1L)
         .user(user)
@@ -359,10 +370,10 @@ class OrderServiceImplTest {
         .build();
 
     orderRepository.save(order);
-    when(orderRepository.findById(1L)).thenReturn(Optional.of(order));
     when(orderRepository.save(any(Order.class))).thenReturn(order);
+    when(validationCheck.validationOrder(anyLong())).thenReturn(order);
     //when
-    OrderDto orderDto = orderService.rejectOrder(1L);
+    OrderDto orderDto = orderServiceForAdmin.rejectOrder(1L);
     //then
     assertNotNull(orderDto);
     assertEquals(orderDto.getOrderStatus(), CancelByCafe);
@@ -387,7 +398,7 @@ class OrderServiceImplTest {
     when(orderRepository.findById(1L)).thenReturn(Optional.of(order));
     when(orderRepository.save(any(Order.class))).thenReturn(order);
     //when
-    OrderDto orderDto = orderService.changeOrderStatus(1L);
+    OrderDto orderDto = orderServiceForAdmin.changeOrderStatus(1L);
     //then
     assertNotNull(orderDto);
     assertEquals(orderDto.getOrderStatus(), OrderStatus.PreParingMenus);
@@ -412,7 +423,7 @@ class OrderServiceImplTest {
     when(orderRepository.findById(1L)).thenReturn(Optional.of(order));
     when(orderRepository.save(any(Order.class))).thenReturn(order);
     //when
-    OrderDto orderDto = orderService.changeOrderStatus(1L);
+    OrderDto orderDto = orderServiceForAdmin.changeOrderStatus(1L);
     //then
     assertNotNull(orderDto);
     assertEquals(orderDto.getOrderStatus(), OrderStatus.WaitingPickUp);
@@ -435,7 +446,7 @@ class OrderServiceImplTest {
     when(orderRepository.findById(1L)).thenReturn(Optional.of(order));
     when(orderRepository.save(any(Order.class))).thenReturn(order);
     //when
-    OrderDto orderDto = orderService.changeOrderStatus(1L);
+    OrderDto orderDto = orderServiceForAdmin.changeOrderStatus(1L);
     //then
     verify(stampService, times(1)).addStampNumbers(orderedMenu10.getQuantity(), "user2@naver.com");
     assertNotNull(orderDto);
@@ -456,7 +467,7 @@ class OrderServiceImplTest {
     //when
 
     //then
-    assertThrows(IllegalStateException.class, () -> orderService.changeOrderStatus(1L));
+    assertThrows(IllegalStateException.class, () -> orderServiceForAdmin.changeOrderStatus(1L));
 
   }
 
@@ -509,7 +520,7 @@ class OrderServiceImplTest {
     when(orderRepository.findAllByOrderStatus(any(OrderStatus.class), any(Pageable.class))).thenReturn(new SliceImpl<>(Arrays.asList(order1), pageable, false));
 
     //when
-    Slice<OrderDto> orderDtos = orderService.viewOrdersByOrderStatus(1, pageable);
+    Slice<OrderDto> orderDtos = orderServiceForAdmin.viewOrdersByOrderStatus(1, pageable);
     List<OrderDto> orderDtoList = orderDtos.getContent();
     //then
     assertEquals(1, orderDtoList.size());
@@ -565,7 +576,7 @@ class OrderServiceImplTest {
     when(orderRepository.findAllByOrderStatus(any(OrderStatus.class), any(Pageable.class))).thenReturn(new SliceImpl<>(Arrays.asList(order2), pageable, false));
 
     //when
-    Slice<OrderDto> orderDtos = orderService.viewOrdersByOrderStatus(2, pageable);
+    Slice<OrderDto> orderDtos = orderServiceForAdmin.viewOrdersByOrderStatus(2, pageable);
     List<OrderDto> orderDtoList = orderDtos.getContent();
     //then
     System.out.println(orderDtos);
@@ -618,7 +629,7 @@ class OrderServiceImplTest {
     when(orderRepository.findAllByOrderStatus(any(OrderStatus.class), any(Pageable.class))).thenReturn(new SliceImpl<>(Arrays.asList(order1, order2), pageable, false));
 
     //when
-    Slice<OrderDto> orderDtos = orderService.viewOrdersByOrderStatus(3, pageable);
+    Slice<OrderDto> orderDtos = orderServiceForAdmin.viewOrdersByOrderStatus(3, pageable);
     List<OrderDto> orderDtoList = orderDtos.getContent();
     //then
     assertEquals(orderDtoList.size(), 2);
@@ -686,7 +697,7 @@ class OrderServiceImplTest {
     when(orderRepository.findAllByOrderStatus(any(OrderStatus.class), any(Pageable.class))).thenReturn(new SliceImpl<>(Arrays.asList(order1), pageable, false));
 
     //when
-    Slice<OrderDto> orderDtos = orderService.viewOrdersByOrderStatus(4, pageable);
+    Slice<OrderDto> orderDtos = orderServiceForAdmin.viewOrdersByOrderStatus(4, pageable);
     List<OrderDto> orderDtoList = orderDtos.getContent();
     //then
     assertEquals(orderDtoList.size(), 1);

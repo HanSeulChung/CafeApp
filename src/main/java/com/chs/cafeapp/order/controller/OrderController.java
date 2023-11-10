@@ -1,14 +1,17 @@
 package com.chs.cafeapp.order.controller;
 
 
+import com.chs.cafeapp.exception.CustomException;
 import com.chs.cafeapp.order.dto.OrderAllFromCartInput;
 import com.chs.cafeapp.order.dto.OrderDto;
 import com.chs.cafeapp.order.dto.OrderFromCartInput;
 import com.chs.cafeapp.order.dto.OrderInput;
 import com.chs.cafeapp.order.dto.OrderResponse;
-import com.chs.cafeapp.order.service.OrderService;
-import java.util.List;
+import com.chs.cafeapp.order.service.OrderServiceForAdmin;
+import com.chs.cafeapp.order.service.OrderServiceForUser;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -18,8 +21,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import com.chs.cafeapp.exception.CustomException;
-import org.w3c.dom.stylesheets.LinkStyle;
 
 /**
  * 주문 Controller
@@ -28,7 +29,7 @@ import org.w3c.dom.stylesheets.LinkStyle;
 @RequiredArgsConstructor
 @RequestMapping("/orders")
 public class OrderController {
-  private final OrderService orderService;
+  private final OrderServiceForUser orderServiceForUser;
 
 
   /**
@@ -41,7 +42,7 @@ public class OrderController {
    */
   @PostMapping()
   public OrderResponse addOrder(@RequestBody OrderInput request, @RequestParam String userId) {
-    OrderDto orderDto = orderService.orderIndividualMenu(request, userId);
+    OrderDto orderDto = orderServiceForUser.orderIndividualMenu(request, userId);
     return OrderResponse.toResponse(orderDto, orderDto.getOrderStatus().getDescription());
   }
 
@@ -58,7 +59,7 @@ public class OrderController {
    */
   @PostMapping("/shopping-basket/select-items/{selectItemCount}")
   public OrderResponse addOrderFromBasket(@PathVariable int selectItemCount, @RequestBody OrderFromCartInput request, @RequestParam String userId) {
-    OrderDto orderDto = orderService.orderFromCart(request, userId);
+    OrderDto orderDto = orderServiceForUser.orderFromCart(request, userId);
     return OrderResponse.toResponse(orderDto, orderDto.getOrderStatus().getDescription());
   }
 
@@ -74,7 +75,7 @@ public class OrderController {
    */
   @PostMapping("/shopping-basket")
   public OrderResponse addOrderFromBasket(@RequestBody OrderAllFromCartInput reqeust, @RequestParam String userId) {
-    OrderDto orderDto = orderService.orderAllFromCart(reqeust, userId);
+    OrderDto orderDto = orderServiceForUser.orderAllFromCart(reqeust, userId);
     return OrderResponse.toResponse(orderDto, orderDto.getOrderStatus().getDescription());
   }
 
@@ -85,8 +86,109 @@ public class OrderController {
    */
   @PatchMapping("/cancels/{orderId}")
   public ResponseEntity<OrderResponse> rejectOrderStatus(@PathVariable long orderId, @RequestParam String userId) {
-    OrderDto orderDto = orderService.cancelOrder(orderId, userId);
+    OrderDto orderDto = orderServiceForUser.cancelOrder(orderId, userId);
     return ResponseEntity.ok(OrderResponse.toResponse(orderDto, orderDto.getOrderStatus().getDescription()));
   }
 
+  /**
+   * 전체 주문 조회 Controller
+   * @param userId: 주문한 사용자 loginId
+   * @param pageable: default -> page = 0, size = 10이고 수정 가능,
+   *                + 정렬 기능 >sortBy=정렬할 기준 column-asc
+   * @return Slice<OrderDto>: 전체 주문 Slice로 반환
+   */
+  @GetMapping()
+  public ResponseEntity<Slice<OrderDto>> viewOrdersAll(@RequestParam String userId, Pageable pageable) {
+    return ResponseEntity.ok(orderServiceForUser.viewAllOrders(userId, pageable));
+  }
+
+  /**
+   * 하루 전체 주문 조회 Controller
+   * @param userId: 주문한 사용자 loginId
+   * @param pageable: default -> page = 0, size = 10이고 수정 가능,
+   *                + 정렬 기능 >sortBy=정렬할 기준 column-asc
+   * @return Slice<OrderDto>: 하루 전체 주문 Slice로 반환
+   */
+  @GetMapping("/days")
+  public ResponseEntity<Slice<OrderDto>> viewOrdersDuringDays(
+      @RequestParam String userId,
+      Pageable pageable
+  ) {
+    return ResponseEntity.ok(orderServiceForUser.viewAllOrdersDuringDays(userId, pageable));
+  }
+
+  /**
+   * 일주일 전체 주문 조회 Controller
+   * @param userId: 주문한 사용자 loginId
+   * @param pageable: default -> page = 0, size = 10이고 수정 가능,
+   *                + 정렬 기능 >sortBy=정렬할 기준 column-asc
+   * @return Slice<OrderDto>: 일주일 전체 주문 Slice로 반환
+   */
+  @GetMapping("/weeks")
+  public ResponseEntity<Slice<OrderDto>> viewOrdersDuringWeeks(
+      @RequestParam String userId,
+      Pageable pageable
+  ) {
+    return ResponseEntity.ok(orderServiceForUser.viewAllOrdersDuringWeeks(userId, pageable));
+  }
+
+  /**
+   * 한달 전체 주문 조회 Controller
+   * @param userId: 주문한 사용자 loginId
+   * @param pageable: default -> page = 0, size = 10이고 수정 가능,
+   *                + 정렬 기능 >sortBy=정렬할 기준 column-asc
+   * @return Slice<OrderDto>: 한달 전체 주문 Slice로 반환
+   */
+  @GetMapping("/months")
+  public ResponseEntity<Slice<OrderDto>> viewOrdersDuringMonths(
+      @RequestParam String userId,
+      Pageable pageable
+  ) {
+    return ResponseEntity.ok(orderServiceForUser.viewAllOrdersDuringMonths(userId, pageable));
+  }
+
+  /**
+   * 3개월 전체 주문 조회 Controller
+   * @param userId: 주문한 사용자 loginId
+   * @param pageable: default -> page = 0, size = 10이고 수정 가능,
+   *                + 정렬 기능 >sortBy=정렬할 기준 column-asc
+   * @return Slice<OrderDto>: 3개월 전체 주문 Slice로 반환
+   */
+  @GetMapping("/three-months")
+  public ResponseEntity<Slice<OrderDto>> viewOrdersDuringThreeMonths(
+      @RequestParam String userId,
+      Pageable pageable
+  ) {
+    return ResponseEntity.ok(orderServiceForUser.viewAllOrdersDuringThreeMonths(userId, pageable));
+  }
+
+  /**
+   * 6개월 전체 주문 조회 Controller
+   * @param userId: 주문한 사용자 loginId
+   * @param pageable: default -> page = 0, size = 10이고 수정 가능,
+   *                + 정렬 기능 >sortBy=정렬할 기준 column-asc
+   * @return Slice<OrderDto>: 6개월 전체 주문 Slice로 반환
+   */
+  @GetMapping("/six-months")
+  public ResponseEntity<Slice<OrderDto>> viewOrdersDuringSixMonths(
+      @RequestParam String userId,
+      Pageable pageable
+  ) {
+    return ResponseEntity.ok(orderServiceForUser.viewAllOrdersDuringSixMonths(userId, pageable));
+  }
+
+  /**
+   * 1년 전체 주문 조회 Controller
+   * @param userId: 주문한 사용자 loginId
+   * @param pageable: default -> page = 0, size = 10이고 수정 가능,
+   *                + 정렬 기능 >sortBy=정렬할 기준 column-asc
+   * @return Slice<OrderDto>: 1년 전체 주문 Slice로 반환
+   */
+  @GetMapping("/years")
+  public ResponseEntity<Slice<OrderDto>> viewOrdersDuringYears(
+      @RequestParam String userId,
+      Pageable pageable
+  ) {
+    return ResponseEntity.ok(orderServiceForUser.viewAllOrdersDuringYears(userId, pageable));
+  }
 }
