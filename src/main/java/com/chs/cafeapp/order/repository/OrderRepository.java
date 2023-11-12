@@ -13,7 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 public interface OrderRepository extends JpaRepository<Order, Long> {
 
   List<Order> findAllByOrderStatus(OrderStatus orderStatus);
-
+  List<Order> findAllByUpdateDateTimeLessThan(LocalDateTime localDateTime);
   Slice<Order> findAllByCreateDateTimeBetween(LocalDateTime startDateTime, LocalDateTime endDateTime, Pageable pageable);
   Slice<Order> findAllByOrderStatus(OrderStatus orderStatus, Pageable pageable);
   Slice<Order> findAllByOrderStatusAndCreateDateTimeBetween(OrderStatus orderStatus, LocalDateTime startDateTime, LocalDateTime endDateTime, Pageable pageable);

@@ -78,38 +78,39 @@ class DataBaseDeleteSchedulerTest {
     em.merge(user);
   }
 
-  @Test
-  @DisplayName("UpdateDateTime이 1년 초과된 주문 삭제 성공")
-  void orderAutoDeleteScheduling() {
-    Instant fixedInstant = Instant.parse("2021-11-01T12:00:00Z");
-    clock.fixed(fixedInstant, ZoneOffset.UTC);
-    LocalDateTime now = LocalDateTime.now();
-    LocalDateTime oneYearAgo = now.minusYears(1);
-
-    Order order1 = Order.builder()
-        .id(1L)
-        .orderStatus(OrderStatus.PayFail)
-        .totalPrice(4100)
-        .build();
-    em.merge(order1);
-
-    // 특정 시간 이전 주문 삭제 스케줄러 메서드 호출
-//    dataBaseDeleteScheduler.orderAutoDeleteScheduling();
-    em.clear();
-    // orderRepository에서 deleteAllByUpdateDateTimeLessThan 메서드가 1번 호출되는지 확인
-    List<Order> remainingOrders = orderRepository.findAll();
-    assertThat(remainingOrders).hasSize(2);
-  }
-
-  @Test
-  @DisplayName("UpdateDateTime이 1년 초과된 쿠폰 삭제 성공")
-  void couponAutoDeleteScheduling() {
-
-  }
-
-  @Test
-  @DisplayName("UpdateDateTime이 2년 초과된 쿠폰 삭제 성공")
-  void userAutoDeleteScheduling() {
-
-  }
+  // TODO: test database를 따로 h2-database로 두어 테스트 코드 진행하고 싶었으나 진행하지 못함.
+//  @Test
+//  @DisplayName("UpdateDateTime이 1년 초과된 주문 삭제 성공")
+//  void orderAutoDeleteScheduling() {
+//    Instant fixedInstant = Instant.parse("2021-11-01T12:00:00Z");
+//    clock.fixed(fixedInstant, ZoneOffset.UTC);
+//    LocalDateTime now = LocalDateTime.now();
+//    LocalDateTime oneYearAgo = now.minusYears(1);
+//
+//    Order order1 = Order.builder()
+//        .id(1L)
+//        .orderStatus(OrderStatus.PayFail)
+//        .totalPrice(4100)
+//        .build();
+//    em.merge(order1);
+//
+//    // 특정 시간 이전 주문 삭제 스케줄러 메서드 호출
+////    dataBaseDeleteScheduler.orderAutoDeleteScheduling();
+//    em.clear();
+//    // orderRepository에서 deleteAllByUpdateDateTimeLessThan 메서드가 1번 호출되는지 확인
+//    List<Order> remainingOrders = orderRepository.findAll();
+//    assertThat(remainingOrders).hasSize(2);
+//  }
+//
+//  @Test
+//  @DisplayName("UpdateDateTime이 1년 초과된 쿠폰 삭제 성공")
+//  void couponAutoDeleteScheduling() {
+//
+//  }
+//
+//  @Test
+//  @DisplayName("UpdateDateTime이 2년 초과된 쿠폰 삭제 성공")
+//  void userAutoDeleteScheduling() {
+//
+//  }
 }

@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 public interface CouponRepository extends JpaRepository<Coupon, Long> {
 
   List<Coupon> findAllByUserId(Long userId);
+  List<Coupon> findAllByUpdateDateTimeLessThan(LocalDateTime localDateTime);
   List<Coupon> findAllByUserIdAndUsedYnFalseAndExpiredYnFalse(Long userId);
   List<Coupon> findAllByUserIdAndUsedYnTrueOrUserIdAndExpiredYnTrue(Long userId1, Long userId2);
 
