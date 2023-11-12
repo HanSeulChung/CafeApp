@@ -1,13 +1,10 @@
 package com.chs.cafeapp.order.service;
 
-import com.chs.cafeapp.order.dto.OrderAllFromCartInput;
 import com.chs.cafeapp.order.dto.OrderDto;
-import com.chs.cafeapp.order.dto.OrderFromCartInput;
-import com.chs.cafeapp.order.dto.OrderInput;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 
-public interface OrderServiceForAdmin {
+public interface OrderAdminService {
   /**
    * 주문 전체 조회
    */

@@ -27,8 +27,8 @@ import com.chs.cafeapp.order.entity.Order;
 import com.chs.cafeapp.order.entity.OrderedMenu;
 import com.chs.cafeapp.order.repository.OrderRepository;
 import com.chs.cafeapp.order.repository.OrderedMenuRepository;
-import com.chs.cafeapp.order.service.impl.OrderServiceForAdminImpl;
-import com.chs.cafeapp.order.service.impl.OrderServiceForUserImpl;
+import com.chs.cafeapp.order.service.impl.OrderAdminServiceImpl;
+import com.chs.cafeapp.order.service.impl.OrderUserServiceImpl;
 import com.chs.cafeapp.order.service.validation.ValidationCheck;
 import com.chs.cafeapp.order.type.OrderStatus;
 import com.chs.cafeapp.stamp.service.impl.StampServiceImpl;
@@ -52,7 +52,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
 
 @ExtendWith(MockitoExtension.class)
-class OrderServiceForAdminImplTest {
+class OrderAdminServiceImplTest {
   @Mock
   private UserRepository userRepository;
   @Mock
@@ -67,10 +67,10 @@ class OrderServiceForAdminImplTest {
   private CartMenusRepository cartMenusRepository;
 
   @InjectMocks
-  private OrderServiceForAdminImpl orderServiceForAdmin;
+  private OrderAdminServiceImpl orderServiceForAdmin;
 
   @InjectMocks
-  private OrderServiceForUserImpl orderServiceForUser;
+  private OrderUserServiceImpl orderServiceForUser;
   @Mock
   private StampServiceImpl stampService;
   @Mock

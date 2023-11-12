@@ -7,7 +7,7 @@ import com.chs.cafeapp.order.dto.OrderInput;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 
-public interface OrderServiceForUser {
+public interface OrderUserService {
   /**
    * 개별 상품 주문
    */

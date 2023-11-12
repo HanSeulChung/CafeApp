@@ -25,7 +25,7 @@ import com.chs.cafeapp.order.entity.Order;
 import com.chs.cafeapp.order.entity.OrderedMenu;
 import com.chs.cafeapp.order.repository.OrderRepository;
 import com.chs.cafeapp.order.repository.OrderedMenuRepository;
-import com.chs.cafeapp.order.service.OrderServiceForUser;
+import com.chs.cafeapp.order.service.OrderUserService;
 import com.chs.cafeapp.order.service.validation.ValidationCheck;
 import com.chs.cafeapp.user.entity.User;
 import com.chs.cafeapp.user.repository.UserRepository;
@@ -43,7 +43,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-public class OrderServiceForUserImpl implements OrderServiceForUser {
+public class OrderUserServiceImpl implements OrderUserService {
 
   private final MenuRepository menuRepository;
   private final UserRepository userRepository;

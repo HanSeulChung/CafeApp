@@ -17,7 +17,7 @@ import com.chs.cafeapp.order.dto.OrderDto;
 import com.chs.cafeapp.order.entity.Order;
 import com.chs.cafeapp.order.entity.OrderedMenu;
 import com.chs.cafeapp.order.repository.OrderRepository;
-import com.chs.cafeapp.order.service.OrderServiceForAdmin;
+import com.chs.cafeapp.order.service.OrderAdminService;
 import com.chs.cafeapp.order.service.validation.ValidationCheck;
 import com.chs.cafeapp.order.type.OrderStatus;
 import com.chs.cafeapp.stamp.service.StampService;
@@ -32,7 +32,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class OrderServiceForAdminImpl implements OrderServiceForAdmin {
+public class OrderAdminServiceImpl implements OrderAdminService {
   private final MenuRepository menuRepository;
   private final OrderRepository orderRepository;
   private final CouponRepository couponRepository;
