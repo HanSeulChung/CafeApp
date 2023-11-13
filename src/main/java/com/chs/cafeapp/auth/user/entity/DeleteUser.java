@@ -1,4 +1,4 @@
-package com.chs.cafeapp.user.entity;
+package com.chs.cafeapp.auth.user.entity;
 
 
 import com.chs.cafeapp.base.BaseEntity;
