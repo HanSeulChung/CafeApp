@@ -9,6 +9,7 @@ public enum ErrorCode {
   INTERNAL_SERVER_ERROR(500,"내부 서버 오류가 발생했습니다."),
   INVALID_REQUEST(400, "잘못된 요청입니다."),
   ALREADY_EXISTS_USER_LOGIN_ID(400, "이미 존재하는 아이디 입니다. 다른 아이디로 회원가입 진행 가능합니다."),
+  ALREADY_EXISTS_USER_NICK_NAME(400, "이미 존재하는 닉네임 입니다. 다른 닉네임으로 회원가입 진행 가능합니다."),
   NOT_EXISTS_USER_LOGIN_ID(400, "로그인 아이디가 존재하지 않습니다. 다시 확인해 주십시오."),
   USER_NOT_FOUND(400, "사용자가 없습니다."),
   MENU_NOT_FOUND(400, "메뉴가 없습니다."),

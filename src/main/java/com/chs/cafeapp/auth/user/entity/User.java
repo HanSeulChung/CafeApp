@@ -43,6 +43,7 @@ public class User extends BaseEntity {
     @Column(unique = true)
     private String nickName;
     private int age;
+    private String emailAuthKey;
 
     @Enumerated(EnumType.STRING)
     private UserSex sex;
@@ -53,7 +54,13 @@ public class User extends BaseEntity {
 
     private LocalDateTime lastLoginDateTime;
 
+    public void setUserStatus(UserStatus userStatus) {
+        this.userStatus = userStatus;
+    }
 
+    public void setAuthority(Authority authority) {
+        this.authority = authority;
+    }
 
     @OneToOne(cascade = CascadeType.ALL, mappedBy = "user")
     @ToString.Exclude

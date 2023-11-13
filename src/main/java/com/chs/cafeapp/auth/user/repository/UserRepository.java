@@ -15,7 +15,9 @@ import org.springframework.transaction.annotation.Transactional;
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
   Optional<User> findByLoginId(String loginId);
+  Optional<User> findByEmailAuthKey(String uuid);
   boolean existsByLoginId(String loginId);
+  boolean existsByNickName(String nickName);
   List<User> findAllByUserStatusAndUpdateDateTimeLessThan(UserStatus userStatus, LocalDateTime nowLocalDateTime);
 
   @Transactional
