@@ -1,6 +1,6 @@
 package com.chs.cafeapp.scheduler;
 
-import com.chs.cafeapp.user.repository.UserRepository;
+import com.chs.cafeapp.auth.user.repository.UserRepository;
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

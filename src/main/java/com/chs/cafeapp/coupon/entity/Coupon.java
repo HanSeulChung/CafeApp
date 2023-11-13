@@ -2,7 +2,7 @@ package com.chs.cafeapp.coupon.entity;
 
 
 import com.chs.cafeapp.base.BaseEntity;
-import com.chs.cafeapp.user.entity.User;
+import com.chs.cafeapp.auth.user.entity.User;
 import java.time.LocalDateTime;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;

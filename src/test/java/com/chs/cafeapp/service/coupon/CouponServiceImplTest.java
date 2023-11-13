@@ -1,8 +1,5 @@
 package com.chs.cafeapp.service.coupon;
 
-import static com.chs.cafeapp.coupon.type.CouponStatus.ALREADY_USED_COUPON;
-import static com.chs.cafeapp.coupon.type.CouponStatus.CAN_USE_COUPON;
-import static com.chs.cafeapp.coupon.type.CouponStatus.EXPIRED_COUPON;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -16,11 +13,10 @@ import com.chs.cafeapp.coupon.entity.Coupon;
 import com.chs.cafeapp.coupon.repository.CouponRepository;
 import com.chs.cafeapp.coupon.service.impl.CouponServiceImpl;
 import com.chs.cafeapp.stamp.entity.Stamp;
-import com.chs.cafeapp.user.entity.User;
-import com.chs.cafeapp.user.repository.UserRepository;
+import com.chs.cafeapp.auth.user.entity.User;
+import com.chs.cafeapp.auth.user.repository.UserRepository;
 import java.time.LocalDateTime;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

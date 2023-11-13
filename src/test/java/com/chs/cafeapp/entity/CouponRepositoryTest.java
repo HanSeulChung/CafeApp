@@ -5,8 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import com.chs.cafeapp.coupon.entity.Coupon;
 import com.chs.cafeapp.coupon.repository.CouponRepository;
-import com.chs.cafeapp.user.entity.User;
-import com.chs.cafeapp.user.repository.UserRepository;
+import com.chs.cafeapp.auth.user.entity.User;
+import com.chs.cafeapp.auth.user.repository.UserRepository;
 import java.util.Arrays;
 import java.util.List;
 import javax.persistence.EntityManager;

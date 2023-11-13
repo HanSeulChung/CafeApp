@@ -1,16 +1,15 @@
 package com.chs.cafeapp.scheduler;
 
-import static com.chs.cafeapp.user.type.UserStatus.USER_STATUS_STOP;
-import static com.chs.cafeapp.user.type.UserStatus.USER_STATUS_WITHDRAW;
+import static com.chs.cafeapp.auth.user.type.UserStatus.USER_STATUS_WITHDRAW;
 
 import com.chs.cafeapp.coupon.entity.Coupon;
 import com.chs.cafeapp.coupon.repository.CouponRepository;
 import com.chs.cafeapp.order.entity.Order;
 import com.chs.cafeapp.order.repository.OrderRepository;
-import com.chs.cafeapp.user.entity.DeleteUser;
-import com.chs.cafeapp.user.entity.User;
-import com.chs.cafeapp.user.repository.DeleteUserRepository;
-import com.chs.cafeapp.user.repository.UserRepository;
+import com.chs.cafeapp.auth.user.entity.DeleteUser;
+import com.chs.cafeapp.auth.user.entity.User;
+import com.chs.cafeapp.auth.user.repository.DeleteUserRepository;
+import com.chs.cafeapp.auth.user.repository.UserRepository;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
