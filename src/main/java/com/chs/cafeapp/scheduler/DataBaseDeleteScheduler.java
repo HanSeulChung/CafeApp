@@ -59,7 +59,7 @@ public class DataBaseDeleteScheduler {
 
   // 매일 12시에 체크
   // 탈퇴한 회원 정보 수집 기간(2년 뒤 파기)
-  @Scheduled(cron = "* * * * * *", zone = SEOUL_TIME_ZONE)
+  @Scheduled(cron = "0 0 0 * * *", zone = SEOUL_TIME_ZONE)
   public void userAutoDeleteScheduling() {
     LocalDateTime nowLocalDateTime = LocalDateTime.now();
     List<User> userList = userRepository.findAllByUserStatusAndUpdateDateTimeLessThan(
