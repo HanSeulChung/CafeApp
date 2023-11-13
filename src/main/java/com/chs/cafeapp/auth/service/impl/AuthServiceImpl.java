@@ -6,21 +6,29 @@ import static com.chs.cafeapp.auth.user.type.UserSex.FEMALE;
 import static com.chs.cafeapp.auth.user.type.UserSex.MALE;
 import static com.chs.cafeapp.auth.user.type.UserStatus.USER_STATUS_ING;
 import static com.chs.cafeapp.auth.user.type.UserStatus.USER_STATUS_REQ;
+import static com.chs.cafeapp.exception.type.ErrorCode.ALREADY_EMAIL_AUTH_USER;
 import static com.chs.cafeapp.exception.type.ErrorCode.ALREADY_EXISTS_USER_LOGIN_ID;
 import static com.chs.cafeapp.exception.type.ErrorCode.ALREADY_EXISTS_USER_NICK_NAME;
+import static com.chs.cafeapp.exception.type.ErrorCode.EXPIRED_DATE_TIME_FOR_EMAIL_AUTH;
 import static com.chs.cafeapp.exception.type.ErrorCode.NOT_EXISTS_USER_LOGIN_ID;
 import static com.chs.cafeapp.exception.type.ErrorCode.USER_NOT_FOUND;
 
 import com.chs.cafeapp.auth.service.AuthService;
+import com.chs.cafeapp.auth.token.dto.TokenDto;
 import com.chs.cafeapp.auth.user.dto.SignUpRequestDto;
+import com.chs.cafeapp.auth.user.dto.UserRequestDto;
 import com.chs.cafeapp.auth.user.dto.UserResponseDto;
 import com.chs.cafeapp.auth.user.entity.User;
 import com.chs.cafeapp.auth.user.repository.UserRepository;
 import com.chs.cafeapp.exception.CustomException;
 import com.chs.cafeapp.exception.type.ErrorCode;
 import com.chs.cafeapp.mail.service.MailService;
+import java.time.Duration;
+import java.time.Instant;
+import java.time.ZoneId;
 import java.util.Collections;
 import java.util.UUID;
+import javax.persistence.EntityManager;
 import javax.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
@@ -36,6 +44,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService, UserDetailsService {
   private final MailService mailService;
+  private final EntityManager em;
   private final UserRepository userRepository;
   private final PasswordEncoder passwordEncoder;
 
@@ -101,9 +110,29 @@ public class AuthServiceImpl implements AuthService, UserDetailsService {
 
   @Override
   public UserResponseDto emailAuth(String uuid) {
+    Instant requestTime = Instant.now();
+
     User user = userRepository.findByEmailAuthKey(uuid)
         .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
 
+    if (user.getUserStatus() == USER_STATUS_ING) {
+      throw new CustomException(ALREADY_EMAIL_AUTH_USER);
+    }
+    Instant expiredTime = user.getUpdateDateTime()
+          .atZone(ZoneId.systemDefault()).toInstant().plus(Duration.ofHours(24));
+
+    if (requestTime.isAfter(expiredTime)) {
+
+      String email = user.getLoginId();
+      String subject = "CafeApp의 이메일 인증만료 후 재발송 메시지입니다.";
+      String text = "가입을 축하합니다. 아래 링크를 클릭하여서 가입을 완료하세요.<br>"
+          + "<a href='http://localhost:8080/auth/email-auth?id=" + uuid + "'> 이메일 인증 </a>";
+
+      user.setUpdateDateTime();
+      userRepository.save(user);
+      mailService.sendMail(email, subject, text);
+      throw new CustomException(EXPIRED_DATE_TIME_FOR_EMAIL_AUTH);
+    }
     user.setUserStatus(USER_STATUS_ING);
     user.setAuthority(ROLE_USER);
     User saveUser = userRepository.save(user);
@@ -115,4 +144,6 @@ public class AuthServiceImpl implements AuthService, UserDetailsService {
         .message("인증이 완료되었습니다. CafeApp 서비스를 이용 가능합니다.")
         .build();
   }
+
+
 }

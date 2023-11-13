@@ -62,6 +62,13 @@ public class User extends BaseEntity {
         this.authority = authority;
     }
 
+    public void setLastLoginDateTime(LocalDateTime lastLoginDateTime) {
+        this.lastLoginDateTime = lastLoginDateTime;
+    }
+    public void setUpdateDateTime() {
+        super.setUpdateDateTime();
+    }
+
     @OneToOne(cascade = CascadeType.ALL, mappedBy = "user")
     @ToString.Exclude
     private Cart cart;
