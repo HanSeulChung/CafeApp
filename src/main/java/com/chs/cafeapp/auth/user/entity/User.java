@@ -1,11 +1,12 @@
-package com.chs.cafeapp.user.entity;
+package com.chs.cafeapp.auth.user.entity;
 
+import com.chs.cafeapp.auth.type.Authority;
+import com.chs.cafeapp.auth.user.type.UserSex;
+import com.chs.cafeapp.auth.user.type.UserStatus;
 import com.chs.cafeapp.base.BaseEntity;
 import com.chs.cafeapp.cart.entity.Cart;
-import com.chs.cafeapp.cart.entity.CartMenu;
 import com.chs.cafeapp.coupon.entity.Coupon;
 import com.chs.cafeapp.stamp.entity.Stamp;
-import com.chs.cafeapp.user.type.UserStatus;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,7 +20,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
-import javax.persistence.UniqueConstraint;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -42,13 +42,32 @@ public class User extends BaseEntity {
 
     @Column(unique = true)
     private String nickName;
-    private String sex;
     private int age;
+    private String emailAuthKey;
 
     @Enumerated(EnumType.STRING)
+    private UserSex sex;
+    @Enumerated(EnumType.STRING)
     private UserStatus userStatus; //이용 가능한상태, 정지상태
+    @Enumerated(EnumType.STRING)
+    private Authority authority; // 사용자는 ROLE_USER
 
     private LocalDateTime lastLoginDateTime;
+
+    public void setUserStatus(UserStatus userStatus) {
+        this.userStatus = userStatus;
+    }
+
+    public void setAuthority(Authority authority) {
+        this.authority = authority;
+    }
+
+    public void setLastLoginDateTime(LocalDateTime lastLoginDateTime) {
+        this.lastLoginDateTime = lastLoginDateTime;
+    }
+    public void setUpdateDateTime() {
+        super.setUpdateDateTime();
+    }
 
     @OneToOne(cascade = CascadeType.ALL, mappedBy = "user")
     @ToString.Exclude

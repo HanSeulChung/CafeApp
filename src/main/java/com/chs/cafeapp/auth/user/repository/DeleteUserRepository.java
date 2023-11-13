@@ -1,7 +1,6 @@
-package com.chs.cafeapp.user.repository;
+package com.chs.cafeapp.auth.user.repository;
 
-import com.chs.cafeapp.user.entity.DeleteUser;
-import java.util.List;
+import com.chs.cafeapp.auth.user.entity.DeleteUser;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

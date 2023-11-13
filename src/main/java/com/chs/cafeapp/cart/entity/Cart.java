@@ -4,12 +4,11 @@ import static com.chs.cafeapp.exception.type.ErrorCode.REMAIN_CART_MENU_IN_CART;
 
 import com.chs.cafeapp.base.BaseEntity;
 import com.chs.cafeapp.exception.CustomException;
-import com.chs.cafeapp.user.entity.User;
+import com.chs.cafeapp.auth.user.entity.User;
 import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;

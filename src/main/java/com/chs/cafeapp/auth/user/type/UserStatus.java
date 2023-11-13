@@ -1,4 +1,4 @@
-package com.chs.cafeapp.user.type;
+package com.chs.cafeapp.auth.user.type;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
