@@ -2,7 +2,7 @@ package com.chs.cafeapp.order.entity;
 
 import com.chs.cafeapp.base.BaseEntity;
 import com.chs.cafeapp.order.type.OrderStatus;
-import com.chs.cafeapp.user.entity.User;
+import com.chs.cafeapp.auth.user.entity.User;
 import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.Entity;
