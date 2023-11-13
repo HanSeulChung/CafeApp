@@ -3,7 +3,7 @@ package com.chs.cafeapp.order.controller;
 import com.chs.cafeapp.kafka.service.KafkaProducerService;
 import com.chs.cafeapp.order.dto.OrderDto;
 import com.chs.cafeapp.order.dto.OrderResponse;
-import com.chs.cafeapp.order.service.OrderServiceForAdmin;
+import com.chs.cafeapp.order.service.OrderAdminService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @RequestMapping("/admin/orders")
 public class OrderAdminController {
-  private final OrderServiceForAdmin orderServiceForAdmin;
+  private final OrderAdminService orderAdminService;
   private final KafkaProducerService producerService;
 
   /**
@@ -32,7 +32,7 @@ public class OrderAdminController {
    */
   @GetMapping()
   public ResponseEntity<Slice<OrderDto>> viewAllOrders(Pageable pageable) {
-    return ResponseEntity.ok(orderServiceForAdmin.viewAllOrders(pageable));
+    return ResponseEntity.ok(orderAdminService.viewAllOrders(pageable));
   }
 
   /**
@@ -43,7 +43,7 @@ public class OrderAdminController {
    */
   @GetMapping("/days")
   public ResponseEntity<Slice<OrderDto>> viewOrdersDuringDays(Pageable pageable) {
-    return ResponseEntity.ok(orderServiceForAdmin.viewAllOrdersDuringDays(pageable));
+    return ResponseEntity.ok(orderAdminService.viewAllOrdersDuringDays(pageable));
   }
 
   /**
@@ -54,7 +54,7 @@ public class OrderAdminController {
    */
   @GetMapping("/weeks")
   public ResponseEntity<Slice<OrderDto>> viewOrdersDuringWeeks(Pageable pageable) {
-    return ResponseEntity.ok(orderServiceForAdmin.viewAllOrdersDuringWeeks(pageable));
+    return ResponseEntity.ok(orderAdminService.viewAllOrdersDuringWeeks(pageable));
   }
 
   /**
@@ -65,7 +65,7 @@ public class OrderAdminController {
    */
   @GetMapping("/months")
   public ResponseEntity<Slice<OrderDto>> viewOrdersDuringMonths(Pageable pageable) {
-    return ResponseEntity.ok(orderServiceForAdmin.viewAllOrdersDuringMonths(pageable));
+    return ResponseEntity.ok(orderAdminService.viewAllOrdersDuringMonths(pageable));
   }
 
   /**
@@ -76,7 +76,7 @@ public class OrderAdminController {
    */
   @GetMapping("/three-months")
   public ResponseEntity<Slice<OrderDto>> viewOrdersDuringThreeMonths(Pageable pageable) {
-    return ResponseEntity.ok(orderServiceForAdmin.viewAllOrdersDuringThreeMonths(pageable));
+    return ResponseEntity.ok(orderAdminService.viewAllOrdersDuringThreeMonths(pageable));
   }
 
   /**
@@ -87,7 +87,7 @@ public class OrderAdminController {
    */
   @GetMapping("/six-months")
   public ResponseEntity<Slice<OrderDto>> viewOrdersDuringSixMonths(Pageable pageable) {
-    return ResponseEntity.ok(orderServiceForAdmin.viewAllOrdersDuringSixMonths(pageable));
+    return ResponseEntity.ok(orderAdminService.viewAllOrdersDuringSixMonths(pageable));
   }
 
   /**
@@ -98,7 +98,7 @@ public class OrderAdminController {
    */
   @GetMapping("/years")
   public ResponseEntity<Slice<OrderDto>> viewOrdersDuringYears(Pageable pageable) {
-    return ResponseEntity.ok(orderServiceForAdmin.viewAllOrdersDuringYears(pageable));
+    return ResponseEntity.ok(orderAdminService.viewAllOrdersDuringYears(pageable));
   }
 
   /**
@@ -110,7 +110,7 @@ public class OrderAdminController {
    */
   @GetMapping("/order-status/{orderStatusNum}")
   public ResponseEntity<Slice<OrderDto>> viewOrdersByOrderStatus(@PathVariable int orderStatusNum, Pageable pageable) {
-    return ResponseEntity.ok(orderServiceForAdmin.viewOrdersByOrderStatus(orderStatusNum, pageable));
+    return ResponseEntity.ok(orderAdminService.viewOrdersByOrderStatus(orderStatusNum, pageable));
   }
 
   /**
@@ -122,7 +122,8 @@ public class OrderAdminController {
    */
   @GetMapping("/order-status/{orderStatusNum}/days")
   public ResponseEntity<Slice<OrderDto>> viewOrdersByOrderStatusDuringDays(@PathVariable int orderStatusNum, Pageable pageable) {
-    return ResponseEntity.ok(orderServiceForAdmin.viewOrdersByOrderStatusDuringDays(orderStatusNum, pageable));
+    return ResponseEntity.ok(
+        orderAdminService.viewOrdersByOrderStatusDuringDays(orderStatusNum, pageable));
   }
 
   /**
@@ -134,7 +135,8 @@ public class OrderAdminController {
    */
   @GetMapping("/order-status/{orderStatusNum}/weeks")
   public ResponseEntity<Slice<OrderDto>> viewOrdersByOrderStatusDuringWeeks(@PathVariable int orderStatusNum, Pageable pageable) {
-    return ResponseEntity.ok(orderServiceForAdmin.viewOrdersByOrderStatusDuringWeeks(orderStatusNum, pageable));
+    return ResponseEntity.ok(
+        orderAdminService.viewOrdersByOrderStatusDuringWeeks(orderStatusNum, pageable));
   }
 
   /**
@@ -146,7 +148,8 @@ public class OrderAdminController {
    */
   @GetMapping("/order-status/{orderStatusNum}/months")
   public ResponseEntity<Slice<OrderDto>> viewOrdersByOrderStatusDuringMonths(@PathVariable int orderStatusNum, Pageable pageable) {
-    return ResponseEntity.ok(orderServiceForAdmin.viewOrdersByOrderStatusDuringMonths(orderStatusNum, pageable));
+    return ResponseEntity.ok(
+        orderAdminService.viewOrdersByOrderStatusDuringMonths(orderStatusNum, pageable));
   }
 
   /**
@@ -158,7 +161,8 @@ public class OrderAdminController {
    */
   @GetMapping("/order-status/{orderStatusNum}/three-months")
   public ResponseEntity<Slice<OrderDto>> viewOrdersByOrderStatusDuringThreeMonths(@PathVariable int orderStatusNum, Pageable pageable) {
-    return ResponseEntity.ok(orderServiceForAdmin.viewOrdersByOrderStatusDuringThreeMonths(orderStatusNum, pageable));
+    return ResponseEntity.ok(
+        orderAdminService.viewOrdersByOrderStatusDuringThreeMonths(orderStatusNum, pageable));
   }
 
   /**
@@ -170,7 +174,8 @@ public class OrderAdminController {
    */
   @GetMapping("/order-status/{orderStatusNum}/six-months")
   public ResponseEntity<Slice<OrderDto>> viewOrdersByOrderStatusDuringSixMonths(@PathVariable int orderStatusNum, Pageable pageable) {
-    return ResponseEntity.ok(orderServiceForAdmin.viewOrdersByOrderStatusDuringSixMonths(orderStatusNum, pageable));
+    return ResponseEntity.ok(
+        orderAdminService.viewOrdersByOrderStatusDuringSixMonths(orderStatusNum, pageable));
   }
 
   /**
@@ -182,7 +187,8 @@ public class OrderAdminController {
    */
   @GetMapping("/order-status/{orderStatusNum}/years")
   public ResponseEntity<Slice<OrderDto>> viewOrdersByOrderStatusDuringYears(@PathVariable int orderStatusNum, Pageable pageable) {
-    return ResponseEntity.ok(orderServiceForAdmin.viewOrdersByOrderStatusDuringYears(orderStatusNum, pageable));
+    return ResponseEntity.ok(
+        orderAdminService.viewOrdersByOrderStatusDuringYears(orderStatusNum, pageable));
   }
 
   /**
@@ -192,7 +198,7 @@ public class OrderAdminController {
    */
   @PatchMapping("/rejections/{orderId}")
   public ResponseEntity<OrderResponse> rejectOrderStatus(@PathVariable long orderId) {
-    OrderDto orderDto = orderServiceForAdmin.rejectOrder(orderId);
+    OrderDto orderDto = orderAdminService.rejectOrder(orderId);
     return ResponseEntity.ok(OrderResponse.toResponse(orderDto, orderDto.getOrderStatus().getDescription()));
   }
 
@@ -204,8 +210,8 @@ public class OrderAdminController {
   @PatchMapping("/order-status/{orderId}")
   public ResponseEntity<OrderResponse> changeOrderStatus(@PathVariable long orderId) {
 
-    OrderDto orderDto = orderServiceForAdmin.changeOrderStatus(orderId);
-    String message = orderServiceForAdmin.viewMessageChanges(orderId);
+    OrderDto orderDto = orderAdminService.changeOrderStatus(orderId);
+    String message = orderAdminService.viewMessageChanges(orderId);
     OrderResponse response = OrderResponse.toResponse(orderDto, message);
     producerService.sendMessage(orderId, orderDto.getOrderStatus().getStatusName());
     return ResponseEntity.ok(response);
