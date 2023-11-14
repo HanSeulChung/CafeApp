@@ -1,13 +1,21 @@
 package com.chs.cafeapp.config.security;
 
+import com.chs.cafeapp.auth.user.service.UserService;
+import com.chs.cafeapp.security.TokenProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.filter.CorsFilter;
 
 @Slf4j
 @Configuration
@@ -15,11 +23,20 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 @RequiredArgsConstructor
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
+    private final CorsFilter corsFilter;
+    private final UserService userService;
+    private final TokenProvider tokenProvider;
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
     private static final String[] AUTH_WHITELIST = {
             "/swagger-resources/**",
             "/swagger-ui.html",
             "/v2/api-docs",
             "/webjars/**",
+            "/menus/**",
             "/h2-console/**"
     };
 
@@ -31,11 +48,15 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
-            .authorizeRequests()
-            .antMatchers("/admin/**", "/", "/orders/**", "/carts/**" ,"/coupons/**").permitAll();
-
-        http
+            .addFilterBefore(corsFilter, UsernamePasswordAuthenticationFilter.class)
             .httpBasic().disable()
-            .csrf().disable();
+            .csrf().disable()
+            .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            .and()
+            .authorizeRequests()
+            .antMatchers("/auth/**").permitAll()
+            .anyRequest().authenticated()
+            .and()
+            .apply(new JwtSecurityConfig(tokenProvider));
     }
 }
