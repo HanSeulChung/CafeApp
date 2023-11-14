@@ -37,9 +37,20 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             "/v2/api-docs",
             "/webjars/**",
             "/menus/**",
-            "/h2-console/**"
+            "/h2-console/**",
+            "/auth"
     };
 
+    private static final String[] AUTH_ADMINLIST = {
+        "/admin/**"
+    };
+
+    private static final String[] AUTH_USERLIST = {
+        "/orders/**",
+        "/carts/**",
+        "/stamps/**",
+        "/coupons/**",
+    };
     @Override
     public void configure(WebSecurity web) throws Exception {
         web.ignoring().antMatchers(AUTH_WHITELIST);
@@ -54,8 +65,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             .and()
             .authorizeRequests()
-            .antMatchers("/auth/**").permitAll()
-            .anyRequest().authenticated()
+            .antMatchers(AUTH_WHITELIST).permitAll()
+            .antMatchers(AUTH_ADMINLIST).hasAuthority("ROLE_ADMIN")
+            .antMatchers(AUTH_USERLIST).hasAuthority("ROLE_USER")
             .and()
             .apply(new JwtSecurityConfig(tokenProvider));
     }

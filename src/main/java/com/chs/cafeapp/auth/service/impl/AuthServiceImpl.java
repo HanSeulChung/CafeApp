@@ -17,6 +17,9 @@ import static com.chs.cafeapp.exception.type.ErrorCode.NOT_MATCH_USER_PASSWORD;
 import static com.chs.cafeapp.exception.type.ErrorCode.NOT_VALID_REFRESH_TOKEN;
 import static com.chs.cafeapp.exception.type.ErrorCode.USER_NOT_FOUND;
 
+import com.chs.cafeapp.auth.admin.entity.Admin;
+import com.chs.cafeapp.auth.admin.repository.AdminRepository;
+import com.chs.cafeapp.auth.admin.service.AdminService;
 import com.chs.cafeapp.auth.service.AuthService;
 import com.chs.cafeapp.auth.token.dto.TokenDto;
 import com.chs.cafeapp.auth.token.dto.TokenRequestDto;
@@ -57,8 +60,10 @@ import org.springframework.transaction.annotation.Transactional;
 public class AuthServiceImpl implements AuthService, UserDetailsService {
   private final MailService mailService;
   private final UserService userService;
+  private final AdminService adminService;
   private final TokenProvider tokenProvider;
   private final UserRepository userRepository;
+  private final AdminRepository adminRepository;
   private final PasswordEncoder passwordEncoder;
 
   private final RefreshTokenRepository refreshTokenRepository;
@@ -67,9 +72,19 @@ public class AuthServiceImpl implements AuthService, UserDetailsService {
   @Override
   @Transactional
   public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-    return userRepository.findByLoginId(username)
+    UserDetails userDetailsByUser = userRepository.findByLoginId(username)
         .map(this::createUserDetails)
-        .orElseThrow(() -> new CustomException(NOT_EXISTS_USER_LOGIN_ID));
+        .orElse(null);
+
+    UserDetails userDetailsByAdmin = adminRepository.findByLoginId(username)
+        .map(this::createAdminUserDetails)
+        .orElse(null);
+
+    if (userDetailsByUser == null && userDetailsByAdmin == null) {
+      throw new CustomException(NOT_EXISTS_USER_LOGIN_ID);
+    }
+
+    return userDetailsByUser == null ? userDetailsByAdmin : userDetailsByUser;
   }
 
   // DB 에 User 값이 존재한다면 UserDetails 객체로 생성 후 리턴
@@ -83,7 +98,17 @@ public class AuthServiceImpl implements AuthService, UserDetailsService {
         Collections.singleton(grantedAuthority)
     );
   }
+  // DB 에 Admin 값이 존재한다면 UserDetails 객체로 생성 후 리턴
+  private UserDetails createAdminUserDetails(Admin admin) {
+    GrantedAuthority grantedAuthority = new SimpleGrantedAuthority(
+        admin.getAuthority().toString());
 
+    return new org.springframework.security.core.userdetails.User(
+        admin.getLoginId(),
+        admin.getPassword(),
+        Collections.singleton(grantedAuthority)
+    );
+  }
   @Override
   @Transactional
   public UserResponseDto signUp(SignUpRequestDto signUpRequestDto) {
@@ -207,6 +232,35 @@ public class AuthServiceImpl implements AuthService, UserDetailsService {
     refreshTokenRepository.save(refreshToken);
 
     userService.updateLastLoginDateTime(user.getLoginId(), LocalDateTime.now());
+    return new TokenResponseDto(tokenDto.getAccessToken(), tokenDto.getRefreshToken());
+  }
+
+  private Admin validationAdmin(SignInRequestDto signInRequestDto) {
+    Admin admin = adminRepository.findByLoginId(signInRequestDto.getUsername())
+        .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+
+    if (!this.passwordEncoder.matches(signInRequestDto.getPassword(), admin.getPassword())) {
+      throw new CustomException(NOT_MATCH_USER_PASSWORD);
+    }
+    return admin;
+  }
+  @Override
+  public TokenResponseDto adminSignIn(SignInRequestDto signInRequestDto) {
+    Admin admin = validationAdmin(signInRequestDto);
+
+    UsernamePasswordAuthenticationToken authenticationToken = signInRequestDto.toAuthentication();
+    Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
+    TokenDto tokenDto = tokenProvider.generateTokenDto(authentication);
+
+    // 프로그램 종료 후 다시 로그인할 때 저장되어있던 것 삭제 후 refresh 저장
+    boolean existsRefreshToken = refreshTokenRepository.existsByKey(signInRequestDto.getUsername());
+    if (existsRefreshToken) {
+      refreshTokenRepository.deleteAllByKey(signInRequestDto.getUsername());
+    }
+    RefreshToken refreshToken = buildRefreshToken(authentication, tokenDto);
+    refreshTokenRepository.save(refreshToken);
+
+    adminService.updateLastLoginDateTime(admin.getLoginId(), LocalDateTime.now());
     return new TokenResponseDto(tokenDto.getAccessToken(), tokenDto.getRefreshToken());
   }
 

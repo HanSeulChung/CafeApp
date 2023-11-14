@@ -23,6 +23,10 @@ public interface AuthService {
    */
   TokenResponseDto signIn(SignInRequestDto signInRequestDto);
 
+  /**
+   * 카페 관계자 로그인
+   */
+  TokenResponseDto adminSignIn(SignInRequestDto signInRequestDto);
 
   /**
    * 소셜 로그인 및 회원가입

@@ -49,7 +49,7 @@ public class AuthController {
 
   /**
    *  사용자(User)일반 로그인 Controller
-   * @param signInRequestDto
+   * @param signInRequestDto: 로그인 입력값 (username(loginId), password)
    * @exception CustomException: 로그인 아이디로 사용자가 존재하지 않을 경우, 비밀번호가 틀릴 경우,
    *                             이메일 인증을 진행하지 않았을 경우 CustomException 발생
    * @return TokenResponseDto: accessToken, refreshToken이 포함되어 있으며 각 1시간, 7일에 유효기간을 가진다.
@@ -57,6 +57,17 @@ public class AuthController {
   @PostMapping("/sign-in")
   public ResponseEntity<TokenResponseDto> signin(@RequestBody SignInRequestDto signInRequestDto) {
     return ResponseEntity.ok(authService.signIn(signInRequestDto));
+  }
+
+  /**
+   * 카페관계자(Admin) 일반 로그인 Controller
+   * @param signInRequestDto: 로그인 입력값 (username(loginId), password)
+   * @exception CustomException: 로그인 아이디로 사용자가 존재하지 않을 경우, 비밀번호가 틀릴 경우 CustomException 발생
+   * @return TokenResponseDto:accessToken, refreshToken이 포함되어 있으며 각 1시간, 7일에 유효기간을 가진다.
+   */
+  @PostMapping("/admin/sign-in")
+  public ResponseEntity<TokenResponseDto> adminSignIn(@RequestBody SignInRequestDto signInRequestDto) {
+    return ResponseEntity.ok(authService.adminSignIn(signInRequestDto));
   }
 
   /**
