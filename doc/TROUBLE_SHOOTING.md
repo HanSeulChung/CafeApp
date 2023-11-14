@@ -82,3 +82,7 @@ main, dev, feature/기능, test/feature-test와 같이 두고 dev를 각 기능 
 <h3>문제 원인</h3>
 <h4>dev 브랜치에서 main 브랜치로 PR요청 후 rebase merge를 했을 때 해시값이 바뀐채로 rebase가 되기 때문에 같은 커밋 이력이라고 해도 해시값이 달라져 다른 커밋이라고 인식해서 중복 커밋이 발생하게 되었다. rebase로 깃 브랜치 이력이 깔끔해지는건 맞으나 보통 원격 저장소에 push 되어있는것은 함부로 rebase하지 말것. 협업시에는 병합도 조심히 하자. 더러워 지더라도 안전하고 만만한 일반 merge를 할 것..</h4>
 
+### 6. 사용자에 대한 엔티티를 User 보다는 Member로 둘 것
+![image](https://github.com/HanSeulChung/CafeApp/assets/94779505/f8357d9d-c54d-42c3-afde-cc0b8a0a4a26)
+
+Security를 진행할때 UserDetails의 User와 변수명이 같아 import하기도 불편하고 가독성이 떨어진다. 추후 다른 프로젝트를 진행할땐 member 등으로 엔티티명 교체할 것
