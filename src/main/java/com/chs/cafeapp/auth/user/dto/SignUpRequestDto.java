@@ -9,9 +9,9 @@ import lombok.Getter;
 @AllArgsConstructor
 public class SignUpRequestDto {
 
-  private String loginId;
+  private String username; //loginId
   private String password;
-  private String userName;
+  private String name;
   private String nickName;
   private int age;
   private int sex; // 0이면 MALE, 1이면 FEMALE
