@@ -36,6 +36,9 @@ public class Admin extends BaseEntity {
 
   private LocalDateTime lastLoginDateTime;
 
+  public void changePassword(String newPassword) {
+    this.password = newPassword;
+  }
   public void setLastLoginDateTime(LocalDateTime lastLoginDateTime) {
     this.lastLoginDateTime = lastLoginDateTime;
   }

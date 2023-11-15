@@ -1,6 +1,8 @@
 package com.chs.cafeapp.auth.service;
 
 import com.chs.cafeapp.auth.dto.LogOutResponse;
+import com.chs.cafeapp.auth.dto.PasswordEditInput;
+import com.chs.cafeapp.auth.dto.PasswordEditResponse;
 import com.chs.cafeapp.auth.token.dto.TokenRequestDto;
 import com.chs.cafeapp.auth.token.dto.TokenResponseDto;
 import com.chs.cafeapp.auth.user.dto.SignInRequestDto;
@@ -42,4 +44,9 @@ public interface AuthService {
    * 로그아웃
    */
   LogOutResponse logOut(String accessToken);
+
+  /**
+   * 비밀번호 변경
+   */
+  PasswordEditResponse changePassword(PasswordEditInput passwordEditInput);
 }

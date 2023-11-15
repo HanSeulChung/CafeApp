@@ -54,6 +54,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         "/carts/**",
         "/stamps/**",
         "/coupons/**",
+        "/user/**"
     };
     @Override
     public void configure(WebSecurity web) throws Exception {
