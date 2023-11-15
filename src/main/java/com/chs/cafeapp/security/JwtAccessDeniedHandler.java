@@ -1,7 +1,5 @@
 package com.chs.cafeapp.security;
 
-import com.chs.cafeapp.exception.CustomException;
-import com.chs.cafeapp.exception.type.ErrorCode;
 import java.io.IOException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
