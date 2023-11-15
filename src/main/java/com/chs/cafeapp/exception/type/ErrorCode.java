@@ -19,6 +19,7 @@ public enum ErrorCode {
   NOT_MATCH_REFRESH_TOKEN_USER(400, "토큰의 유저 정보가 일치하지 않습니다."),
   UN_AUTHORIZATION(401, "인증이 되지 않았습니다."),
   NOT_MATCH_AUTHORIZATION(403, "접근 권한이 올바르지 않습니다."),
+  LOGOUT_USER(400, "로그아웃한 사용자입니다."),
   USER_NOT_FOUND(400, "사용자가 없습니다."),
   MENU_NOT_FOUND(400, "메뉴가 없습니다."),
   CATEGORY_NOT_FOUND(400, "카테고리가 없습니다."),
