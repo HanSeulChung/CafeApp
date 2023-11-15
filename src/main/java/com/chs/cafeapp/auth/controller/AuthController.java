@@ -73,12 +73,12 @@ public class AuthController {
   }
 
   /**
-   *
-   * @return
+   * 로그아웃 Controller
+   * @exception CustomException: 유효하지 않은 token값일 경우, 이미 로그아웃된 사용자일 경우 CustomException 발생
+   * @return LogOutResponse: logout한 loginId, "로그아웃 되었습니다." String 값
    */
   @PostMapping("/logout")
   public ResponseEntity<LogOutResponse> logOut(@RequestHeader("Authorization") String accessToken) {
-
     return ResponseEntity.ok(authService.logOut(accessToken));
   }
   /**
