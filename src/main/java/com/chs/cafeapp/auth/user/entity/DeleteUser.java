@@ -19,7 +19,7 @@ import lombok.Setter;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class DeleteUser extends BaseEntity {
+public class DeleteUser {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private long id;
