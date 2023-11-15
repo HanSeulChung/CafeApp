@@ -12,6 +12,7 @@ import static com.chs.cafeapp.exception.type.ErrorCode.ALREADY_EMAIL_AUTH_USER;
 import static com.chs.cafeapp.exception.type.ErrorCode.ALREADY_EXISTS_USER_LOGIN_ID;
 import static com.chs.cafeapp.exception.type.ErrorCode.ALREADY_EXISTS_USER_NICK_NAME;
 import static com.chs.cafeapp.exception.type.ErrorCode.EXPIRED_DATE_TIME_FOR_EMAIL_AUTH;
+import static com.chs.cafeapp.exception.type.ErrorCode.INVALID_ACCESS_TOKEN;
 import static com.chs.cafeapp.exception.type.ErrorCode.LOGOUT_USER;
 import static com.chs.cafeapp.exception.type.ErrorCode.NOT_EMAIL_AUTH;
 import static com.chs.cafeapp.exception.type.ErrorCode.NOT_EXISTS_USER_LOGIN_ID;
@@ -309,11 +310,11 @@ public class AuthServiceImpl implements AuthService, UserDetailsService {
   @Override
   public LogOutResponse logOut(String accessToken) {
     Authentication authentication = tokenProvider.getAuthentication(accessToken);
-
+    if(!tokenProvider.validateToken(accessToken)) {
+      throw new CustomException(INVALID_ACCESS_TOKEN);
+    }
     String loginId = authentication.getName();
     refreshTokenRepository.findByKey(loginId)
-        .orElseThrow(() -> new CustomException(LOGOUT_USER));
-    RefreshToken refreshToken = refreshTokenRepository.findByKey(loginId)
         .orElseThrow(() -> new CustomException(LOGOUT_USER));
 
     refreshTokenRepository.deleteByKey(authentication.getName());
