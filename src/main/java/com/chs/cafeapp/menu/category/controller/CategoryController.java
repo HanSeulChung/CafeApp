@@ -1,5 +1,6 @@
 package com.chs.cafeapp.menu.category.controller;
 
+import com.chs.cafeapp.exception.CustomException;
 import com.chs.cafeapp.menu.category.dto.CategoryDto;
 import com.chs.cafeapp.menu.category.dto.CategoryEditInput;
 import com.chs.cafeapp.menu.category.dto.CategoryInput;
@@ -17,7 +18,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import com.chs.cafeapp.exception.CustomException;
 
 /**
  * 카테고리 CRUD Controller

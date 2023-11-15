@@ -32,6 +32,7 @@ public class GlobalExceptionHandler {
         log.error("handleDataIntegrityViolationException is occurred.", e);
         return new ErrorResponse(INVALID_REQUEST, INVALID_REQUEST.getHttpCode(), INVALID_REQUEST.getDescription());
     }
+
     @ExceptionHandler(Exception.class)
     public ErrorResponse handleException(Exception e) {
         log.error("Exception is occurred.", e);

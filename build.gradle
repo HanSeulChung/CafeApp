@@ -43,14 +43,17 @@ dependencies {
 	implementation 'org.springframework.kafka:spring-kafka'
 
 	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
-	implementation 'com.h2database:h2:1.4.200'
 	implementation 'io.springfox:springfox-boot-starter:3.0.0'
 	implementation 'io.springfox:springfox-swagger-ui:3.0.0'
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
-	implementation group: 'io.jsonwebtoken', name: 'jjwt', version: '0.9.1'
+
+	// jwt
+	implementation group: 'io.jsonwebtoken', name: 'jjwt-api', version: '0.11.2'
+	runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-impl', version: '0.11.2'
+	runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-jackson', version: '0.11.2'
+
 	implementation group: 'org.apache.commons', name: 'commons-collections4', version: '4.3'
 	runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
-	runtimeOnly 'com.h2database:h2'
 
 	implementation 'com.querydsl:querydsl-jpa'
 	annotationProcessor 'com.querydsl:querydsl-apt'
@@ -78,11 +81,7 @@ sourceSets {
 	}
 }
 
-//tasks.named('test') {
-//	useJUnitPlatform()
-//}
-
-test {
+tasks.named('test') {
 	useJUnitPlatform()
 	systemProperty "spring.profiles.active", "test"
 }
