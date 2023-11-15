@@ -1,6 +1,8 @@
 package com.chs.cafeapp.security;
 
 import com.chs.cafeapp.auth.token.dto.TokenDto;
+import com.chs.cafeapp.exception.CustomException;
+import com.chs.cafeapp.exception.type.ErrorCode;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
@@ -121,6 +123,8 @@ public class TokenProvider {
       return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(accessToken).getBody();
     } catch (ExpiredJwtException e) {
       return e.getClaims();
+    } catch (SignatureException e) {
+      throw new CustomException(ErrorCode.LOGOUT_USER);
     }
   }
 }

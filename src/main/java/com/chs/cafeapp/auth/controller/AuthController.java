@@ -1,5 +1,6 @@
 package com.chs.cafeapp.auth.controller;
 
+import com.chs.cafeapp.auth.dto.LogOutResponse;
 import com.chs.cafeapp.exception.CustomException;
 import com.chs.cafeapp.auth.service.AuthService;
 import com.chs.cafeapp.auth.token.dto.TokenDto;
@@ -14,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -71,9 +73,18 @@ public class AuthController {
   }
 
   /**
+   *
+   * @return
+   */
+  @PostMapping("/logout")
+  public ResponseEntity<LogOutResponse> logOut(@RequestHeader("Authorization") String accessToken) {
+
+    return ResponseEntity.ok(authService.logOut(accessToken));
+  }
+  /**
    * access Token 재발급 Controller
    * @param tokenRequestDto: 기존에 로그인때 받았던 tokenResponseDto(accessToken, refreshToken)값
-   * @exception CustomException: refreshToken이 우효하지 않을 경우, 해당 토큰 값과 접근하려는 사용자가 같지 않을 경우,
+   * @exception CustomException: refreshToken이 유효하지 않을 경우, 해당 토큰 값과 접근하려는 사용자가 같지 않을 경우,
    *                           TODO: 로그아웃 사용자가 재발급 접근할 경우
    * @return TokenResponseDto: accessToken, refreshToken이 포함되어 있으며 각 1시간, 7일에 유효기간을 가진다.
    */

@@ -10,6 +10,7 @@ import static com.chs.cafeapp.exception.type.ErrorCode.ALREADY_EMAIL_AUTH_USER;
 import static com.chs.cafeapp.exception.type.ErrorCode.ALREADY_EXISTS_USER_LOGIN_ID;
 import static com.chs.cafeapp.exception.type.ErrorCode.ALREADY_EXISTS_USER_NICK_NAME;
 import static com.chs.cafeapp.exception.type.ErrorCode.EXPIRED_DATE_TIME_FOR_EMAIL_AUTH;
+import static com.chs.cafeapp.exception.type.ErrorCode.LOGOUT_USER;
 import static com.chs.cafeapp.exception.type.ErrorCode.NOT_EMAIL_AUTH;
 import static com.chs.cafeapp.exception.type.ErrorCode.NOT_EXISTS_USER_LOGIN_ID;
 import static com.chs.cafeapp.exception.type.ErrorCode.NOT_MATCH_REFRESH_TOKEN_USER;
@@ -20,6 +21,7 @@ import static com.chs.cafeapp.exception.type.ErrorCode.USER_NOT_FOUND;
 import com.chs.cafeapp.auth.admin.entity.Admin;
 import com.chs.cafeapp.auth.admin.repository.AdminRepository;
 import com.chs.cafeapp.auth.admin.service.AdminService;
+import com.chs.cafeapp.auth.dto.LogOutResponse;
 import com.chs.cafeapp.auth.service.AuthService;
 import com.chs.cafeapp.auth.token.dto.TokenDto;
 import com.chs.cafeapp.auth.token.dto.TokenRequestDto;
@@ -32,6 +34,7 @@ import com.chs.cafeapp.auth.user.dto.UserResponseDto;
 import com.chs.cafeapp.auth.user.entity.User;
 import com.chs.cafeapp.auth.user.repository.UserRepository;
 import com.chs.cafeapp.auth.user.service.UserService;
+import com.chs.cafeapp.config.security.SecurityConfig;
 import com.chs.cafeapp.exception.CustomException;
 import com.chs.cafeapp.mail.service.MailService;
 import com.chs.cafeapp.security.TokenProvider;
@@ -47,6 +50,8 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -280,9 +285,8 @@ public class AuthServiceImpl implements AuthService, UserDetailsService {
     validateRefreshToken(tokenRequestDto);
     Authentication authentication = tokenProvider.getAuthentication(tokenRequestDto.getAccessToken());
 
-    // TODO: 로그아웃시 refresh token 레포지토리에서 삭제
     RefreshToken refreshToken = refreshTokenRepository.findByKey(authentication.getName())
-        .orElseThrow(() -> new RuntimeException("로그아웃 된 사용자입니다."));
+        .orElseThrow(() -> new CustomException(LOGOUT_USER));
 
     validateRefreshTokenOwner(refreshToken, tokenRequestDto);
 
@@ -291,5 +295,18 @@ public class AuthServiceImpl implements AuthService, UserDetailsService {
     refreshTokenRepository.save(newRefreshToken);
 
     return new TokenResponseDto(tokenDto.getAccessToken(), tokenDto.getRefreshToken());
+  }
+
+  @Override
+  public LogOutResponse logOut(String accessToken) {
+    Authentication authentication = tokenProvider.getAuthentication(accessToken);
+
+    String loginId = authentication.getName();
+    refreshTokenRepository.findByKey(loginId)
+        .orElseThrow(() -> new CustomException(LOGOUT_USER));
+
+    refreshTokenRepository.deleteByKey(authentication.getName());
+
+    return new LogOutResponse(loginId, "로그아웃 되었습니다.");
   }
 }
