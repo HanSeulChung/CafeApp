@@ -1,5 +1,6 @@
 # 카페 메뉴 스마트 주문 서비스 : CafeApp
-해당 카페의 메뉴(음식, 음료, MD 굿즈)를 미리 결제하고 주문하는 서비스 입니다.
+* 프로젝트 기간  2023-10-18 ~ 2023-11-17(4주)
+* 프로젝트 소개 > 해당 카페의 메뉴(음식, 음료, MD 굿즈)를 미리 결제하고 주문하는 서비스 입니다.
 
 ## Tech Stack
 <div align=center>
@@ -23,10 +24,15 @@
 
 ## 프로젝트 기능 설계
 * ### **공통**
-  * [ ] 회원가입 기능
-  * [ ] 소셜 회원가입 기능
-  * [ ] 로그인 기능
-  * [ ] 소셜 로그인 기능
+  * 일반 회원가입 기능<br>
+    ➡️ 사용자(User)만 회원가입 가능<br>
+    ➡️ 카페관계자(Admin)은 admin-data.sql로 insert하는 것으로 진행했음.<br>
+    ➡️ admin-data.sql: 우선 3개의 admin 계정 insert 값 존재
+  * 로그인 기능<br>
+    ➡️ 사용자(User), 카페관계자(Admin) 로그인 가능<br>
+    ➡️ 로그인 성공시 accessToken, refreshToken값을 json형태로 내보냄. (각 1시간, 7일의 유효기간을 가지고 있음)<br>
+    ➡️ 추후 서버와 클라이언트 관계가 명확해지면 클라이언트가 이 accessToken값을 저장하고있어야함<br>
+  * [ ] 소셜 회원가입/로그인 기능
 * ### **카페 관계자(admin)**
   * 카테고리 
     * 상품 카테고리 등록
@@ -90,33 +96,56 @@
      * 사용 불가능한 쿠폰 조회(기간 만료, 사용 완료 동시 조회)
 
 *TODO*
-* [ ] 주문시 실제 주문의 순서 고려
-* [ ] 주문 트랜잭션 lock, rollback 고려
+* [ ] 주문시 실제 주문의 순서 고려, 동시성 락 문제 해결 필요
 * [ ] JPA의 N+1 문제
 * [ ] 쿼리의 실행 갯수 고려
-* [ ] 주문 상태 변경시 pub-sub 구조로 알림 기능을 보낼지, 상태 조회 서버를 별도 구축할 지 고려
+* [X] 주문 상태 변경시 pub-sub 구조로 알림 기능을 보낼지, 상태 조회 서버를 별도 구축할 지 고려<br>
+   ➡️ 주문 상태 조회 서버 별도 구축<br>
+   ➡️ pub-sub> kafka + firebase 고려 중
 * [ ] 사용자의 위치를 어떻게 받을 지
 * [ ] 조회시 List로 받고있는것 Paging, Paging 시에도 쿼리 limit 구문 고려
 
-
-
 ## ERD
-11/01 ERD 수정 (이후 수정 있을 수도 있음)
-![image](https://github.com/HanSeulChung/CafeApp/assets/94779505/c0cd93f2-345f-43e4-9e03-70ccd2aeefa9)
+
+11/15 ERD 
+![image](https://github.com/HanSeulChung/CafeApp/assets/94779505/637c59b4-fb09-462a-a1dc-19233e855860)
+
+
 
 <details>
 <summary><h4>이전 ERD 셋팅</h4></summary>
   <div markdown=1>
-   
-   10/26 ERD 수정 (이후 수정 있을 수도 있음)
-![image](https://github.com/HanSeulChung/CafeApp/assets/94779505/f17c72f3-18ca-409e-ac65-83b506fe70b0)
-   10/19 초기 **변경됨**
-   
-![image](https://github.com/HanSeulChung/CafeApp/assets/94779505/a2ba85b6-3a56-472d-8805-eb29615fced6)
+    
+   11/01 ERD **변경됨**
+    ![image](https://github.com/HanSeulChung/CafeApp/assets/94779505/c0cd93f2-345f-43e4-9e03-70ccd2aeefa9)
+    
+   10/26 ERD **변경됨**
+    ![image](https://github.com/HanSeulChung/CafeApp/assets/94779505/f17c72f3-18ca-409e-ac65-83b506fe70b0)
+    
+   10/19 초기 ERD **변경됨**
+    ![image](https://github.com/HanSeulChung/CafeApp/assets/94779505/a2ba85b6-3a56-472d-8805-eb29615fced6)
   </div>
 </details>
 
 ## 
+
+## Git Commit Message Convention
+```markdown
+feat: 새로운 기능 추가, 한 묶음의 완전한 기능일 경우 티켓번호 ([FEAT-001])을 추가했음.
+fix: 버그 수정
+docs: 문서의 수정, 코드의 주석 추가 혹은 수정 등등
+style: (코드의 수정 없이) 스타일만 변경(ex. 들여쓰기, 세미콜론 추가 및 삭제 등등)
+refactor: 코드를 리팩토링
+test: Test 관련한 코드의 추가, 수정
+chore: 코드 수정 없이 설정을 변경(build.gradle 등)
+```
+
+## Git Branch Convention
+```markdown
+main <- dev : pull request 후 create merge 전략
+dev 브랜치에서 기능 branch 생성후 기능 구현
+dev <- 기능구현 branch : rebase 전략
+```
 
 ### Trouble Shooting
 [troble shooting 보러가기](https://github.com/HanSeulChung/CafeApp/blob/main/doc/TROUBLE_SHOOTING.md)
