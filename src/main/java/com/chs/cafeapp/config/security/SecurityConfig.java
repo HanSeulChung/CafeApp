@@ -1,6 +1,8 @@
 package com.chs.cafeapp.config.security;
 
 import com.chs.cafeapp.auth.user.service.UserService;
+import com.chs.cafeapp.security.JwtAccessDeniedHandler;
+import com.chs.cafeapp.security.JwtAuthenticationEntryPoint;
 import com.chs.cafeapp.security.TokenProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,6 +28,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private final CorsFilter corsFilter;
     private final UserService userService;
     private final TokenProvider tokenProvider;
+    private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
+    private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -63,6 +67,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .httpBasic().disable()
             .csrf().disable()
             .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            .and()
+            .exceptionHandling()
+            .authenticationEntryPoint(jwtAuthenticationEntryPoint)
+            .accessDeniedHandler(jwtAccessDeniedHandler)
             .and()
             .authorizeRequests()
             .antMatchers(AUTH_WHITELIST).permitAll()
