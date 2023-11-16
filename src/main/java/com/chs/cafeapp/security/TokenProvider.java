@@ -1,6 +1,5 @@
 package com.chs.cafeapp.security;
 
-import static com.chs.cafeapp.exception.type.ErrorCode.INVALID_ACCESS_TOKEN;
 import static com.chs.cafeapp.exception.type.ErrorCode.NO_ROLE_TOKEN;
 
 import com.chs.cafeapp.auth.service.AccessTokenValidator;
