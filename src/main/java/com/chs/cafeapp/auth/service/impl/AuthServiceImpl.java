@@ -28,6 +28,7 @@ import com.chs.cafeapp.auth.admin.entity.Admin;
 import com.chs.cafeapp.auth.admin.repository.AdminRepository;
 import com.chs.cafeapp.auth.admin.service.AdminService;
 import com.chs.cafeapp.auth.component.TokenBlackList;
+import com.chs.cafeapp.auth.component.TokenPrepareList;
 import com.chs.cafeapp.auth.dto.LogOutResponse;
 import com.chs.cafeapp.auth.dto.PasswordEditInput;
 import com.chs.cafeapp.auth.dto.PasswordEditResponse;
@@ -79,6 +80,7 @@ public class AuthServiceImpl implements AuthService, UserDetailsService {
   private final PasswordEncoder passwordEncoder;
 
   private final TokenBlackList tokenBlackList;
+  private final TokenPrepareList tokenPrepareList;
   private final RefreshTokenRepository refreshTokenRepository;
   private final AuthenticationManagerBuilder authenticationManagerBuilder;
 
@@ -360,7 +362,9 @@ public class AuthServiceImpl implements AuthService, UserDetailsService {
       user.changePassword(passwordEncoder.encode(passwordEditInput.getNewPassword()));
       userRepository.save(user);
       refreshTokenRepository.deleteByKey(user.getLoginId());
-      //TODO: 접근한 accessToken을 가져오는 것, 이렇게 가져오는게 안전한가?
+      String accessToken = tokenPrepareList.getAccessToken(user.getLoginId());
+      tokenBlackList.addToBlacklist(accessToken);
+      tokenPrepareList.delete(user.getLoginId());
       return new PasswordEditResponse(user.getLoginId(), "비밀번호가 변경되었습니다. 다시 로그인 후 이용해주세요.");
     }
     if (roleName.equals("ROLE_ADMIN")) {
@@ -368,7 +372,9 @@ public class AuthServiceImpl implements AuthService, UserDetailsService {
       admin.changePassword(passwordEncoder.encode(passwordEditInput.getNewPassword()));
       adminRepository.save(admin);
       refreshTokenRepository.deleteByKey(admin.getLoginId());
-      //TODO: 접근한 accessToken을 가져오는 것, 이렇게 가져오는게 안전한가?
+      String accessToken = tokenPrepareList.getAccessToken(admin.getLoginId());
+      tokenBlackList.addToBlacklist(accessToken);
+      tokenPrepareList.delete(admin.getLoginId());
       return new PasswordEditResponse(admin.getLoginId(), "비밀번호가 변경되었습니다. 다시 로그인 후 이용해주세요.");
     }
     return new PasswordEditResponse(authentication.getName(), "비밀번호가 변경되지 않았습니다.");
