@@ -1,5 +1,8 @@
 package com.chs.cafeapp.security;
 
+import static com.chs.cafeapp.exception.type.ErrorCode.NO_ROLE_TOKEN;
+
+import com.chs.cafeapp.auth.service.AccessTokenValidator;
 import com.chs.cafeapp.auth.token.dto.TokenDto;
 import com.chs.cafeapp.exception.CustomException;
 import com.chs.cafeapp.exception.type.ErrorCode;
@@ -28,6 +31,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 public class TokenProvider {
+  private final AccessTokenValidator accessTokenValidator;
   private static final String AUTHORITIES_KEY = "auth";
   private static final String BEARER_TYPE = "Bearer";
   private static final long  ACCESS_TOKEN_EXPIRE_TIME = 1000 * 60 * 60; // 1 hour
@@ -39,7 +43,8 @@ public class TokenProvider {
 
   private final Key key;
 
-  public TokenProvider() {
+  public TokenProvider(AccessTokenValidator accessTokenValidator) {
+    this.accessTokenValidator = accessTokenValidator;
     this.key = Keys.secretKeyFor(SignatureAlgorithm.HS512);
   }
 
@@ -84,7 +89,7 @@ public class TokenProvider {
     Claims claims = parseClaims(accessToken);
 
     if (claims.get(AUTHORITIES_KEY) == null) {
-      throw new RuntimeException("권한 정보가 없는 토큰입니다.");
+      throw new CustomException(NO_ROLE_TOKEN);
     }
 
     // 클레임에서 권한 정보 가져오기
@@ -103,6 +108,12 @@ public class TokenProvider {
   }
 
   public boolean validateToken(String token) {
+
+    if (!accessTokenValidator.validateToken(token)) {
+      log.info("로그아웃이나 재발급으로 tokenBlackList에 있는 token입니다.");
+      return false;
+    }
+
     try {
       Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
       return true;

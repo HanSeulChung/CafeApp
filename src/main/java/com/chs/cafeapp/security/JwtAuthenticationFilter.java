@@ -1,5 +1,6 @@
 package com.chs.cafeapp.security;
 
+import com.chs.cafeapp.auth.component.TokenPrepareList;
 import java.io.IOException;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -22,6 +23,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
   private final TokenProvider tokenProvider;
 
+  private final TokenPrepareList tokenPrepareList;
+
   // 실제 필터링 로직은 doFilterInternal 에 들어감
   // JWT 토큰의 인증 정보를 현재 쓰레드의 SecurityContext 에 저장하는 역할 수행
   @Override
@@ -29,14 +32,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     // 1. Request Header 에서 토큰을 꺼냄
     String jwt = resolveToken(request);
-
     // 2. validateToken 으로 토큰 유효성 검사
     // 정상 토큰이면 해당 토큰으로 Authentication 을 가져와서 SecurityContext 에 저장
+    Authentication authentication = null;
     if (StringUtils.hasText(jwt) && tokenProvider.validateToken(jwt)) {
-      Authentication authentication = tokenProvider.getAuthentication(jwt);
+      authentication = tokenProvider.getAuthentication(jwt);
       SecurityContextHolder.getContext().setAuthentication(authentication);
     }
 
+    // 3. request url이 비밀번호 변경일 경우 우선 list에 담아둠.
+    String requestURI = request.getRequestURI();
+    if (requestURI.equals("/user") || requestURI.equals("/admin")) {
+      tokenPrepareList.addToSpareList(authentication.getName(), jwt);
+    }
     filterChain.doFilter(request, response);
   }
 

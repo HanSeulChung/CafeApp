@@ -1,5 +1,6 @@
 package com.chs.cafeapp.config.security;
 
+import com.chs.cafeapp.auth.component.TokenPrepareList;
 import com.chs.cafeapp.security.JwtAuthenticationFilter;
 import com.chs.cafeapp.security.TokenProvider;
 import lombok.RequiredArgsConstructor;
@@ -12,11 +13,12 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class JwtSecurityConfig extends
     SecurityConfigurerAdapter<DefaultSecurityFilterChain, HttpSecurity> {
   private final TokenProvider tokenProvider;
+  private final TokenPrepareList tokenPrepareList;
 
   // TokenProvider 를 주입받아서 JwtFilter 를 통해 Security 로직에 필터를 등록
   @Override
   public void configure(HttpSecurity http) {
-    JwtAuthenticationFilter customFilter = new JwtAuthenticationFilter(tokenProvider);
+    JwtAuthenticationFilter customFilter = new JwtAuthenticationFilter(tokenProvider, tokenPrepareList);
     http.addFilterBefore(customFilter, UsernamePasswordAuthenticationFilter.class);
   }
 }

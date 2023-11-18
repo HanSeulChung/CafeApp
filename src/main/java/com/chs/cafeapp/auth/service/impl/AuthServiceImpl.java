@@ -1,27 +1,37 @@
 package com.chs.cafeapp.auth.service.impl;
 
+import static com.chs.cafeapp.auth.type.Authority.ROLE_ADMIN;
 import static com.chs.cafeapp.auth.type.Authority.ROLE_USER;
 import static com.chs.cafeapp.auth.type.Authority.ROLE_YET_USER;
 import static com.chs.cafeapp.auth.user.type.UserSex.FEMALE;
 import static com.chs.cafeapp.auth.user.type.UserSex.MALE;
 import static com.chs.cafeapp.auth.user.type.UserStatus.USER_STATUS_ING;
 import static com.chs.cafeapp.auth.user.type.UserStatus.USER_STATUS_REQ;
+import static com.chs.cafeapp.exception.type.ErrorCode.ADMIN_NOT_FOUND;
 import static com.chs.cafeapp.exception.type.ErrorCode.ALREADY_EMAIL_AUTH_USER;
 import static com.chs.cafeapp.exception.type.ErrorCode.ALREADY_EXISTS_USER_LOGIN_ID;
 import static com.chs.cafeapp.exception.type.ErrorCode.ALREADY_EXISTS_USER_NICK_NAME;
 import static com.chs.cafeapp.exception.type.ErrorCode.EXPIRED_DATE_TIME_FOR_EMAIL_AUTH;
+import static com.chs.cafeapp.exception.type.ErrorCode.INVALID_ACCESS_TOKEN;
 import static com.chs.cafeapp.exception.type.ErrorCode.LOGOUT_USER;
 import static com.chs.cafeapp.exception.type.ErrorCode.NOT_EMAIL_AUTH;
 import static com.chs.cafeapp.exception.type.ErrorCode.NOT_EXISTS_USER_LOGIN_ID;
+import static com.chs.cafeapp.exception.type.ErrorCode.NOT_MATCH_ORIGIN_PASSWORD;
 import static com.chs.cafeapp.exception.type.ErrorCode.NOT_MATCH_REFRESH_TOKEN_USER;
+import static com.chs.cafeapp.exception.type.ErrorCode.NOT_MATCH_ROLE;
 import static com.chs.cafeapp.exception.type.ErrorCode.NOT_MATCH_USER_PASSWORD;
 import static com.chs.cafeapp.exception.type.ErrorCode.NOT_VALID_REFRESH_TOKEN;
+import static com.chs.cafeapp.exception.type.ErrorCode.TOO_MANY_ROLE;
 import static com.chs.cafeapp.exception.type.ErrorCode.USER_NOT_FOUND;
 
 import com.chs.cafeapp.auth.admin.entity.Admin;
 import com.chs.cafeapp.auth.admin.repository.AdminRepository;
 import com.chs.cafeapp.auth.admin.service.AdminService;
+import com.chs.cafeapp.auth.component.TokenBlackList;
+import com.chs.cafeapp.auth.component.TokenPrepareList;
 import com.chs.cafeapp.auth.dto.LogOutResponse;
+import com.chs.cafeapp.auth.dto.PasswordEditInput;
+import com.chs.cafeapp.auth.dto.PasswordEditResponse;
 import com.chs.cafeapp.auth.service.AuthService;
 import com.chs.cafeapp.auth.token.dto.TokenDto;
 import com.chs.cafeapp.auth.token.dto.TokenRequestDto;
@@ -34,7 +44,6 @@ import com.chs.cafeapp.auth.user.dto.UserResponseDto;
 import com.chs.cafeapp.auth.user.entity.User;
 import com.chs.cafeapp.auth.user.repository.UserRepository;
 import com.chs.cafeapp.auth.user.service.UserService;
-import com.chs.cafeapp.config.security.SecurityConfig;
 import com.chs.cafeapp.exception.CustomException;
 import com.chs.cafeapp.mail.service.MailService;
 import com.chs.cafeapp.security.TokenProvider;
@@ -42,6 +51,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -50,12 +60,10 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -71,6 +79,8 @@ public class AuthServiceImpl implements AuthService, UserDetailsService {
   private final AdminRepository adminRepository;
   private final PasswordEncoder passwordEncoder;
 
+  private final TokenBlackList tokenBlackList;
+  private final TokenPrepareList tokenPrepareList;
   private final RefreshTokenRepository refreshTokenRepository;
   private final AuthenticationManagerBuilder authenticationManagerBuilder;
 
@@ -158,7 +168,7 @@ public class AuthServiceImpl implements AuthService, UserDetailsService {
         .build();
   }
 
-  private User validationUser(String uuid) {
+  private User validationUserByUuid(String uuid) {
     User user = userRepository.findByEmailAuthKey(uuid)
         .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
 
@@ -179,7 +189,7 @@ public class AuthServiceImpl implements AuthService, UserDetailsService {
   }
   @Override
   public UserResponseDto emailAuth(String uuid) {
-    User user = validationUser(uuid);
+    User user = validationUserByUuid(uuid);
 
     Instant requestTime = Instant.now();
     Instant expiredTime = user.getUpdateDateTime()
@@ -201,7 +211,7 @@ public class AuthServiceImpl implements AuthService, UserDetailsService {
         .build();
   }
 
-  private User validationUser(SignInRequestDto signInRequestDto) {
+  private User validationUserFromSignIn(SignInRequestDto signInRequestDto) {
     User user = userRepository.findByLoginId(signInRequestDto.getUsername())
         .orElseThrow(() -> new CustomException(NOT_EXISTS_USER_LOGIN_ID));
     if (!this.passwordEncoder.matches(signInRequestDto.getPassword(), user.getPassword())) {
@@ -222,7 +232,7 @@ public class AuthServiceImpl implements AuthService, UserDetailsService {
   @Override
   @Transactional
   public TokenResponseDto signIn(SignInRequestDto signInRequestDto) {
-    User user = validationUser(signInRequestDto);
+    User user = validationUserFromSignIn(signInRequestDto);
 
     UsernamePasswordAuthenticationToken authenticationToken = signInRequestDto.toAuthentication();
     Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
@@ -294,19 +304,79 @@ public class AuthServiceImpl implements AuthService, UserDetailsService {
     RefreshToken newRefreshToken = refreshToken.updateValue(tokenDto.getRefreshToken());
     refreshTokenRepository.save(newRefreshToken);
 
+    tokenBlackList.addToBlacklist(tokenRequestDto.getAccessToken());
+
     return new TokenResponseDto(tokenDto.getAccessToken(), tokenDto.getRefreshToken());
   }
 
   @Override
   public LogOutResponse logOut(String accessToken) {
     Authentication authentication = tokenProvider.getAuthentication(accessToken);
-
+    if(!tokenProvider.validateToken(accessToken)) {
+      throw new CustomException(INVALID_ACCESS_TOKEN);
+    }
     String loginId = authentication.getName();
     refreshTokenRepository.findByKey(loginId)
         .orElseThrow(() -> new CustomException(LOGOUT_USER));
 
     refreshTokenRepository.deleteByKey(authentication.getName());
+    tokenBlackList.addToBlacklist(accessToken);
 
     return new LogOutResponse(loginId, "로그아웃 되었습니다.");
+  }
+
+  private User validationUserByPasswordEdit(Authentication authentication, String originPassword) {
+    User user = userRepository.findByLoginId(authentication.getName())
+        .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+    if (user.getAuthority() != ROLE_USER) {
+      throw new CustomException(NOT_MATCH_ROLE);
+    }
+    if (!passwordEncoder.matches(originPassword, user.getPassword())) {
+      throw new CustomException(NOT_MATCH_ORIGIN_PASSWORD);
+    }
+    return user;
+  }
+
+  private Admin validationAdminByPasswordEdit(Authentication authentication, String originPassword) {
+    Admin admin = adminRepository.findByLoginId(authentication.getName())
+        .orElseThrow(() -> new CustomException(ADMIN_NOT_FOUND));
+    if (admin.getAuthority() != ROLE_ADMIN) {
+      throw new CustomException(NOT_MATCH_ROLE);
+    }
+    if (!passwordEncoder.matches(originPassword, admin.getPassword())) {
+      throw new CustomException(NOT_MATCH_ORIGIN_PASSWORD);
+    }
+    return admin;
+  }
+  @Override
+  public PasswordEditResponse changePassword(PasswordEditInput passwordEditInput) {
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    Collection<? extends GrantedAuthority> authority = authentication.getAuthorities();
+    if (authority.size() >= 2) {
+      throw new CustomException(TOO_MANY_ROLE);
+    }
+    String roleName = authority.iterator().next().getAuthority();
+
+    if (roleName.equals("ROLE_USER")) {
+      User user = validationUserByPasswordEdit(authentication, passwordEditInput.getOriginPassword());
+      user.changePassword(passwordEncoder.encode(passwordEditInput.getNewPassword()));
+      userRepository.save(user);
+      refreshTokenRepository.deleteByKey(user.getLoginId());
+      String accessToken = tokenPrepareList.getAccessToken(user.getLoginId());
+      tokenBlackList.addToBlacklist(accessToken);
+      tokenPrepareList.delete(user.getLoginId());
+      return new PasswordEditResponse(user.getLoginId(), "비밀번호가 변경되었습니다. 다시 로그인 후 이용해주세요.");
+    }
+    if (roleName.equals("ROLE_ADMIN")) {
+      Admin admin = validationAdminByPasswordEdit(authentication, passwordEditInput.getOriginPassword());
+      admin.changePassword(passwordEncoder.encode(passwordEditInput.getNewPassword()));
+      adminRepository.save(admin);
+      refreshTokenRepository.deleteByKey(admin.getLoginId());
+      String accessToken = tokenPrepareList.getAccessToken(admin.getLoginId());
+      tokenBlackList.addToBlacklist(accessToken);
+      tokenPrepareList.delete(admin.getLoginId());
+      return new PasswordEditResponse(admin.getLoginId(), "비밀번호가 변경되었습니다. 다시 로그인 후 이용해주세요.");
+    }
+    return new PasswordEditResponse(authentication.getName(), "비밀번호가 변경되지 않았습니다.");
   }
 }

@@ -1,6 +1,6 @@
 package com.chs.cafeapp.config.security;
 
-import com.chs.cafeapp.auth.user.service.UserService;
+import com.chs.cafeapp.auth.component.TokenPrepareList;
 import com.chs.cafeapp.security.JwtAccessDeniedHandler;
 import com.chs.cafeapp.security.JwtAuthenticationEntryPoint;
 import com.chs.cafeapp.security.TokenProvider;
@@ -26,8 +26,8 @@ import org.springframework.web.filter.CorsFilter;
 @RequiredArgsConstructor
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private final CorsFilter corsFilter;
-    private final UserService userService;
     private final TokenProvider tokenProvider;
+    private final TokenPrepareList tokenPrepareList;
     private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
     @Bean
@@ -54,6 +54,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         "/carts/**",
         "/stamps/**",
         "/coupons/**",
+        "/user/**"
     };
     @Override
     public void configure(WebSecurity web) throws Exception {
@@ -77,6 +78,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .antMatchers(AUTH_ADMINLIST).hasAuthority("ROLE_ADMIN")
             .antMatchers(AUTH_USERLIST).hasAuthority("ROLE_USER")
             .and()
-            .apply(new JwtSecurityConfig(tokenProvider));
+            .apply(new JwtSecurityConfig(tokenProvider, tokenPrepareList));
     }
 }

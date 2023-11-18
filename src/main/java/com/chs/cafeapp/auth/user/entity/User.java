@@ -54,6 +54,9 @@ public class User extends BaseEntity {
 
     private LocalDateTime lastLoginDateTime;
 
+    public void changePassword(String newPassword) {
+        this.password = newPassword;
+    }
     public void setUserStatus(UserStatus userStatus) {
         this.userStatus = userStatus;
     }
