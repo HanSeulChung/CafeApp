@@ -96,3 +96,58 @@ Security를 진행할때 UserDetails의 User와 변수명이 같아 import하기
 
 <h3>캐싱으로 성능을 높일 때 주문 시 메뉴의 데이터 일관성 문제(해당 메뉴의 재고가 바로 바로 바뀔때 바로 적용이 되어야한다.)</h3>
 캐싱시 global cache로 redis를 선택하는 이유가 데이터의 일관성 때문.
+
+### 8. Kafka 메시지 역직렬화 시 문제
+```java
+2023-11-19 23:34:57.621 ERROR 559659 --- [ org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1 ] o.s.k.l.KafkaMessageListenerContainer$ListenerConsumer : Consumer exception
+java.lang.IllegalStateException: This error handler cannot process 'SerializationException's directly; please consider configuring an 'ErrorHandlingDeserializer' in the value and/or key deserializer
+	at org.springframework.kafka.listener.SeekUtils.seekOrRecover(SeekUtils.java:145)
+	at org.springframework.kafka.listener.SeekToCurrentErrorHandler.handle(SeekToCurrentErrorHandler.java:113)
+	at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.handleConsumerException(KafkaMessageListenerContainer.java:1427)
+	at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.run(KafkaMessageListenerContainer.java:1124)
+	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:577)
+	at java.base/java.util.concurrent.FutureTask.run$$$capture(FutureTask.java:317)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java)
+	at java.base/java.lang.Thread.run(Thread.java:1623)
+Caused by: org.apache.kafka.common.errors.SerializationException: Error deserializing key/value for partition order-status-topic-0 at offset 0. If needed, please seek past the record to continue consumption.
+Caused by: org.apache.kafka.common.errors.SerializationException: Can't deserialize data [[123, 34, 117, 115, 101, 114, 73, 100, 34, 58, 34, 99, 119, 100, 95, 50, 48, 50, 51, 64, 110, 97, 118, 101, 114, 46, 99, 111, 109, 34, 44, 34, 111, 114, 100, 101, 114, 73, 100, 34, 58, 49, 52, 44, 34, 111, 114, 100, 101, 114, 83, 116, 97, 116, 117, 115, 34, 58, 34, -21, -87, -108, -21, -119, -76, 32, -20, -92, -128, -21, -71, -124, 32, -20, -92, -111, 34, 125]] from topic [order-status-topic]
+Caused by: com.fasterxml.jackson.databind.exc.InvalidDefinitionException: Cannot construct instance of `com.chs.cafeapp.kafka.NotificationMessage` (no Creators, like default constructor, exist): cannot deserialize from Object value (no delegate- or property-based Creator)
+ at [Source: (byte[])"{"userId":"cwd_2023@naver.com","orderId":14,"orderStatus":"메뉴 준비 중"}"; line: 1, column: 2]
+	at com.fasterxml.jackson.databind.exc.InvalidDefinitionException.from(InvalidDefinitionException.java:67)
+	at com.fasterxml.jackson.databind.DeserializationContext.reportBadDefinition(DeserializationContext.java:1615)
+	at com.fasterxml.jackson.databind.DatabindContext.reportBadDefinition(DatabindContext.java:400)
+	at com.fasterxml.jackson.databind.DeserializationContext.handleMissingInstantiator(DeserializationContext.java:1077)
+	at com.fasterxml.jackson.databind.deser.BeanDeserializerBase.deserializeFromObjectUsingNonDefault(BeanDeserializerBase.java:1332)
+	at com.fasterxml.jackson.databind.deser.BeanDeserializer.deserializeFromObject(BeanDeserializer.java:331)
+	at com.fasterxml.jackson.databind.deser.BeanDeserializer.deserialize(BeanDeserializer.java:164)
+	at com.fasterxml.jackson.databind.ObjectReader._bindAndClose(ObjectReader.java:2079)
+	at com.fasterxml.jackson.databind.ObjectReader.readValue(ObjectReader.java:1555)
+	at org.springframework.kafka.support.serializer.JsonDeserializer.deserialize(JsonDeserializer.java:517)
+	at org.apache.kafka.clients.consumer.internals.Fetcher.parseRecord(Fetcher.java:1365)
+	at org.apache.kafka.clients.consumer.internals.Fetcher.access$3400(Fetcher.java:130)
+	at org.apache.kafka.clients.consumer.internals.Fetcher$CompletedFetch.fetchRecords(Fetcher.java:1596)
+	at org.apache.kafka.clients.consumer.internals.Fetcher$CompletedFetch.access$1700(Fetcher.java:1432)
+	at org.apache.kafka.clients.consumer.internals.Fetcher.fetchRecords(Fetcher.java:684)
+	at org.apache.kafka.clients.consumer.internals.Fetcher.fetchedRecords(Fetcher.java:635)
+	at org.apache.kafka.clients.consumer.KafkaConsumer.pollForFetches(KafkaConsumer.java:1283)
+	at org.apache.kafka.clients.consumer.KafkaConsumer.poll(KafkaConsumer.java:1237)
+	at org.apache.kafka.clients.consumer.KafkaConsumer.poll(KafkaConsumer.java:1210)
+	at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.doPoll(KafkaMessageListenerContainer.java:1271)
+	at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.pollAndInvoke(KafkaMessageListenerContainer.java:1162)
+	at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.run(KafkaMessageListenerContainer.java:1075)
+	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:577)
+	at java.base/java.util.concurrent.FutureTask.run$$$capture(FutureTask.java:317)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java)
+	at java.base/java.lang.Thread.run(Thread.java:1623)
+```
+<h3>문제</h3>
+<h4>kafka 메세지의 클래스인 NotificationMessage 클래스의 역직렬화 실패 문제</h4>
+<h3>문제 원인</h3>
+<h4> kafka 메시지가 JSON 형식으로 구성되어 있고, 이를 NotificationMessage 객체로 변환하려고 시도할때, 메시지의 형식과 클래스의 구조가 일치하지 않아서 생긴 문제,
+Jackson이 사용할 수 있는 기본 생성자를 추가하여야하는데 NotificationMessage에 @AllArgsConstructor만 존재하고 @NoArgsConstructor을 두지 않아서 기본 생성자를 Jackson이 찾지 못함.
+</h4>
+<h3>해결 방법</h3>
+<h4>@NoArgsConstructor를 두고 해결함
+
+![image](https://github.com/HanSeulChung/CafeApp/assets/94779505/cbf45153-65ce-4b6b-b7ea-e8500a11871c)
+</h4>
