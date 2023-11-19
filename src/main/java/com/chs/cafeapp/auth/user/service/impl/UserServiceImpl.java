@@ -22,4 +22,8 @@ public class UserServiceImpl implements UserService {
     user.setLastLoginDateTime(localDateTime);
     userRepository.save(user);
   }
+
+  public User getUserById(String userId) {
+    return userRepository.findByLoginId(userId).orElse(null);
+  }
 }

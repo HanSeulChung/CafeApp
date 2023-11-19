@@ -1,6 +1,6 @@
 package com.chs.cafeapp.kafka.config;
 
-import com.chs.cafeapp.order.dto.OrderResponse;
+import com.chs.cafeapp.kafka.notification.dto.NotificationMessage;
 import java.util.HashMap;
 import java.util.Map;
 import org.apache.kafka.clients.producer.ProducerConfig;
@@ -22,7 +22,7 @@ public class KafkaProducerConfig {
   private String servers;
 
   @Bean
-  public ProducerFactory<String, String> producerFactory() {
+  public ProducerFactory<String, NotificationMessage> producerFactory() {
     Map<String, Object> config = new HashMap<>();
     config.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, servers);
     config.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
@@ -31,7 +31,7 @@ public class KafkaProducerConfig {
   }
 
   @Bean
-  public KafkaTemplate<String, String> kafkaTemplate() {
+  public KafkaTemplate<String, NotificationMessage> kafkaTemplate() {
     return new KafkaTemplate<>(producerFactory());
   }
 
