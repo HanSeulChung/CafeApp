@@ -1,7 +1,8 @@
 package com.chs.cafeapp.kafka.config;
 
-import com.chs.cafeapp.order.dto.OrderResponse;
+import com.chs.cafeapp.kafka.notification.dto.NotificationMessage;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
+import org.apache.kafka.common.serialization.LongDeserializer;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -23,17 +24,17 @@ public class KafkaConsumerConfig {
   private String servers;
 
   @Bean
-  public ConsumerFactory<String, String> consumerFactory() {
+  public ConsumerFactory<String, NotificationMessage> consumerFactory() {
     Map<String, Object> config = new HashMap<>();
     config.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, servers);
     config.put(ConsumerConfig.GROUP_ID_CONFIG, "orderstatus");
-
-    return new DefaultKafkaConsumerFactory<>(config, new StringDeserializer(), new JsonDeserializer<>(String.class));
+    config.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, LongDeserializer.class);
+    return new DefaultKafkaConsumerFactory<>(config, new StringDeserializer(), new JsonDeserializer<>(NotificationMessage.class));
   }
 
   @Bean
-  public ConcurrentKafkaListenerContainerFactory<String, String> kafkaListener() {
-    ConcurrentKafkaListenerContainerFactory<String, String> factory = new ConcurrentKafkaListenerContainerFactory<>();
+  public ConcurrentKafkaListenerContainerFactory<String , NotificationMessage> kafkaListener() {
+    ConcurrentKafkaListenerContainerFactory<String, NotificationMessage> factory = new ConcurrentKafkaListenerContainerFactory<>();
     factory.setConsumerFactory(consumerFactory());
     return factory;
   }

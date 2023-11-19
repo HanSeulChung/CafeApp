@@ -213,7 +213,7 @@ public class OrderAdminController {
     OrderDto orderDto = orderAdminService.changeOrderStatus(orderId);
     String message = orderAdminService.viewMessageChanges(orderId);
     OrderResponse response = OrderResponse.toResponse(orderDto, message);
-    producerService.sendMessage(orderId, orderDto.getOrderStatus().getStatusName());
+    producerService.sendMessage(orderDto.getUserId(), orderId, orderDto.getOrderStatus().getStatusName());
     return ResponseEntity.ok(response);
   }  
 }
