@@ -1,5 +1,6 @@
 package com.chs.cafeapp.auth.service.impl;
 
+import static com.chs.cafeapp.auth.token.type.ACCESS_TOKEN_TYPE.NO_ACCESS_TOKEN;
 import static com.chs.cafeapp.auth.type.Authority.ROLE_ADMIN;
 import static com.chs.cafeapp.auth.type.Authority.ROLE_USER;
 import static com.chs.cafeapp.auth.type.Authority.ROLE_YET_USER;
@@ -14,6 +15,7 @@ import static com.chs.cafeapp.exception.type.ErrorCode.ALREADY_EXISTS_USER_NICK_
 import static com.chs.cafeapp.exception.type.ErrorCode.EXPIRED_DATE_TIME_FOR_EMAIL_AUTH;
 import static com.chs.cafeapp.exception.type.ErrorCode.INVALID_ACCESS_TOKEN;
 import static com.chs.cafeapp.exception.type.ErrorCode.LOGOUT_USER;
+import static com.chs.cafeapp.exception.type.ErrorCode.NOTING_ACCESS_TOKEN;
 import static com.chs.cafeapp.exception.type.ErrorCode.NOT_EMAIL_AUTH;
 import static com.chs.cafeapp.exception.type.ErrorCode.NOT_EXISTS_USER_LOGIN_ID;
 import static com.chs.cafeapp.exception.type.ErrorCode.NOT_MATCH_ORIGIN_PASSWORD;
@@ -168,7 +170,7 @@ public class AuthServiceImpl implements AuthService, UserDetailsService {
         .build();
   }
 
-  private User validationUserByUuid(String uuid) {
+  private User validationUserBy(String uuid) {
     User user = userRepository.findByEmailAuthKey(uuid)
         .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
 
@@ -189,7 +191,7 @@ public class AuthServiceImpl implements AuthService, UserDetailsService {
   }
   @Override
   public UserResponseDto emailAuth(String uuid) {
-    User user = validationUserByUuid(uuid);
+    User user = validationUserBy(uuid);
 
     Instant requestTime = Instant.now();
     Instant expiredTime = user.getUpdateDateTime()
@@ -362,7 +364,12 @@ public class AuthServiceImpl implements AuthService, UserDetailsService {
       user.changePassword(passwordEncoder.encode(passwordEditInput.getNewPassword()));
       userRepository.save(user);
       refreshTokenRepository.deleteByKey(user.getLoginId());
+
       String accessToken = tokenPrepareList.getAccessToken(user.getLoginId());
+      if (accessToken.equals(NO_ACCESS_TOKEN.getToken_value())) {
+        throw new CustomException(NOTING_ACCESS_TOKEN);
+      }
+
       tokenBlackList.addToBlacklist(accessToken);
       tokenPrepareList.delete(user.getLoginId());
       return new PasswordEditResponse(user.getLoginId(), "비밀번호가 변경되었습니다. 다시 로그인 후 이용해주세요.");
@@ -372,7 +379,12 @@ public class AuthServiceImpl implements AuthService, UserDetailsService {
       admin.changePassword(passwordEncoder.encode(passwordEditInput.getNewPassword()));
       adminRepository.save(admin);
       refreshTokenRepository.deleteByKey(admin.getLoginId());
+
       String accessToken = tokenPrepareList.getAccessToken(admin.getLoginId());
+      if (accessToken.equals(NO_ACCESS_TOKEN.getToken_value())) {
+        throw new CustomException(NOTING_ACCESS_TOKEN);
+      }
+
       tokenBlackList.addToBlacklist(accessToken);
       tokenPrepareList.delete(admin.getLoginId());
       return new PasswordEditResponse(admin.getLoginId(), "비밀번호가 변경되었습니다. 다시 로그인 후 이용해주세요.");

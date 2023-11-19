@@ -109,7 +109,7 @@ public class TokenProvider {
 
   public boolean validateToken(String token) {
 
-    if (!accessTokenValidator.validateToken(token)) {
+    if (!accessTokenValidator.isValidateToken(token)) {
       log.info("로그아웃이나 재발급으로 tokenBlackList에 있는 token입니다.");
       return false;
     }
