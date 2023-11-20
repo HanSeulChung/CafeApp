@@ -13,10 +13,12 @@ import javax.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -39,14 +41,14 @@ public class AuthController {
 
   /**
    * 이메일 인증 Controller
-   * @param request: 사용자의 이메일에서 링크를 누른 servletRequest 값
+   * @param -: 사용자의 이메일에서 링크를 누른 servletRequest 값
    * @exception CustomException: 이메일 인증기한(24시간)이 지났을 경우, 이미 인증이 끝난 사용자일 경우,
    *                              해당 uuid링크 값으로 유효한 사용자가 없을 경우 CustomException 발생
    * @return 해당 링크 페이지에서 json 형태로 UserResponse 값
    */
   @GetMapping("/email-auth")
-  public ResponseEntity<UserResponseDto> emailAuth(HttpServletRequest request) {
-    return ResponseEntity.ok(authService.emailAuth(request.getParameter("id")));
+  public ResponseEntity<UserResponseDto> emailAuth(@RequestParam String id) {
+    return ResponseEntity.ok(authService.emailAuth(id));
   }
 
   /**
