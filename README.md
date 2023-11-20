@@ -1,5 +1,5 @@
 # 카페 메뉴 스마트 주문 서비스 : CafeApp
-* 프로젝트 기간  2023-10-18 ~ 2023-11-17(4주)
+* 프로젝트 기간 > 2023-10-18 ~ 2023-11-20(4주)
 * 프로젝트 소개 > 해당 카페의 메뉴(음식, 음료, MD 굿즈)를 미리 결제하고 주문하는 서비스 입니다.
 
 ## Tech Stack
@@ -17,6 +17,7 @@
    <img src="https://img.shields.io/badge/mariaDB-003545?style=for-the-badge&logo=mariaDB&logoColor=white">
   <img src="https://img.shields.io/badge/Json_Web_Tokens-000000?style=for-the-badge&logo=json-web-tokens&logoColor=white"> 
   <img src="https://img.shields.io/badge/Lombok-BC4520?style=for-the-badge&logo=lombok&logoColor=white"> 
+  <img src="https://img.shields.io/badge/JavaMailSender-FF6347?style=for-the-badge&logo=lombok&logoColor=white"> 
   </br>
   <img src="https://img.shields.io/badge/github-181717?style=for-the-badge&logo=github&logoColor=white">
   <img src="https://img.shields.io/badge/git-F05032?style=for-the-badge&logo=git&logoColor=white">
@@ -95,37 +96,8 @@
      * 사용 가능한 쿠폰 조회
      * 사용 불가능한 쿠폰 조회(기간 만료, 사용 완료 동시 조회)
 
-*TODO*
-* [ ] 주문시 실제 주문의 순서 고려, 동시성 락 문제 해결 필요
-* [ ] JPA의 N+1 문제
-* [ ] 쿼리의 실행 갯수 고려
-* [X] 주문 상태 변경시 pub-sub 구조로 알림 기능을 보낼지, 상태 조회 서버를 별도 구축할 지 고려<br>
-   ➡️ 주문 상태 조회 서버 별도 구축<br>
-   ➡️ pub-sub> kafka + firebase 고려 중
-* [ ] 사용자의 위치를 어떻게 받을 지
-* [ ] 조회시 List로 받고있는것 Paging, Paging 시에도 쿼리 limit 구문 고려
-
 ## ERD
-
-11/15 ERD 
 ![image](https://github.com/HanSeulChung/CafeApp/assets/94779505/637c59b4-fb09-462a-a1dc-19233e855860)
-
-
-
-<details>
-<summary><h4>이전 ERD 셋팅</h4></summary>
-  <div markdown=1>
-    
-   11/01 ERD **변경됨**
-    ![image](https://github.com/HanSeulChung/CafeApp/assets/94779505/c0cd93f2-345f-43e4-9e03-70ccd2aeefa9)
-    
-   10/26 ERD **변경됨**
-    ![image](https://github.com/HanSeulChung/CafeApp/assets/94779505/f17c72f3-18ca-409e-ac65-83b506fe70b0)
-    
-   10/19 초기 ERD **변경됨**
-    ![image](https://github.com/HanSeulChung/CafeApp/assets/94779505/a2ba85b6-3a56-472d-8805-eb29615fced6)
-  </div>
-</details>
 
 ## 
 
