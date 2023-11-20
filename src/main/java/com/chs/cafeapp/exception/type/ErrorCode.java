@@ -17,6 +17,7 @@ public enum ErrorCode {
   NOT_MATCH_USER_PASSWORD(400, "로그인 비밀번호가 틀렸습니다."),
   NOT_MATCH_ORIGIN_PASSWORD(400, "기존 비밀번호가 맞지 않습니다. 다시 확인해 주십시오."),
   NOT_VALID_REFRESH_TOKEN(400, "Refresh Token이 유효하지 않습니다."),
+  NOTING_ACCESS_TOKEN(400, "Access Token이 없습니다."),
   NOT_MATCH_REFRESH_TOKEN_USER(400, "토큰의 유저 정보가 일치하지 않습니다."),
   UN_AUTHORIZATION(401, "인증이 되지 않았습니다."),
   NOT_MATCH_AUTHORIZATION(403, "접근 권한이 올바르지 않습니다."),
