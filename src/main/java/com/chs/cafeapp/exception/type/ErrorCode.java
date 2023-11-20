@@ -41,6 +41,8 @@ public enum ErrorCode {
   NOT_MATCH_USER_AND_ORDER(400, "사용자의 주문이 아닙니다."),
   ZERO_CART_MENU_IN_CART(400, "장바구니에 담긴 장바구니 메뉴가 없습니다."),
   EXIST_MENU_NAME(400, "이미 있는 메뉴 이름입니다."),
+  EXIST_CATEGORY_NAME(400, "이미 있는 카테고리 이름입니다."),
+  EXIST_MENU_BY_CATEGORY(400, "해당 카테고리에 속해있는 메뉴가 존재합니다. 메뉴 삭제 후에 카테고리 삭제 가능합니다."),
   REMAIN_CART_MENU_IN_CART(400, "장바구니에 메뉴가 남아있습니다."),
   CAN_NOT_CART_MENU_THAN_STOCK(400, "메뉴의 재고 이상 장바구니에 담을 수 없습니다."),
   CAN_NOT_ORDER_THAN_STOCK(400, "메뉴의 재고 이상 주문할 수 없습니다."),
