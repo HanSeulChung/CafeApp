@@ -34,9 +34,6 @@ dependencies {
 	implementation 'org.springframework.security:spring-security-taglibs'
 	implementation 'org.springframework.security:spring-security-web'
 
-//    implementation 'javax.mail:javax.mail-api:1.7.3'
-//    implementation 'com.sun.mail:javax.mail:1.7.3'
-
 	// mail
 	implementation 'org.springframework.boot:spring-boot-starter-mail'
 
@@ -76,15 +73,6 @@ dependencies {
 
 }
 
-sourceSets {
-	test {
-		resources {
-			srcDir 'src/test/resources'
-		}
-	}
-}
-
 tasks.named('test') {
 	useJUnitPlatform()
-	systemProperty "spring.profiles.active", "test"
 }
