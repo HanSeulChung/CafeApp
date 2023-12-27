@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.ToString;
 import org.springframework.data.domain.Page;
 
@@ -26,6 +27,8 @@ public class MenuDto {
   private int stock;
   private int price;
   private boolean isSoldOut;
+  @Setter
+  private String menuImageFileUrl;
 
   private String superCategory;
   private String baseCategory;
@@ -78,6 +81,7 @@ public class MenuDto {
                 .stock(menu.getStock())
                 .price(menu.getPrice())
                 .isSoldOut(menu.isSoldOut())
+                .menuImageFileUrl(menu.getMenuImageFileUrl())
                 .superCategory(menu.getCategory().getSuperCategory())
                 .baseCategory(menu.getCategory().getBaseCategory())
                 .createdDateTime(menu.getCreateDateTime())

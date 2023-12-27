@@ -17,10 +17,10 @@ public class MenuResponse {
   private int stock;
   private int price;
   private boolean isSoldOut;
+  private String menuImageFileUrl;
 
   private String superCategory;
   private String baseCategory;
-
 
   public static List<MenuResponse> toResponse(List<MenuDto> menuDtos) {
 
@@ -41,6 +41,7 @@ public class MenuResponse {
                         .stock(menuDto.getStock())
                         .price(menuDto.getPrice())
                         .isSoldOut(menuDto.isSoldOut())
+                        .menuImageFileUrl(menuDto.getMenuImageFileUrl())
                         .superCategory(menuDto.getSuperCategory())
                         .baseCategory(menuDto.getBaseCategory())
                         .build();
