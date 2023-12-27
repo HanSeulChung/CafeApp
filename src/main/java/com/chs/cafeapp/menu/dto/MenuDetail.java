@@ -17,6 +17,7 @@ public class MenuDetail {
   private int stock;
   private int price;
   private boolean isSoldOut;
+  private String menuImageFileUrl;
 
   private String superCategory;
   private String baseCategory;
@@ -33,6 +34,7 @@ public class MenuDetail {
         .stock(menuDto.getStock())
         .price(menuDto.getPrice())
         .isSoldOut(menuDto.isSoldOut())
+        .menuImageFileUrl(menuDto.getMenuImageFileUrl())
         .superCategory(menuDto.getSuperCategory())
         .baseCategory(menuDto.getBaseCategory())
         .createdDateTime(menuDto.getCreatedDateTime())

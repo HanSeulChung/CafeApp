@@ -7,9 +7,11 @@ import com.chs.cafeapp.menu.dto.MenuEditInput;
 import com.chs.cafeapp.menu.dto.MenuInput;
 import com.chs.cafeapp.menu.dto.MenuResponse;
 import com.chs.cafeapp.menu.service.MenuService;
+import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -38,8 +40,8 @@ public class MenuAdminController {
    * @return MenuResponse: 생성된 메뉴 정보(이름, 칼로리, 설명, 수량 ..)
    * @throws CustomException: 이미 있는 메뉴일 경우, 메뉴에 설정할 카테고리가 없을 경우 CustomException 발생
    */
-  @PostMapping()
-  public MenuResponse createMenu(@RequestBody MenuInput request) {
+  @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+  public MenuResponse createMenu(@Valid MenuInput request) {
     MenuDto menuDto = menuService.add(request);
     var result = MenuResponse.toResponse(menuDto);
     return result;
@@ -51,8 +53,8 @@ public class MenuAdminController {
    * @return MenuResponse: 수정된 메뉴 정보(이름, 칼로리, 설명, 수량 ..)
    * @throws CustomException: 수정할 메뉴 이름이 이미 있는 메뉴일 경우, 수정할 카테고리가 없을 경우 CustomException 발생
    */
-  @PutMapping()
-  public MenuResponse editMenu(@RequestBody MenuEditInput request) {
+  @PostMapping(value = "/update", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+  public MenuResponse editMenu(@Valid MenuEditInput request) {
     MenuDto menuDto = menuService.edit(request);
     var result = MenuResponse.toResponse(menuDto);
     return result;

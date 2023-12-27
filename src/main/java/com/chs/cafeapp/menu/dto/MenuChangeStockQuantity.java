@@ -1,5 +1,6 @@
 package com.chs.cafeapp.menu.dto;
 
+import javax.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -8,6 +9,8 @@ import lombok.Getter;
 @Builder
 @AllArgsConstructor
 public class MenuChangeStockQuantity {
+  @NotNull
   private long menuId;
+  @NotNull
   private int quantity;
 }

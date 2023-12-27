@@ -37,12 +37,18 @@ dependencies {
 	// mail
 	implementation 'org.springframework.boot:spring-boot-starter-mail'
 
-	// kfaka
+	// kafka
 	implementation 'org.springframework.kafka:spring-kafka'
 
 	// swagger
 	implementation 'io.springfox:springfox-boot-starter:3.0.0'
 	implementation 'io.springfox:springfox-swagger-ui:3.0.0'
+
+	// file
+	implementation 'org.apache.commons:commons-lang3:3.12.0'
+
+	// AWS S3 Mock
+	implementation 'io.findify:s3mock_2.13:0.2.6'
 
 	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
@@ -55,9 +61,11 @@ dependencies {
 	implementation group: 'org.apache.commons', name: 'commons-collections4', version: '4.3'
 	runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
 
+	// querydsl
 	implementation 'com.querydsl:querydsl-jpa'
 	annotationProcessor 'com.querydsl:querydsl-apt'
 
+	// lombok
 	compileOnly 'org.projectlombok:lombok:1.18.20'
 	annotationProcessor 'org.projectlombok:lombok:1.18.20'
 	compileOnly('javax.servlet:javax.servlet-api:4.0.1')

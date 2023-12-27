@@ -8,6 +8,8 @@ import static com.chs.cafeapp.exception.type.ErrorCode.EXIST_MENU_NAME;
 import static com.chs.cafeapp.exception.type.ErrorCode.MENU_NOT_FOUND;
 
 import com.chs.cafeapp.exception.CustomException;
+import com.chs.cafeapp.file.service.FileProcessService;
+import com.chs.cafeapp.file.type.FileFolder;
 import com.chs.cafeapp.menu.category.entity.Category;
 import com.chs.cafeapp.menu.category.repository.CategoryRepository;
 import com.chs.cafeapp.menu.dto.MenuChangeStockQuantity;
@@ -20,18 +22,20 @@ import com.chs.cafeapp.menu.entity.Menus;
 import com.chs.cafeapp.menu.repository.MenuRepository;
 import com.chs.cafeapp.menu.service.MenuService;
 import java.util.List;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-@AllArgsConstructor
 @Service
+@RequiredArgsConstructor
 public class MenuServiceImpl implements MenuService {
+
 
   private final MenuRepository menuRepository;
   private final CategoryRepository categoryRepository;
+  private final FileProcessService fileProcessService;
 
   public Menus validationMenus(Long menuId) {
     Menus menus = menuRepository.findById(menuId)
@@ -56,6 +60,9 @@ public class MenuServiceImpl implements MenuService {
             menuInput.getSuperCategory(), menuInput.getBaseCategory())
         .orElseThrow(() -> new CustomException(CATEGORY_NOT_FOUND));
 
+    FileFolder fileFolder = FileFolder.fromDescription(menuInput.getSuperCategory());
+    String imgUrl = fileProcessService.uploadImage(menuInput.getMenuImageFileUrl(), fileFolder);
+    menuDto.setMenuImageFileUrl(imgUrl);
     Menus menu = Menus.toEntity(menuDto);
     menu.setCategory(category);
     menuRepository.save(menu);
@@ -80,6 +87,9 @@ public class MenuServiceImpl implements MenuService {
       }
     }
 
+    FileFolder fileFolder = FileFolder.fromDescription(menuEditInput.getSuperCategory());
+    String imgUrl = fileProcessService.uploadImage(menuEditInput.getMenuImageFileUrl(), fileFolder);
+
     Menus buildMenu = Menus.builder()
         .id(menu.getId())
         .category(category)
@@ -88,6 +98,7 @@ public class MenuServiceImpl implements MenuService {
         .description(menuEditInput.getDescription())
         .stock(menuEditInput.getStock())
         .price(menuEditInput.getPrice())
+        .menuImageFileUrl(imgUrl)
         .build();
 
     return MenuDto.of(menuRepository.save(buildMenu));
