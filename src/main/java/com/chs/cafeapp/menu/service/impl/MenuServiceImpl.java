@@ -106,8 +106,9 @@ public class MenuServiceImpl implements MenuService {
 
   @Override
   public void delete(Long menuId) {
-    menuRepository.findById(menuId)
-                    .orElseThrow(() -> new CustomException(MENU_NOT_FOUND));
+    Menus menus = menuRepository.findById(menuId)
+        .orElseThrow(() -> new CustomException(MENU_NOT_FOUND));
+    fileProcessService.deleteImage(menus.getMenuImageFileUrl());
     menuRepository.deleteById(menuId);
   }
 
