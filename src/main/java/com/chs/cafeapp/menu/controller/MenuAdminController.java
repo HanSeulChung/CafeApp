@@ -53,7 +53,7 @@ public class MenuAdminController {
    * @return MenuResponse: 수정된 메뉴 정보(이름, 칼로리, 설명, 수량 ..)
    * @throws CustomException: 수정할 메뉴 이름이 이미 있는 메뉴일 경우, 수정할 카테고리가 없을 경우 CustomException 발생
    */
-  @PutMapping(value = "/update", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+  @PutMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   public MenuResponse editMenu(@Valid MenuEditInput request) {
     MenuDto menuDto = menuService.edit(request);
     var result = MenuResponse.toResponse(menuDto);
