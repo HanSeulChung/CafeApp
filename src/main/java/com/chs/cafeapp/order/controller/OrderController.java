@@ -56,7 +56,7 @@ public class OrderController {
    *                         장바구니에 있는 메뉴 id가 존재하지 않을 때,
    *                         메뉴의 재고 이상 주문하려고 할 때 CustomException 발생
    */
-  @PostMapping("/shopping-basket/select-items/{selectItemCount}")
+  @PostMapping("/carts/select-items/{selectItemCount}")
   public OrderResponse addOrderFromBasket(@PathVariable int selectItemCount, @RequestBody OrderFromCartInput request, @RequestParam String userId) {
     OrderDto orderDto = orderUserService.orderFromCart(request, userId);
     return OrderResponse.toResponse(orderDto, orderDto.getOrderStatus().getDescription());
@@ -72,7 +72,7 @@ public class OrderController {
    *                         장바구니에 있는 메뉴 id가 존재하지 않을 때,
    *                         메뉴의 재고 이상 주문하려고 할 때 CustomException 발생
    */
-  @PostMapping("/shopping-basket")
+  @PostMapping("/carts")
   public OrderResponse addOrderFromBasket(@RequestBody OrderAllFromCartInput reqeust, @RequestParam String userId) {
     OrderDto orderDto = orderUserService.orderAllFromCart(reqeust, userId);
     return OrderResponse.toResponse(orderDto, orderDto.getOrderStatus().getDescription());
