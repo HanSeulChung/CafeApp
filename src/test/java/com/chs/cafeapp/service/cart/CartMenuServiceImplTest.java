@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
+import com.chs.cafeapp.auth.member.type.MemberSex;
 import com.chs.cafeapp.cart.dto.CartMenuChangeQuantity;
 import com.chs.cafeapp.cart.entity.Cart;
 import com.chs.cafeapp.cart.entity.CartMenu;
@@ -13,8 +14,8 @@ import com.chs.cafeapp.cart.repository.CartRepository;
 import com.chs.cafeapp.cart.service.impl.CartMenuServiceImpl;
 import com.chs.cafeapp.menu.entity.Menus;
 import com.chs.cafeapp.menu.repository.MenuRepository;
-import com.chs.cafeapp.auth.user.entity.User;
-import com.chs.cafeapp.auth.user.repository.UserRepository;
+import com.chs.cafeapp.auth.member.entity.Member;
+import com.chs.cafeapp.auth.member.repository.MemberRepository;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -26,7 +27,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class CartMenuServiceImplTest {
   @Mock
-  private UserRepository userRepository;
+  private MemberRepository userRepository;
 
   @Mock
   private MenuRepository menuRepository;
@@ -44,13 +45,13 @@ class CartMenuServiceImplTest {
   @DisplayName("장바구니 전체 삭제 성공")
   void deleteAllCartMenuTest_Success() {
     //given
-    User user = User.builder()
+    Member member = Member.builder()
         .id(4L)
         .loginId("user2@naver.com")
         .password("user2비밀번호")
         .userName("user2 이름")
         .nickName("user2 닉네임")
-        .sex("Male")
+        .sex(MemberSex.MALE)
         .age(32)
         .build();
 
@@ -94,9 +95,9 @@ class CartMenuServiceImplTest {
     cartMenu2.setCart(cart);
     cart.setCartMenu(cartMenu1);
     cart.setCartMenu(cartMenu2);
-    user.setCart(cart);
+    member.setCart(cart);
 
-    when(userRepository.findByLoginId("user2@naver.com")).thenReturn(Optional.of(user));
+    when(userRepository.findByLoginId("user2@naver.com")).thenReturn(Optional.of(member));
     when(cartRepository.findById(1L)).thenReturn(Optional.of(cart));
 
     //when
@@ -109,13 +110,13 @@ class CartMenuServiceImplTest {
   @DisplayName("장바구니 특정 메뉴 삭제 성공")
   void deleteSpecificCartMenuTest_Success() {
     //given
-    User user = User.builder()
+    Member user = Member.builder()
         .id(4L)
         .loginId("user2@naver.com")
         .password("user2비밀번호")
         .userName("user2 이름")
         .nickName("user2 닉네임")
-        .sex("Male")
+        .sex(MemberSex.MALE)
         .age(32)
         .build();
 
@@ -176,13 +177,13 @@ class CartMenuServiceImplTest {
   @DisplayName("장바구니 메뉴 수량 늘리기 성공")
   void addCartMenuQuantityTest_Success() {
     //given
-    User user = User.builder()
+    Member user = Member.builder()
         .id(4L)
         .loginId("user2@naver.com")
         .password("user2비밀번호")
         .userName("user2 이름")
         .nickName("user2 닉네임")
-        .sex("Male")
+        .sex(MemberSex.MALE)
         .age(32)
         .build();
 
@@ -226,13 +227,13 @@ class CartMenuServiceImplTest {
   @DisplayName("장바구니 메뉴 수량 줄이기 성공")
   void minusCartMenuQuantityTest_Success() {
     //given
-    User user = User.builder()
+    Member user = Member.builder()
         .id(4L)
         .loginId("user2@naver.com")
         .password("user2비밀번호")
         .userName("user2 이름")
         .nickName("user2 닉네임")
-        .sex("Male")
+        .sex(MemberSex.MALE)
         .age(32)
         .build();
 

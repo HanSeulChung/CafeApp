@@ -135,7 +135,7 @@ public class TokenProvider {
     } catch (ExpiredJwtException e) {
       return e.getClaims();
     } catch (SignatureException e) {
-      throw new CustomException(ErrorCode.LOGOUT_USER);
+      throw new CustomException(ErrorCode.LOGOUT_MEMBER);
     }
   }
 }

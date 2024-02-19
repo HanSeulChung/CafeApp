@@ -5,21 +5,21 @@ import com.chs.cafeapp.auth.dto.PasswordEditInput;
 import com.chs.cafeapp.auth.dto.PasswordEditResponse;
 import com.chs.cafeapp.auth.token.dto.TokenRequestDto;
 import com.chs.cafeapp.auth.token.dto.TokenResponseDto;
-import com.chs.cafeapp.auth.user.dto.SignInRequestDto;
-import com.chs.cafeapp.auth.user.dto.SignUpRequestDto;
-import com.chs.cafeapp.auth.user.dto.UserResponseDto;
+import com.chs.cafeapp.auth.member.dto.SignInRequestDto;
+import com.chs.cafeapp.auth.member.dto.SignUpRequestDto;
+import com.chs.cafeapp.auth.member.dto.MemberResponseDto;
 
 public interface AuthService {
 
   /**
    * 일반 회원가입
    */
-  UserResponseDto signUp(SignUpRequestDto signUpRequestDto);
+  MemberResponseDto signUp(SignUpRequestDto signUpRequestDto);
 
   /**
    * 메일 인증
    */
-  UserResponseDto emailAuth(String uuid);
+  MemberResponseDto emailAuth(String uuid);
 
   /**
    * 사용자 일반 로그인

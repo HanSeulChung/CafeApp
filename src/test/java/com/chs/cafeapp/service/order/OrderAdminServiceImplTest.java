@@ -11,6 +11,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.chs.cafeapp.auth.member.type.MemberSex;
 import com.chs.cafeapp.cart.entity.Cart;
 import com.chs.cafeapp.cart.entity.CartMenu;
 import com.chs.cafeapp.cart.repository.CartMenusRepository;
@@ -28,12 +29,12 @@ import com.chs.cafeapp.order.entity.OrderedMenu;
 import com.chs.cafeapp.order.repository.OrderRepository;
 import com.chs.cafeapp.order.repository.OrderedMenuRepository;
 import com.chs.cafeapp.order.service.impl.OrderAdminServiceImpl;
-import com.chs.cafeapp.order.service.impl.OrderUserServiceImpl;
+import com.chs.cafeapp.order.service.impl.OrderMemberServiceImpl;
 import com.chs.cafeapp.order.service.validation.ValidationCheck;
 import com.chs.cafeapp.order.type.OrderStatus;
 import com.chs.cafeapp.stamp.service.impl.StampServiceImpl;
-import com.chs.cafeapp.auth.user.entity.User;
-import com.chs.cafeapp.auth.user.repository.UserRepository;
+import com.chs.cafeapp.auth.member.entity.Member;
+import com.chs.cafeapp.auth.member.repository.MemberRepository;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -54,7 +55,7 @@ import org.springframework.transaction.annotation.Transactional;
 @ExtendWith(MockitoExtension.class)
 class OrderAdminServiceImplTest {
   @Mock
-  private UserRepository userRepository;
+  private MemberRepository userRepository;
   @Mock
   private MenuRepository menuRepository;
   @Mock
@@ -70,7 +71,7 @@ class OrderAdminServiceImplTest {
   private OrderAdminServiceImpl orderServiceForAdmin;
 
   @InjectMocks
-  private OrderUserServiceImpl orderServiceForUser;
+  private OrderMemberServiceImpl orderServiceForUser;
   @Mock
   private StampServiceImpl stampService;
   @Mock
@@ -79,7 +80,7 @@ class OrderAdminServiceImplTest {
   @Mock
   private ValidationCheck validationCheck;
 
-  static User user;
+  static Member user;
   static Menus menu1;
   static Menus menu2;
   static Menus menu3;
@@ -88,13 +89,13 @@ class OrderAdminServiceImplTest {
   static OrderedMenu orderedMenu10;
   @BeforeEach
   public void setUp() {
-    user = User.builder()
+    user = Member.builder()
         .id(4L)
         .loginId("user2@naver.com")
         .password("user2비밀번호")
         .userName("user2 이름")
         .nickName("user2 닉네임")
-        .sex("Male")
+        .sex(MemberSex.MALE)
         .age(32)
         .build();
 
@@ -174,7 +175,7 @@ class OrderAdminServiceImplTest {
 
     Order order = Order.builder()
         .id(1L)
-        .user(user)
+        .member(user)
         .couponUse(false)
         .build();
 
@@ -184,14 +185,14 @@ class OrderAdminServiceImplTest {
     user.setCart(cart);
 
     OrderedMenu orderedMenu1 = OrderedMenu.builder()
-        .userId(cartMenu1.getCart().getUser().getLoginId())
+        .userId(cartMenu1.getCart().getMember().getLoginId())
         .quantity(cartMenu1.getQuantity())
         .totalPrice(cartMenu1.getQuantity() * cartMenu1.getMenus().getPrice())
         .menus(cartMenu1.getMenus())
         .order(order)
         .build();
     OrderedMenu orderedMenu2 = OrderedMenu.builder()
-        .userId(cartMenu2.getCart().getUser().getLoginId())
+        .userId(cartMenu2.getCart().getMember().getLoginId())
         .quantity(cartMenu2.getQuantity())
         .totalPrice(cartMenu2.getQuantity() * cartMenu2.getMenus().getPrice())
         .menus(cartMenu2.getMenus())
@@ -262,7 +263,7 @@ class OrderAdminServiceImplTest {
 
     Order order = Order.builder()
         .id(1L)
-        .user(user)
+        .member(user)
         .build();
 
     cartMenu1.setCart(cart);
@@ -275,7 +276,7 @@ class OrderAdminServiceImplTest {
 
 
     OrderedMenu orderedMenu1 = OrderedMenu.builder()
-        .userId(cartMenu1.getCart().getUser().getLoginId())
+        .userId(cartMenu1.getCart().getMember().getLoginId())
         .quantity(cartMenu1.getQuantity())
         .totalPrice(cartMenu1.getQuantity() * cartMenu1.getMenus().getPrice())
         .menus(cartMenu1.getMenus())
@@ -283,7 +284,7 @@ class OrderAdminServiceImplTest {
         .build();
 
     OrderedMenu orderedMenu2 = OrderedMenu.builder()
-        .userId(cartMenu3.getCart().getUser().getLoginId())
+        .userId(cartMenu3.getCart().getMember().getLoginId())
         .quantity(cartMenu3.getQuantity())
         .totalPrice(cartMenu3.getQuantity() * cartMenu3.getMenus().getPrice())
         .menus(cartMenu3.getMenus())
@@ -326,7 +327,7 @@ class OrderAdminServiceImplTest {
     //given
     Order order = Order.builder()
         .id(1L)
-        .user(user)
+        .member(user)
         .orderStatus(OrderStatus.PaySuccess)
         .build();
 
@@ -365,7 +366,7 @@ class OrderAdminServiceImplTest {
     //given
     Order order = Order.builder()
         .id(1L)
-        .user(user)
+        .member(user)
         .orderStatus(OrderStatus.PaySuccess)
         .build();
 
@@ -383,14 +384,14 @@ class OrderAdminServiceImplTest {
   @DisplayName("주문 상태 변경 성공: PaySuccess -> PreParingMenus")
   void changeOrderStatusTest_Success1() {
     //given
-    User user = User.builder()
+    Member user = Member.builder()
         .id(1L)
         .loginId("usertest1@naver.com")
         .build();
 
     Order order = Order.builder()
         .id(1L)
-        .user(user)
+        .member(user)
         .orderStatus(OrderStatus.PaySuccess)
         .build();
 
@@ -408,14 +409,14 @@ class OrderAdminServiceImplTest {
   @DisplayName("주문 상태 변경 성공: PreParingMenus -> WaitingPickUp")
   void changeOrderStatusTest_Success2() {
     //given
-    User user = User.builder()
+    Member user = Member.builder()
         .id(1L)
         .loginId("usertest1@naver.com")
         .build();
 
     Order order = Order.builder()
         .id(1L)
-        .user(user)
+        .member(user)
         .orderStatus(OrderStatus.PreParingMenus)
         .build();
 
@@ -435,7 +436,7 @@ class OrderAdminServiceImplTest {
     //given
     Order order = Order.builder()
         .id(1L)
-        .user(user)
+        .member(user)
         .orderStatus(OrderStatus.WaitingPickUp)
         .orderedMenus(Arrays.asList(orderedMenu10))
         .build();
@@ -458,7 +459,7 @@ class OrderAdminServiceImplTest {
     //given
     Order order = Order.builder()
         .id(1L)
-        .user(user)
+        .member(user)
         .orderStatus(OrderStatus.PayFail)
         .build();
 
@@ -480,7 +481,7 @@ class OrderAdminServiceImplTest {
 
     Order order1 = Order.builder()
         .id(1L)
-        .user(user)
+        .member(user)
         .orderStatus(OrderStatus.PayFail)
         .build();
 
@@ -493,7 +494,7 @@ class OrderAdminServiceImplTest {
 
     Order order2 = Order.builder()
         .id(2L)
-        .user(user)
+        .member(user)
         .orderStatus(OrderStatus.PaySuccess)
         .build();
 
@@ -531,7 +532,7 @@ class OrderAdminServiceImplTest {
   @DisplayName("PaySuccess만 조회")
   void viewOrdersByOrderStatus_PaySuccess() {
     //given
-    User user = User.builder()
+    Member user = Member.builder()
         .loginId("user2@naver.com")
         .build();
 
@@ -541,7 +542,7 @@ class OrderAdminServiceImplTest {
 
     Order order1 = Order.builder()
         .id(1L)
-        .user(user)
+        .member(user)
         .orderStatus(OrderStatus.PayFail)
         .build();
 
@@ -554,7 +555,7 @@ class OrderAdminServiceImplTest {
 
     Order order2 = Order.builder()
         .id(2L)
-        .user(user)
+        .member(user)
         .orderStatus(OrderStatus.PaySuccess)
         .build();
 
@@ -594,7 +595,7 @@ class OrderAdminServiceImplTest {
 
     Order order1 = Order.builder()
         .id(1L)
-        .user(user)
+        .member(user)
         .orderStatus(CancelByCafe)
         .build();
 
@@ -607,7 +608,7 @@ class OrderAdminServiceImplTest {
 
     Order order2 = Order.builder()
         .id(2L)
-        .user(user)
+        .member(user)
         .orderStatus(CancelByCafe)
         .build();
 
@@ -640,7 +641,7 @@ class OrderAdminServiceImplTest {
   @DisplayName("CancelByUser만 조회")
   void viewOrdersByOrderStatus_CancelByUser() {
     //given
-    User user = User.builder()
+    Member user = Member.builder()
         .loginId("user2@naver.com")
         .build();
 
@@ -654,7 +655,7 @@ class OrderAdminServiceImplTest {
 
     Order order1 = Order.builder()
         .id(1L)
-        .user(user)
+        .member(user)
         .orderStatus(OrderStatus.CancelByUser)
         .build();
 
@@ -667,7 +668,7 @@ class OrderAdminServiceImplTest {
 
     Order order2 = Order.builder()
         .id(2L)
-        .user(user)
+        .member(user)
         .orderStatus(OrderStatus.PaySuccess)
         .build();
 

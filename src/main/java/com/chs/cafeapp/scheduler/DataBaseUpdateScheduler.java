@@ -1,6 +1,6 @@
 package com.chs.cafeapp.scheduler;
 
-import com.chs.cafeapp.auth.user.repository.UserRepository;
+import com.chs.cafeapp.auth.member.repository.MemberRepository;
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 @AllArgsConstructor
 public class DataBaseUpdateScheduler {
 
-  private final UserRepository userRepository;
+  private final MemberRepository userRepository;
 
   private static final String SEOUL_TIME_ZONE = "Asia/Seoul";
 

@@ -1,15 +1,15 @@
 package com.chs.cafeapp.scheduler;
 
-import static com.chs.cafeapp.auth.user.type.UserStatus.USER_STATUS_WITHDRAW;
+import static com.chs.cafeapp.auth.member.type.MemberStatus.USER_STATUS_WITHDRAW;
 
 import com.chs.cafeapp.coupon.entity.Coupon;
 import com.chs.cafeapp.coupon.repository.CouponRepository;
 import com.chs.cafeapp.order.entity.Order;
 import com.chs.cafeapp.order.repository.OrderRepository;
-import com.chs.cafeapp.auth.user.entity.DeleteUser;
-import com.chs.cafeapp.auth.user.entity.User;
-import com.chs.cafeapp.auth.user.repository.DeleteUserRepository;
-import com.chs.cafeapp.auth.user.repository.UserRepository;
+import com.chs.cafeapp.auth.member.entity.DeleteMember;
+import com.chs.cafeapp.auth.member.entity.Member;
+import com.chs.cafeapp.auth.member.repository.DeleteMemberRepository;
+import com.chs.cafeapp.auth.member.repository.MemberRepository;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,10 +25,10 @@ import org.springframework.transaction.annotation.Transactional;
 @AllArgsConstructor
 public class DataBaseDeleteScheduler {
 
-  private final UserRepository userRepository;
+  private final MemberRepository userRepository;
   private final OrderRepository orderRepository;
   private final CouponRepository couponRepository;
-  private final DeleteUserRepository deleteUserRepository;
+  private final DeleteMemberRepository deleteUserRepository;
 
   private static final String SEOUL_TIME_ZONE = "Asia/Seoul";
 
@@ -61,22 +61,22 @@ public class DataBaseDeleteScheduler {
   @Scheduled(cron = "0 0 0 * * *", zone = SEOUL_TIME_ZONE)
   public void userAutoDeleteScheduling() {
     LocalDateTime nowLocalDateTime = LocalDateTime.now();
-    List<User> userList = userRepository.findAllByUserStatusAndUpdateDateTimeLessThan(
+    List<Member> userList = userRepository.findAllByUserStatusAndUpdateDateTimeLessThan(
         USER_STATUS_WITHDRAW, nowLocalDateTime.minusYears(2));
 
     if (userList.size() != 0) {
-      List<DeleteUser> deleteUserList = new ArrayList<>();
-      for (User user : userList) {
-        DeleteUser deleteUser = DeleteUser.builder()
+      List<DeleteMember> deleteMemberList = new ArrayList<>();
+      for (Member user : userList) {
+        DeleteMember deleteMember = DeleteMember.builder()
             .loginId(user.getLoginId())
             .userName(user.getUserName())
             .deleteDateTime(nowLocalDateTime)
             .build();
-        deleteUserList.add(deleteUser);
+        deleteMemberList.add(deleteMember);
       }
       userRepository.deleteAllByUserStatusAndUpdateDateTimeLessThan(USER_STATUS_WITHDRAW, nowLocalDateTime.minusYears(2));
-      deleteUserRepository.saveAll(deleteUserList);
-      log.info("[현재 날짜와 시간] -> {} 지금 시간으로부터 탈퇴한지 2년이상 초과된 사용자들 총 {}명이 삭제되었습니다.", nowLocalDateTime, deleteUserList.size());
+      deleteUserRepository.saveAll(deleteMemberList);
+      log.info("[현재 날짜와 시간] -> {} 지금 시간으로부터 탈퇴한지 2년이상 초과된 사용자들 총 {}명이 삭제되었습니다.", nowLocalDateTime, deleteMemberList.size());
     }
   }
 }

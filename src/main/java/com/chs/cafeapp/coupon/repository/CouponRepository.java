@@ -10,14 +10,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 public interface CouponRepository extends JpaRepository<Coupon, Long> {
 
-  List<Coupon> findAllByUserId(Long userId);
+  List<Coupon> findAllByMemberId(Long memberId);
   List<Coupon> findAllByUpdateDateTimeLessThan(LocalDateTime localDateTime);
-  List<Coupon> findAllByUserIdAndUsedYnFalseAndExpiredYnFalse(Long userId);
-  List<Coupon> findAllByUserIdAndUsedYnTrueOrUserIdAndExpiredYnTrue(Long userId1, Long userId2);
+  List<Coupon> findAllByMemberIdAndUsedYnFalseAndExpiredYnFalse(Long memberId);
+  List<Coupon> findAllByMemberIdAndUsedYnTrueOrMemberIdAndExpiredYnTrue(Long memberId1, Long memberId2);
 
-  Page<Coupon> findAllByUserId(Long userId, Pageable pageable);
-  Page<Coupon> findAllByUserIdAndUsedYnFalseAndExpiredYnFalse(Long userId, Pageable pageable);
-  Page<Coupon> findAllByUserIdAndUsedYnTrueOrUserIdAndExpiredYnTrue(Long userId1, Long userId2, Pageable pageable);
+  Page<Coupon> findAllByMemberId(Long memberId, Pageable pageable);
+  Page<Coupon> findAllByMemberIdAndUsedYnFalseAndExpiredYnFalse(Long memberId, Pageable pageable);
+  Page<Coupon> findAllByMemberIdAndUsedYnTrueOrMemberIdAndExpiredYnTrue(Long memberId1, Long memberId2, Pageable pageable);
 
   @Transactional
   void deleteAllByUpdateDateTimeLessThan(LocalDateTime nowLocalDateTime);

@@ -2,7 +2,7 @@ package com.chs.cafeapp.cart.service.impl;
 
 import static com.chs.cafeapp.exception.type.ErrorCode.CAN_NOT_CART_MENU_THAN_STOCK;
 import static com.chs.cafeapp.exception.type.ErrorCode.MENU_NOT_FOUND;
-import static com.chs.cafeapp.exception.type.ErrorCode.USER_NOT_FOUND;
+import static com.chs.cafeapp.exception.type.ErrorCode.MEMBER_NOT_FOUND;
 
 import com.chs.cafeapp.cart.dto.CartInput;
 import com.chs.cafeapp.cart.dto.CartMenuChangeQuantity;
@@ -16,8 +16,8 @@ import com.chs.cafeapp.cart.service.CartService;
 import com.chs.cafeapp.exception.CustomException;
 import com.chs.cafeapp.menu.entity.Menus;
 import com.chs.cafeapp.menu.repository.MenuRepository;
-import com.chs.cafeapp.auth.user.entity.User;
-import com.chs.cafeapp.auth.user.repository.UserRepository;
+import com.chs.cafeapp.auth.member.entity.Member;
+import com.chs.cafeapp.auth.member.repository.MemberRepository;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -31,7 +31,7 @@ import org.springframework.stereotype.Service;
 @AllArgsConstructor
 public class CartServiceImpl implements CartService {
 
-  private final UserRepository userRepository;
+  private final MemberRepository userRepository;
   private final CartRepository cartRepository;
   private final MenuRepository menuRepository;
   private final CartMenusRepository cartMenusRepository;
@@ -40,13 +40,13 @@ public class CartServiceImpl implements CartService {
 
 
   public Cart validationUserAndCart(String userId) {
-    User user = userRepository.findByLoginId(userId)
-        .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+    Member user = userRepository.findByLoginId(userId)
+        .orElseThrow(() -> new CustomException(MEMBER_NOT_FOUND));
 
     Cart cart = user.getCart();
     cart = Optional.ofNullable(cart).orElseGet(() -> {
       Cart newCart = new Cart();
-      newCart.setUser(user);
+      newCart.setMember(user);
       user.setCart(newCart);
       cartRepository.save(newCart);
       return newCart;

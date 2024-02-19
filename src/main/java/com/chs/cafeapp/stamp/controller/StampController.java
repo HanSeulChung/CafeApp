@@ -19,8 +19,8 @@ public class StampController {
   private final StampService stampService;
 
   @GetMapping
-  public ResponseEntity<StampDto> viewStamp(@RequestParam String userId) {
-    return ResponseEntity.ok(stampService.viewStamp(userId));
+  public ResponseEntity<StampDto> viewStamp(@RequestParam String memberId) {
+    return ResponseEntity.ok(stampService.viewStamp(memberId));
   }
 
 }

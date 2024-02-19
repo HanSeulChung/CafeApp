@@ -5,8 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import com.chs.cafeapp.coupon.entity.Coupon;
 import com.chs.cafeapp.coupon.repository.CouponRepository;
-import com.chs.cafeapp.auth.user.entity.User;
-import com.chs.cafeapp.auth.user.repository.UserRepository;
+import com.chs.cafeapp.auth.member.entity.Member;
 import java.util.Arrays;
 import java.util.List;
 import javax.persistence.EntityManager;
@@ -24,7 +23,7 @@ import org.springframework.test.context.TestPropertySource;
 @TestPropertySource(locations = "classpath:application-test.yml")
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 class CouponRepositoryTest {
-  static User user;
+  static Member member;
   static Coupon coupon1;
   static Coupon coupon2;
   static Coupon coupon3;
@@ -32,8 +31,6 @@ class CouponRepositoryTest {
   static Coupon coupon5;
   @Autowired
   private EntityManager em;
-  @Autowired
-  private UserRepository userRepository;
 
   @Autowired
   private CouponRepository couponRepository;
@@ -76,19 +73,19 @@ class CouponRepositoryTest {
     em.merge(coupon4);
     em.merge(coupon5);
 
-    user = User.builder()
+    member = Member.builder()
         .id(1L)
         .loginId("user2@naver.com")
         .coupons(Arrays.asList(coupon1, coupon2, coupon3, coupon4, coupon5))
         .build();
 
-    em.merge(user);
+    em.merge(member);
 
-    coupon1.setUser(user);
-    coupon2.setUser(user);
-    coupon3.setUser(user);
-    coupon4.setUser(user);
-    coupon5.setUser(user);
+    coupon1.setMember(member);
+    coupon2.setMember(member);
+    coupon3.setMember(member);
+    coupon4.setMember(member);
+    coupon5.setMember(member);
 
     em.merge(coupon1);
     em.merge(coupon2);
@@ -102,7 +99,7 @@ class CouponRepositoryTest {
   void findAllByUserId() {
 
     // when
-    List<Coupon> coupons = couponRepository.findAllByUserId(1L);
+    List<Coupon> coupons = couponRepository.findAllByMemberId(1L);
     // then
     assertNotNull(coupons);
     assertEquals(coupons.size(), 5);
@@ -112,7 +109,7 @@ class CouponRepositoryTest {
   @DisplayName("사용 가능한 쿠폰 전체 조회")
   void findAllByUserIdAndUsedYnFalseAndExpiredYnFalse() {
     // when
-    List<Coupon> coupons = couponRepository.findAllByUserIdAndUsedYnFalseAndExpiredYnFalse(1L);
+    List<Coupon> coupons = couponRepository.findAllByMemberIdAndUsedYnFalseAndExpiredYnFalse(1L);
     // then
     assertNotNull(coupons);
     assertEquals(coupons.size(), 2);
@@ -122,7 +119,7 @@ class CouponRepositoryTest {
   @DisplayName("사용 불가능한 쿠폰 전체 조회")
   void findAllByUserIdAndUsedYnTrueOrUserIdAndExpiredYnTrue() {
     // when
-    List<Coupon> coupons = couponRepository.findAllByUserIdAndUsedYnTrueOrUserIdAndExpiredYnTrue(1L, 1L);
+    List<Coupon> coupons = couponRepository.findAllByMemberIdAndUsedYnTrueOrMemberIdAndExpiredYnTrue(1L, 1L);
     // then
     assertNotNull(coupons);
     assertEquals(coupons.size(), 3);

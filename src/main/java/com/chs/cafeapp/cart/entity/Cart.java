@@ -4,7 +4,7 @@ import static com.chs.cafeapp.exception.type.ErrorCode.REMAIN_CART_MENU_IN_CART;
 
 import com.chs.cafeapp.base.BaseEntity;
 import com.chs.cafeapp.exception.CustomException;
-import com.chs.cafeapp.auth.user.entity.User;
+import com.chs.cafeapp.auth.member.entity.Member;
 import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.CascadeType;
@@ -34,14 +34,14 @@ public class Cart extends BaseEntity {
   private long totalPrice;
 
   @OneToOne
-  @JoinColumn(name = "user_id")
-  private User user;
+  @JoinColumn(name = "member_id")
+  private Member member;
 
   @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, orphanRemoval = true)
   private List<CartMenu> cartMenu;
 
-  public void setUser(User user) {
-    this.user = user;
+  public void setMember(Member member) {
+    this.member = member;
   }
 
   public void setCartMenu(CartMenu cartMenu) {

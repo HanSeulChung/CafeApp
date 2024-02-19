@@ -7,8 +7,8 @@ import com.chs.cafeapp.coupon.repository.CouponRepository;
 import com.chs.cafeapp.order.entity.Order;
 import com.chs.cafeapp.order.repository.OrderRepository;
 import com.chs.cafeapp.order.type.OrderStatus;
-import com.chs.cafeapp.auth.user.entity.User;
-import com.chs.cafeapp.auth.user.repository.UserRepository;
+import com.chs.cafeapp.auth.member.entity.Member;
+import com.chs.cafeapp.auth.member.repository.MemberRepository;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.ZoneOffset;
@@ -31,7 +31,7 @@ class DataBaseDeleteSchedulerTest {
   private Clock clock;
 
   @Autowired
-  private UserRepository userRepository;
+  private MemberRepository userRepository;
 
   @Autowired
   private OrderRepository orderRepository;
@@ -66,7 +66,7 @@ class DataBaseDeleteSchedulerTest {
 
     em.merge(coupon);
 
-    User user = User.builder()
+    Member user = Member.builder()
         .id(2L)
         .userName("신생사용자 이름")
         .build();

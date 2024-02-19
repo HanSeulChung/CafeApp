@@ -1,4 +1,4 @@
-package com.chs.cafeapp.auth.user.dto;
+package com.chs.cafeapp.auth.member.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

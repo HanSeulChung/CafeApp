@@ -13,8 +13,8 @@ import com.chs.cafeapp.coupon.entity.Coupon;
 import com.chs.cafeapp.coupon.repository.CouponRepository;
 import com.chs.cafeapp.coupon.service.impl.CouponServiceImpl;
 import com.chs.cafeapp.stamp.entity.Stamp;
-import com.chs.cafeapp.auth.user.entity.User;
-import com.chs.cafeapp.auth.user.repository.UserRepository;
+import com.chs.cafeapp.auth.member.entity.Member;
+import com.chs.cafeapp.auth.member.repository.MemberRepository;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Optional;
@@ -32,14 +32,14 @@ import org.springframework.data.domain.Sort;
 @ExtendWith(MockitoExtension.class)
 class CouponServiceImplTest {
   static Pageable pageable;
-  static User user;
+  static Member member;
   static Coupon coupon1;
   static Coupon coupon2;
   static Coupon coupon3;
   static Coupon coupon4;
   static Coupon coupon5;
   @Mock
-  private UserRepository userRepository;
+  private MemberRepository userRepository;
 
   @Mock
   private CouponRepository couponRepository;
@@ -79,19 +79,19 @@ class CouponServiceImplTest {
         .expiredYn(true)
         .build();
 
-    user = User.builder()
+    member = Member.builder()
         .id(1L)
         .loginId("user2@naver.com")
         .coupons(Arrays.asList(coupon1, coupon2, coupon3, coupon4, coupon5))
         .build();
 
-    coupon1.setUser(user);
-    coupon2.setUser(user);
-    coupon3.setUser(user);
-    coupon4.setUser(user);
-    coupon5.setUser(user);
+    coupon1.setMember(member);
+    coupon2.setMember(member);
+    coupon3.setMember(member);
+    coupon4.setMember(member);
+    coupon5.setMember(member);
 
-    userRepository.save(user);
+    userRepository.save(member);
 
     couponRepository.save(coupon1);
     couponRepository.save(coupon2);
@@ -146,7 +146,7 @@ class CouponServiceImplTest {
   @DisplayName("스탬프 10회 적립시 쿠폰 자동 생성 성공")
   void createCouponByStamp_Success() {
     // given
-    User user3 = User.builder()
+    Member user3 = Member.builder()
         .id(3L)
         .loginId("user3@naver.com")
         .build();
@@ -181,8 +181,8 @@ class CouponServiceImplTest {
       //given
 
       //when
-    when(userRepository.findByLoginId(anyString())).thenReturn(Optional.of(user));
-    when(couponRepository.findAllByUserId(1L)).thenReturn(Arrays.asList(coupon1, coupon2, coupon3, coupon4, coupon5));
+    when(userRepository.findByLoginId(anyString())).thenReturn(Optional.of(member));
+    when(couponRepository.findAllByMemberId(1L)).thenReturn(Arrays.asList(coupon1, coupon2, coupon3, coupon4, coupon5));
     Page<CouponResponse> couponResponsePage = couponService.viewAllCoupons("user2@naver.com", pageable);
 
     //then
@@ -196,8 +196,8 @@ class CouponServiceImplTest {
       //given
 
     //when
-    when(userRepository.findByLoginId(anyString())).thenReturn(Optional.of(user));
-    when(couponRepository.findAllByUserIdAndUsedYnFalseAndExpiredYnFalse(1L)).thenReturn(Arrays.asList(coupon1, coupon2));
+    when(userRepository.findByLoginId(anyString())).thenReturn(Optional.of(member));
+    when(couponRepository.findAllByMemberIdAndUsedYnFalseAndExpiredYnFalse(1L)).thenReturn(Arrays.asList(coupon1, coupon2));
     Page<CouponResponse> couponResponsePage = couponService.viewAllCanUseCoupons("user2@naver.com", pageable);
 
     //then
@@ -213,8 +213,8 @@ class CouponServiceImplTest {
     //given
 
     //when
-    when(userRepository.findByLoginId(anyString())).thenReturn(Optional.of(user));
-    when(couponRepository.findAllByUserIdAndUsedYnTrueOrUserIdAndExpiredYnTrue(1L, 1L)).thenReturn(Arrays.asList(coupon3, coupon4, coupon5));
+    when(userRepository.findByLoginId(anyString())).thenReturn(Optional.of(member));
+    when(couponRepository.findAllByMemberIdAndUsedYnTrueOrMemberIdAndExpiredYnTrue(1L, 1L)).thenReturn(Arrays.asList(coupon3, coupon4, coupon5));
     Page<CouponResponse> couponResponsePage = couponService.viewAllCanNotUseCoupons("user2@naver.com", pageable);
 
     //then

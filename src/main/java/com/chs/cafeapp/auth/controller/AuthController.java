@@ -3,17 +3,14 @@ package com.chs.cafeapp.auth.controller;
 import com.chs.cafeapp.auth.dto.LogOutResponse;
 import com.chs.cafeapp.exception.CustomException;
 import com.chs.cafeapp.auth.service.AuthService;
-import com.chs.cafeapp.auth.token.dto.TokenDto;
 import com.chs.cafeapp.auth.token.dto.TokenRequestDto;
 import com.chs.cafeapp.auth.token.dto.TokenResponseDto;
-import com.chs.cafeapp.auth.user.dto.SignUpRequestDto;
-import com.chs.cafeapp.auth.user.dto.SignInRequestDto;
-import com.chs.cafeapp.auth.user.dto.UserResponseDto;
-import javax.servlet.http.HttpServletRequest;
+import com.chs.cafeapp.auth.member.dto.SignUpRequestDto;
+import com.chs.cafeapp.auth.member.dto.SignInRequestDto;
+import com.chs.cafeapp.auth.member.dto.MemberResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -35,7 +32,7 @@ public class AuthController {
    * @return UserResponseDto: 아이디, 생성 날짜, 가입 축하 멘트
    */
   @PostMapping("/sign-up")
-  public ResponseEntity<UserResponseDto> signup(@RequestBody SignUpRequestDto signUpRequestDto) {
+  public ResponseEntity<MemberResponseDto> signup(@RequestBody SignUpRequestDto signUpRequestDto) {
     return ResponseEntity.ok(authService.signUp(signUpRequestDto));
   }
 
@@ -47,7 +44,7 @@ public class AuthController {
    * @return 해당 링크 페이지에서 json 형태로 UserResponse 값
    */
   @GetMapping("/email-auth")
-  public ResponseEntity<UserResponseDto> emailAuth(@RequestParam String id) {
+  public ResponseEntity<MemberResponseDto> emailAuth(@RequestParam String id) {
     return ResponseEntity.ok(authService.emailAuth(id));
   }
 

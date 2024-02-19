@@ -1,11 +1,11 @@
-package com.chs.cafeapp.auth.user.type;
+package com.chs.cafeapp.auth.member.type;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public enum UserStatus {
+public enum MemberStatus {
 
   /**
    * 가입 요청

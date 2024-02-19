@@ -16,7 +16,7 @@ public class AdminServiceImpl implements AdminService {
   @Override
   public void updateLastLoginDateTime(String loginId, LocalDateTime localDateTime) {
     Admin admin = adminRepository.findByLoginId(loginId)
-        .orElseThrow(() -> new CustomException(ErrorCode.NOT_EXISTS_USER_LOGIN_ID));
+        .orElseThrow(() -> new CustomException(ErrorCode.NOT_EXISTS_MEMBER_LOGIN_ID));
 
     admin.setLastLoginDateTime(localDateTime);
     adminRepository.save(admin);

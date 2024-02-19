@@ -2,7 +2,7 @@ package com.chs.cafeapp.stamp.entity;
 
 
 import com.chs.cafeapp.base.BaseEntity;
-import com.chs.cafeapp.auth.user.entity.User;
+import com.chs.cafeapp.auth.member.entity.Member;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -27,11 +27,11 @@ public class Stamp extends BaseEntity {
   private long stampNumbers;
 
   @OneToOne
-  @JoinColumn(name = "user_id")
-  private User user;
+  @JoinColumn(name = "member_id")
+  private Member member;
 
-  public void setUser(User user) {
-    this.user = user;
+  public void setMember(Member member) {
+    this.member = member;
   }
 
   public void addStamp(long stampCnt) {

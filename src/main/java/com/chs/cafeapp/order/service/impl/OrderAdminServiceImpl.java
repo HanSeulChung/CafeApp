@@ -95,7 +95,7 @@ public class OrderAdminServiceImpl implements OrderAdminService {
             .filter(orderedMenu -> "음료".equals(orderedMenu.getMenus().getCategory().getSuperCategory()))
             .mapToLong(orderedMenu -> orderedMenu.getQuantity())
             .sum();
-        stampService.addStampNumbers(drinksCnt, order.getUser().getLoginId());
+        stampService.addStampNumbers(drinksCnt, order.getMember().getLoginId());
         break;
       case PickUpSuccess:
         throw new CustomException(ALREADY_PICKUP_SUCCESS);

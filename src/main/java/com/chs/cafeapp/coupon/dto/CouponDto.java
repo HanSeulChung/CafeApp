@@ -48,7 +48,7 @@ public class CouponDto {
   public static CouponDto of(Coupon coupon) {
     return CouponDto.builder()
         .id(coupon.getId())
-        .userId(coupon.getUser().getLoginId())
+        .userId(coupon.getMember().getLoginId())
         .couponName(coupon.getCouponName())
         .price(coupon.getPrice())
         .usedYn(coupon.isUsedYn())

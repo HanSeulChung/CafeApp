@@ -1,4 +1,4 @@
-package com.chs.cafeapp.auth.user.dto;
+package com.chs.cafeapp.auth.member.dto;
 
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
@@ -8,7 +8,7 @@ import lombok.Getter;
 @Getter
 @Builder
 @AllArgsConstructor
-public class UserResponseDto {
+public class MemberResponseDto {
   private String loginId;
   private String nickName;
   private LocalDateTime createDateTime;
