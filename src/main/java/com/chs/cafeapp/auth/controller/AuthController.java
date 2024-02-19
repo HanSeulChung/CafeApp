@@ -34,7 +34,7 @@ public class AuthController {
    * @exception CustomException: 이미 존재하는 아이디, 닉네임일 경우, //TODO repassword도 추가하여 password값도 비교 추가
    * @return UserResponseDto: 아이디, 생성 날짜, 가입 축하 멘트
    */
-  @PostMapping("/sing-up")
+  @PostMapping("/sign-up")
   public ResponseEntity<UserResponseDto> signup(@RequestBody SignUpRequestDto signUpRequestDto) {
     return ResponseEntity.ok(authService.signUp(signUpRequestDto));
   }
