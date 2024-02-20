@@ -1,7 +1,5 @@
 package com.chs.cafeapp.order.dto;
 
-import com.chs.cafeapp.coupon.dto.CouponDto;
-import com.chs.cafeapp.coupon.entity.Coupon;
 import com.chs.cafeapp.order.entity.Order;
 import com.chs.cafeapp.order.type.OrderStatus;
 import java.util.ArrayList;
@@ -11,7 +9,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Slice;
 
 
@@ -64,7 +61,7 @@ public class OrderDto {
         .totalPrice(order.getTotalPrice())
         .totalQuantity(order.getTotalQuantity())
         .couponUse(order.isCouponUse())
-        .userId(order.getUser().getLoginId())
+        .userId(order.getMember().getLoginId())
         .orderedMenus(OrderedMenuDto.of(order.getOrderedMenus()))
         .build();
   }

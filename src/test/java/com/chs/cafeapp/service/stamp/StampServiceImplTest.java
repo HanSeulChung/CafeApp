@@ -10,8 +10,8 @@ import com.chs.cafeapp.stamp.dto.StampDto;
 import com.chs.cafeapp.stamp.entity.Stamp;
 import com.chs.cafeapp.stamp.repository.StampRepository;
 import com.chs.cafeapp.stamp.service.impl.StampServiceImpl;
-import com.chs.cafeapp.auth.user.entity.User;
-import com.chs.cafeapp.auth.user.repository.UserRepository;
+import com.chs.cafeapp.auth.member.entity.Member;
+import com.chs.cafeapp.auth.member.repository.MemberRepository;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -23,7 +23,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class StampServiceImplTest {
   @Mock
-  private UserRepository userRepository;
+  private MemberRepository memberRepository;
   @Mock
   private StampRepository stampRepository;
   @Mock
@@ -35,7 +35,7 @@ class StampServiceImplTest {
   @DisplayName("스탬프 추가시 최대 적립 10회를 넘었을 경우 0으로 reset 후 재적립 성공")
   void addStampNumbers_Success() {
     // given
-    User user = User.builder()
+    Member user = Member.builder()
         .id(1L)
         .loginId("user2@naver.com")
         .build();
@@ -47,7 +47,7 @@ class StampServiceImplTest {
         .build();
     user.setStamp(stamp);
 
-    when(userRepository.findByLoginId(anyString())).thenReturn(Optional.of(user));
+    when(memberRepository.findByLoginId(anyString())).thenReturn(Optional.of(user));
     when(stampRepository.save(any(Stamp.class))).thenReturn(stamp);
 
     // when

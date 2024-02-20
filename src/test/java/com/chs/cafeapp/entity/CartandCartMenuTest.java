@@ -4,14 +4,15 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
+import com.chs.cafeapp.auth.member.type.MemberSex;
 import com.chs.cafeapp.cart.entity.Cart;
 import com.chs.cafeapp.cart.entity.CartMenu;
 import com.chs.cafeapp.cart.repository.CartMenusRepository;
 import com.chs.cafeapp.cart.repository.CartRepository;
 import com.chs.cafeapp.menu.entity.Menus;
 import com.chs.cafeapp.menu.repository.MenuRepository;
-import com.chs.cafeapp.auth.user.entity.User;
-import com.chs.cafeapp.auth.user.repository.UserRepository;
+import com.chs.cafeapp.auth.member.entity.Member;
+import com.chs.cafeapp.auth.member.repository.MemberRepository;
 import java.util.List;
 import javax.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
@@ -33,7 +34,7 @@ public class CartandCartMenuTest {
   @Autowired
   private EntityManager em;
   @Autowired
-  private UserRepository userRepository;
+  private MemberRepository userRepository;
   @Autowired
   private MenuRepository menuRepository;
 
@@ -76,13 +77,13 @@ public class CartandCartMenuTest {
   @DisplayName("CartMenu가 삭제되면 Cart에서도 cartMenu List가 삭제되는 것 확인")
   void deleteCartMenuAndCartTest() {
     //given
-    User user = User.builder()
+    Member user = Member.builder()
         .id(1L)
         .loginId("user2@naver.com")
         .password("user2비밀번호")
         .userName("user2 이름")
         .nickName("user2 닉네임")
-        .sex("Male")
+        .sex(MemberSex.MALE)
         .age(32)
         .build();
 
@@ -108,7 +109,7 @@ public class CartandCartMenuTest {
 
     Cart cart = Cart.builder()
         .id(1L)
-        .user(user)
+        .member(user)
         .build();
 
     userRepository.save(user);

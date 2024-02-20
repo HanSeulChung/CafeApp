@@ -2,7 +2,7 @@ package com.chs.cafeapp.order.entity;
 
 import com.chs.cafeapp.base.BaseEntity;
 import com.chs.cafeapp.order.type.OrderStatus;
-import com.chs.cafeapp.auth.user.entity.User;
+import com.chs.cafeapp.auth.member.entity.Member;
 import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.Entity;
@@ -42,14 +42,14 @@ public class Order extends BaseEntity {
   private long couponId;
 
   @ManyToOne(fetch = FetchType.LAZY) // 다대일 단방향 매핑
-  @JoinColumn(name = "user_id")
-  private User user;
+  @JoinColumn(name = "member_id")
+  private Member member;
 
   @OneToMany(mappedBy = "order") // 일대다 양방향 매핑
   private List<OrderedMenu> orderedMenus;
 
-  public void setUser(User user) {
-    this.user = user;
+  public void setMember(Member member) {
+    this.member = member;
   }
   public void setOrderedMenus(OrderedMenu orderedMenu) {
     if (this.getOrderedMenus() == null) {

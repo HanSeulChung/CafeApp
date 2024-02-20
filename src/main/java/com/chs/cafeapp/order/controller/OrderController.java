@@ -7,7 +7,7 @@ import com.chs.cafeapp.order.dto.OrderDto;
 import com.chs.cafeapp.order.dto.OrderFromCartInput;
 import com.chs.cafeapp.order.dto.OrderInput;
 import com.chs.cafeapp.order.dto.OrderResponse;
-import com.chs.cafeapp.order.service.OrderUserService;
+import com.chs.cafeapp.order.service.OrderMemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -28,7 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @RequestMapping("/orders")
 public class OrderController {
-  private final OrderUserService orderUserService;
+  private final OrderMemberService orderMemberService;
 
 
   /**
@@ -41,7 +41,7 @@ public class OrderController {
    */
   @PostMapping()
   public OrderResponse addOrder(@RequestBody OrderInput request, @RequestParam String userId) {
-    OrderDto orderDto = orderUserService.orderIndividualMenu(request, userId);
+    OrderDto orderDto = orderMemberService.orderIndividualMenu(request, userId);
     return OrderResponse.toResponse(orderDto, orderDto.getOrderStatus().getDescription());
   }
 
@@ -58,7 +58,7 @@ public class OrderController {
    */
   @PostMapping("/carts/select-items/{selectItemCount}")
   public OrderResponse addOrderFromBasket(@PathVariable int selectItemCount, @RequestBody OrderFromCartInput request, @RequestParam String userId) {
-    OrderDto orderDto = orderUserService.orderFromCart(request, userId);
+    OrderDto orderDto = orderMemberService.orderFromCart(request, userId);
     return OrderResponse.toResponse(orderDto, orderDto.getOrderStatus().getDescription());
   }
 
@@ -74,7 +74,7 @@ public class OrderController {
    */
   @PostMapping("/carts")
   public OrderResponse addOrderFromBasket(@RequestBody OrderAllFromCartInput reqeust, @RequestParam String userId) {
-    OrderDto orderDto = orderUserService.orderAllFromCart(reqeust, userId);
+    OrderDto orderDto = orderMemberService.orderAllFromCart(reqeust, userId);
     return OrderResponse.toResponse(orderDto, orderDto.getOrderStatus().getDescription());
   }
 
@@ -85,7 +85,7 @@ public class OrderController {
    */
   @PatchMapping("/cancels/{orderId}")
   public ResponseEntity<OrderResponse> rejectOrderStatus(@PathVariable long orderId, @RequestParam String userId) {
-    OrderDto orderDto = orderUserService.cancelOrder(orderId, userId);
+    OrderDto orderDto = orderMemberService.cancelOrder(orderId, userId);
     return ResponseEntity.ok(OrderResponse.toResponse(orderDto, orderDto.getOrderStatus().getDescription()));
   }
 
@@ -98,7 +98,7 @@ public class OrderController {
    */
   @GetMapping()
   public ResponseEntity<Slice<OrderDto>> viewOrdersAll(@RequestParam String userId, Pageable pageable) {
-    return ResponseEntity.ok(orderUserService.viewAllOrders(userId, pageable));
+    return ResponseEntity.ok(orderMemberService.viewAllOrders(userId, pageable));
   }
 
   /**
@@ -113,7 +113,7 @@ public class OrderController {
       @RequestParam String userId,
       Pageable pageable
   ) {
-    return ResponseEntity.ok(orderUserService.viewAllOrdersDuringDays(userId, pageable));
+    return ResponseEntity.ok(orderMemberService.viewAllOrdersDuringDays(userId, pageable));
   }
 
   /**
@@ -128,7 +128,7 @@ public class OrderController {
       @RequestParam String userId,
       Pageable pageable
   ) {
-    return ResponseEntity.ok(orderUserService.viewAllOrdersDuringWeeks(userId, pageable));
+    return ResponseEntity.ok(orderMemberService.viewAllOrdersDuringWeeks(userId, pageable));
   }
 
   /**
@@ -143,7 +143,7 @@ public class OrderController {
       @RequestParam String userId,
       Pageable pageable
   ) {
-    return ResponseEntity.ok(orderUserService.viewAllOrdersDuringMonths(userId, pageable));
+    return ResponseEntity.ok(orderMemberService.viewAllOrdersDuringMonths(userId, pageable));
   }
 
   /**
@@ -158,7 +158,7 @@ public class OrderController {
       @RequestParam String userId,
       Pageable pageable
   ) {
-    return ResponseEntity.ok(orderUserService.viewAllOrdersDuringThreeMonths(userId, pageable));
+    return ResponseEntity.ok(orderMemberService.viewAllOrdersDuringThreeMonths(userId, pageable));
   }
 
   /**
@@ -173,7 +173,7 @@ public class OrderController {
       @RequestParam String userId,
       Pageable pageable
   ) {
-    return ResponseEntity.ok(orderUserService.viewAllOrdersDuringSixMonths(userId, pageable));
+    return ResponseEntity.ok(orderMemberService.viewAllOrdersDuringSixMonths(userId, pageable));
   }
 
   /**
@@ -188,6 +188,6 @@ public class OrderController {
       @RequestParam String userId,
       Pageable pageable
   ) {
-    return ResponseEntity.ok(orderUserService.viewAllOrdersDuringYears(userId, pageable));
+    return ResponseEntity.ok(orderMemberService.viewAllOrdersDuringYears(userId, pageable));
   }
 }

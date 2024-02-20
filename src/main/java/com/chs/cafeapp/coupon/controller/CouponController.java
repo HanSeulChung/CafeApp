@@ -24,41 +24,41 @@ public class CouponController {
 
   /**
    * 쿠폰 전체 조회 Controller
-   * @param userId: 쿠폰 조회할 사용자의 id
+   * @param memberId: 쿠폰 조회할 사용자의 id
    * @return Page<CouponResponse>: 사용자가 가지고 있는 모든 쿠폰 Page 반환
    *                                기존 CouponDto에서 사용 가능, 사용 완료, 기간 만료 등의 statusName 추가
    */
   @GetMapping()
   public ResponseEntity<Page<CouponResponse>> viewAllCoupons(
-      @RequestParam("userId") String userId,
+      @RequestParam("memberId") String memberId,
       Pageable pageable) {
-    return ResponseEntity.ok(couponService.viewAllCoupons(userId, pageable));
+    return ResponseEntity.ok(couponService.viewAllCoupons(memberId, pageable));
   }
 
   /**
    * 사용 가능한 쿠폰 전체 조회 Controller
-   * @param userId: 쿠폰 조회할 사용자의 id
+   * @param memberId: 쿠폰 조회할 사용자의 id
    * @return Page<CouponResponse>: 사용자가 가지고 있는 모든 쿠폰 중 사용 가능한 쿠폰 Page 반환
    *                                기존 CouponDto에서 사용 가능, 사용 완료, 기간 만료 등의 statusName 추가
    */
   @GetMapping("/usable-coupons")
   public ResponseEntity<Page<CouponResponse>> viewAllCanUseCoupons(
-      @RequestParam("userId") String userId,
+      @RequestParam("memberId") String memberId,
       Pageable pageable) {
-    return ResponseEntity.ok(couponService.viewAllCanUseCoupons(userId, pageable));
+    return ResponseEntity.ok(couponService.viewAllCanUseCoupons(memberId, pageable));
   }
 
   /**
    * 사용 불가능한 쿠폰 전체 조회 Controller
-   * @param userId: 쿠폰 조회할 사용자의 id
+   * @param memberId: 쿠폰 조회할 사용자의 id
    * @return Page<CouponResponse>: 사용자가 가지고 있는 모든 쿠폰 중 사용 불가능한 쿠폰 Page 반환
    *                                기존 CouponDto에서 사용 가능, 사용 완료, 기간 만료 등의 statusName 추가
    */
   @GetMapping("/un-usable")
   public ResponseEntity<Page<CouponResponse>> viewAllCanNotUseCoupons(
-      @RequestParam("userId") String userId,
+      @RequestParam("memberId") String memberId,
       Pageable pageable
   ) {
-    return ResponseEntity.ok(couponService.viewAllCanNotUseCoupons(userId, pageable));
+    return ResponseEntity.ok(couponService.viewAllCanNotUseCoupons(memberId, pageable));
   }
 }

@@ -1,7 +1,7 @@
 package com.chs.cafeapp.order.service.validation;
 
 import static com.chs.cafeapp.exception.type.ErrorCode.ALREADY_CANCEL_BY_CAFE;
-import static com.chs.cafeapp.exception.type.ErrorCode.ALREADY_CANCEL_BY_USER;
+import static com.chs.cafeapp.exception.type.ErrorCode.ALREADY_CANCEL_BY_MEMBER;
 import static com.chs.cafeapp.exception.type.ErrorCode.ALREADY_EXPIRED_COUPON;
 import static com.chs.cafeapp.exception.type.ErrorCode.ALREADY_USED_COUPON;
 import static com.chs.cafeapp.exception.type.ErrorCode.CAN_NOT_ORDER_CANCEL;
@@ -9,9 +9,9 @@ import static com.chs.cafeapp.exception.type.ErrorCode.CART_MENU_NOT_FOUND;
 import static com.chs.cafeapp.exception.type.ErrorCode.CART_NOT_FOUND;
 import static com.chs.cafeapp.exception.type.ErrorCode.COUPON_NOT_FOUND;
 import static com.chs.cafeapp.exception.type.ErrorCode.MENU_NOT_FOUND;
-import static com.chs.cafeapp.exception.type.ErrorCode.NOT_MATCH_USER_AND_ORDER;
+import static com.chs.cafeapp.exception.type.ErrorCode.NOT_MATCH_MEMBER_AND_ORDER;
 import static com.chs.cafeapp.exception.type.ErrorCode.ORDER_NOT_FOUND;
-import static com.chs.cafeapp.exception.type.ErrorCode.USER_NOT_FOUND;
+import static com.chs.cafeapp.exception.type.ErrorCode.MEMBER_NOT_FOUND;
 import static com.chs.cafeapp.order.type.OrderStatus.CancelByCafe;
 import static com.chs.cafeapp.order.type.OrderStatus.CancelByUser;
 import static com.chs.cafeapp.order.type.OrderStatus.PaySuccess;
@@ -28,8 +28,8 @@ import com.chs.cafeapp.menu.repository.MenuRepository;
 import com.chs.cafeapp.order.entity.Order;
 import com.chs.cafeapp.order.repository.OrderRepository;
 import com.chs.cafeapp.order.repository.OrderedMenuRepository;
-import com.chs.cafeapp.auth.user.entity.User;
-import com.chs.cafeapp.auth.user.repository.UserRepository;
+import com.chs.cafeapp.auth.member.entity.Member;
+import com.chs.cafeapp.auth.member.repository.MemberRepository;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -38,7 +38,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class ValidationCheck {
   private final MenuRepository menuRepository;
-  private final UserRepository userRepository;
+  private final MemberRepository userRepository;
   private final CartRepository cartRepository;
   private final OrderRepository orderRepository;
   private final CouponRepository couponRepository;
@@ -59,9 +59,9 @@ public class ValidationCheck {
     return coupon;
   }
 
-  public User validationUser(String userId) {
-    User user = userRepository.findByLoginId(userId)
-        .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+  public Member validationUser(String userId) {
+    Member user = userRepository.findByLoginId(userId)
+        .orElseThrow(() -> new CustomException(MEMBER_NOT_FOUND));
     return user;
   }
 
@@ -93,7 +93,7 @@ public class ValidationCheck {
     }
 
     if (order.getOrderStatus().equals(CancelByUser)) {
-      throw new CustomException(ALREADY_CANCEL_BY_USER);
+      throw new CustomException(ALREADY_CANCEL_BY_MEMBER);
     }
 
     if (!order.getOrderStatus().equals(PaySuccess)) {
@@ -103,11 +103,11 @@ public class ValidationCheck {
   }
 
   public void validationOrderAndUser(Order order, String userId) {
-    User user = userRepository.findByLoginId(userId)
-        .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+    Member user = userRepository.findByLoginId(userId)
+        .orElseThrow(() -> new CustomException(MEMBER_NOT_FOUND));
 
-    if (!order.getUser().equals(user)) {
-      throw new CustomException(NOT_MATCH_USER_AND_ORDER);
+    if (!order.getMember().equals(user)) {
+      throw new CustomException(NOT_MATCH_MEMBER_AND_ORDER);
     }
   }
 }

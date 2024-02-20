@@ -16,7 +16,7 @@ public class StampDto {
   public static StampDto of(Stamp stamp) {
     return StampDto.builder()
                   .id(stamp.getId())
-                  .userLoginId(stamp.getUser().getLoginId())
+                  .userLoginId(stamp.getMember().getLoginId())
                   .stampNumbers(stamp.getStampNumbers())
                   .build();
   }

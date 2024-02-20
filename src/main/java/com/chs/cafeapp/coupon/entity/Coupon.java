@@ -2,7 +2,7 @@ package com.chs.cafeapp.coupon.entity;
 
 
 import com.chs.cafeapp.base.BaseEntity;
-import com.chs.cafeapp.auth.user.entity.User;
+import com.chs.cafeapp.auth.member.entity.Member;
 import java.time.LocalDateTime;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -27,16 +27,16 @@ public class Coupon extends BaseEntity {
   private long id;
 
   @ManyToOne(fetch = FetchType.LAZY) // 다대일 양방향 매핑
-  @JoinColumn(name = "user_id")
-  private User user;
+  @JoinColumn(name = "member_id")
+  private Member member;
 
   private String couponName;
   private int price;
   private boolean usedYn;
   private LocalDateTime expirationDateTime;
   private boolean expiredYn;
-  public void setUser(User user) {
-    this.user = user;
+  public void setMember(Member member) {
+    this.member = member;
   }
 
   public void setUsedYn(boolean usedYn) {

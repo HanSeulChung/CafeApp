@@ -1,7 +1,6 @@
-package com.chs.cafeapp.auth.user.entity;
+package com.chs.cafeapp.auth.member.entity;
 
 
-import com.chs.cafeapp.base.BaseEntity;
 import java.time.LocalDateTime;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -12,14 +11,13 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Entity
 @Builder
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class DeleteUser {
+public class DeleteMember {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private long id;

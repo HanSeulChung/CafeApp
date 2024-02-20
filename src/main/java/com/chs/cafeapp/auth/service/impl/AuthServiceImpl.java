@@ -2,29 +2,29 @@ package com.chs.cafeapp.auth.service.impl;
 
 import static com.chs.cafeapp.auth.token.type.ACCESS_TOKEN_TYPE.NO_ACCESS_TOKEN;
 import static com.chs.cafeapp.auth.type.Authority.ROLE_ADMIN;
-import static com.chs.cafeapp.auth.type.Authority.ROLE_USER;
-import static com.chs.cafeapp.auth.type.Authority.ROLE_YET_USER;
-import static com.chs.cafeapp.auth.user.type.UserSex.FEMALE;
-import static com.chs.cafeapp.auth.user.type.UserSex.MALE;
-import static com.chs.cafeapp.auth.user.type.UserStatus.USER_STATUS_ING;
-import static com.chs.cafeapp.auth.user.type.UserStatus.USER_STATUS_REQ;
+import static com.chs.cafeapp.auth.type.Authority.ROLE_MEMBER;
+import static com.chs.cafeapp.auth.type.Authority.ROLE_YET_MEMBER;
+import static com.chs.cafeapp.auth.member.type.MemberSex.FEMALE;
+import static com.chs.cafeapp.auth.member.type.MemberSex.MALE;
+import static com.chs.cafeapp.auth.member.type.MemberStatus.USER_STATUS_ING;
+import static com.chs.cafeapp.auth.member.type.MemberStatus.USER_STATUS_REQ;
 import static com.chs.cafeapp.exception.type.ErrorCode.ADMIN_NOT_FOUND;
-import static com.chs.cafeapp.exception.type.ErrorCode.ALREADY_EMAIL_AUTH_USER;
-import static com.chs.cafeapp.exception.type.ErrorCode.ALREADY_EXISTS_USER_LOGIN_ID;
-import static com.chs.cafeapp.exception.type.ErrorCode.ALREADY_EXISTS_USER_NICK_NAME;
+import static com.chs.cafeapp.exception.type.ErrorCode.ALREADY_EMAIL_AUTH_MEMBER;
+import static com.chs.cafeapp.exception.type.ErrorCode.ALREADY_EXISTS_MEMBER_LOGIN_ID;
+import static com.chs.cafeapp.exception.type.ErrorCode.ALREADY_EXISTS_MEMBER_NICK_NAME;
 import static com.chs.cafeapp.exception.type.ErrorCode.EXPIRED_DATE_TIME_FOR_EMAIL_AUTH;
 import static com.chs.cafeapp.exception.type.ErrorCode.INVALID_ACCESS_TOKEN;
-import static com.chs.cafeapp.exception.type.ErrorCode.LOGOUT_USER;
+import static com.chs.cafeapp.exception.type.ErrorCode.LOGOUT_MEMBER;
 import static com.chs.cafeapp.exception.type.ErrorCode.NOTING_ACCESS_TOKEN;
 import static com.chs.cafeapp.exception.type.ErrorCode.NOT_EMAIL_AUTH;
-import static com.chs.cafeapp.exception.type.ErrorCode.NOT_EXISTS_USER_LOGIN_ID;
+import static com.chs.cafeapp.exception.type.ErrorCode.NOT_EXISTS_MEMBER_LOGIN_ID;
 import static com.chs.cafeapp.exception.type.ErrorCode.NOT_MATCH_ORIGIN_PASSWORD;
-import static com.chs.cafeapp.exception.type.ErrorCode.NOT_MATCH_REFRESH_TOKEN_USER;
+import static com.chs.cafeapp.exception.type.ErrorCode.NOT_MATCH_REFRESH_TOKEN_MEMBER;
 import static com.chs.cafeapp.exception.type.ErrorCode.NOT_MATCH_ROLE;
-import static com.chs.cafeapp.exception.type.ErrorCode.NOT_MATCH_USER_PASSWORD;
+import static com.chs.cafeapp.exception.type.ErrorCode.NOT_MATCH_MEMBER_PASSWORD;
 import static com.chs.cafeapp.exception.type.ErrorCode.NOT_VALID_REFRESH_TOKEN;
 import static com.chs.cafeapp.exception.type.ErrorCode.TOO_MANY_ROLE;
-import static com.chs.cafeapp.exception.type.ErrorCode.USER_NOT_FOUND;
+import static com.chs.cafeapp.exception.type.ErrorCode.MEMBER_NOT_FOUND;
 
 import com.chs.cafeapp.auth.admin.entity.Admin;
 import com.chs.cafeapp.auth.admin.repository.AdminRepository;
@@ -40,12 +40,12 @@ import com.chs.cafeapp.auth.token.dto.TokenRequestDto;
 import com.chs.cafeapp.auth.token.dto.TokenResponseDto;
 import com.chs.cafeapp.auth.token.entity.RefreshToken;
 import com.chs.cafeapp.auth.token.repository.RefreshTokenRepository;
-import com.chs.cafeapp.auth.user.dto.SignInRequestDto;
-import com.chs.cafeapp.auth.user.dto.SignUpRequestDto;
-import com.chs.cafeapp.auth.user.dto.UserResponseDto;
-import com.chs.cafeapp.auth.user.entity.User;
-import com.chs.cafeapp.auth.user.repository.UserRepository;
-import com.chs.cafeapp.auth.user.service.UserService;
+import com.chs.cafeapp.auth.member.dto.SignInRequestDto;
+import com.chs.cafeapp.auth.member.dto.SignUpRequestDto;
+import com.chs.cafeapp.auth.member.dto.MemberResponseDto;
+import com.chs.cafeapp.auth.member.entity.Member;
+import com.chs.cafeapp.auth.member.repository.MemberRepository;
+import com.chs.cafeapp.auth.member.service.MemberService;
 import com.chs.cafeapp.exception.CustomException;
 import com.chs.cafeapp.mail.service.MailService;
 import com.chs.cafeapp.security.TokenProvider;
@@ -74,10 +74,10 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService, UserDetailsService {
   private final MailService mailService;
-  private final UserService userService;
+  private final MemberService memberService;
   private final AdminService adminService;
   private final TokenProvider tokenProvider;
-  private final UserRepository userRepository;
+  private final MemberRepository memberRepository;
   private final AdminRepository adminRepository;
   private final PasswordEncoder passwordEncoder;
 
@@ -89,7 +89,7 @@ public class AuthServiceImpl implements AuthService, UserDetailsService {
   @Override
   @Transactional
   public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-    UserDetails userDetailsByUser = userRepository.findByLoginId(username)
+    UserDetails userDetailsByMember = memberRepository.findByLoginId(username)
         .map(this::createUserDetails)
         .orElse(null);
 
@@ -97,21 +97,21 @@ public class AuthServiceImpl implements AuthService, UserDetailsService {
         .map(this::createAdminUserDetails)
         .orElse(null);
 
-    if (userDetailsByUser == null && userDetailsByAdmin == null) {
-      throw new CustomException(NOT_EXISTS_USER_LOGIN_ID);
+    if (userDetailsByMember == null && userDetailsByAdmin == null) {
+      throw new CustomException(NOT_EXISTS_MEMBER_LOGIN_ID);
     }
 
-    return userDetailsByUser == null ? userDetailsByAdmin : userDetailsByUser;
+    return userDetailsByMember == null ? userDetailsByAdmin : userDetailsByMember;
   }
 
   // DB 에 User 값이 존재한다면 UserDetails 객체로 생성 후 리턴
-  private UserDetails createUserDetails(User user) {
+  private UserDetails createUserDetails(Member member) {
     GrantedAuthority grantedAuthority = new SimpleGrantedAuthority(
-        user.getAuthority().toString());
+        member.getAuthority().toString());
 
     return new org.springframework.security.core.userdetails.User(
-        user.getLoginId(),
-        user.getPassword(),
+        member.getLoginId(),
+        member.getPassword(),
         Collections.singleton(grantedAuthority)
     );
   }
@@ -128,32 +128,32 @@ public class AuthServiceImpl implements AuthService, UserDetailsService {
   }
   @Override
   @Transactional
-  public UserResponseDto signUp(SignUpRequestDto signUpRequestDto) {
-    boolean existsByLoginId = userRepository.existsByLoginId(signUpRequestDto.getUsername());
+  public MemberResponseDto signUp(SignUpRequestDto signUpRequestDto) {
+    boolean existsByLoginId = memberRepository.existsByLoginId(signUpRequestDto.getUsername());
     if (existsByLoginId) {
-      throw new CustomException(ALREADY_EXISTS_USER_LOGIN_ID);
+      throw new CustomException(ALREADY_EXISTS_MEMBER_LOGIN_ID);
     }
-    boolean existsByNickName = userRepository.existsByNickName(signUpRequestDto.getNickName());
+    boolean existsByNickName = memberRepository.existsByNickName(signUpRequestDto.getNickName());
     if (existsByNickName) {
-      throw new CustomException(ALREADY_EXISTS_USER_NICK_NAME);
+      throw new CustomException(ALREADY_EXISTS_MEMBER_NICK_NAME);
     }
 
     String encPassword = passwordEncoder.encode(signUpRequestDto.getPassword());
     String uuid = UUID.randomUUID().toString();
 
-    User user = User.builder()
+    Member member = Member.builder()
         .loginId(signUpRequestDto.getUsername())
         .password(encPassword)
         .userName(signUpRequestDto.getName())
         .nickName(signUpRequestDto.getNickName())
         .age(signUpRequestDto.getAge())
         .sex(signUpRequestDto.getSex() == 0 ? MALE : FEMALE)
-        .userStatus(USER_STATUS_REQ)
+        .memberStatus(USER_STATUS_REQ)
         .emailAuthKey(uuid)
-        .authority(ROLE_YET_USER)
+        .authority(ROLE_YET_MEMBER)
         .build();
 
-    User saveUser = userRepository.save(user);
+    Member saveMember = memberRepository.save(member);
 
     // 회원가입 후 메일 보내기
     String email = signUpRequestDto.getUsername(); // 이메일은 로그인 아이디로 가정
@@ -162,67 +162,67 @@ public class AuthServiceImpl implements AuthService, UserDetailsService {
         + "<a href='http://localhost:8080/auth/email-auth?id=" + uuid + "'> 이메일 인증 </a>";
 
     mailService.sendMail(email, subject, text); // 메일 전송
-    return UserResponseDto.builder()
-        .loginId(saveUser.getLoginId())
-        .nickName(saveUser.getNickName())
-        .createDateTime(saveUser.getCreateDateTime())
+    return MemberResponseDto.builder()
+        .loginId(saveMember.getLoginId())
+        .nickName(saveMember.getNickName())
+        .createDateTime(saveMember.getCreateDateTime())
         .message("가입을 축하드립니다. 로그인 아이디로 메일을 확인해 인증을 완료한 뒤 서비스를 사용할 수 있습니다.")
         .build();
   }
 
-  private User validationUserBy(String uuid) {
-    User user = userRepository.findByEmailAuthKey(uuid)
-        .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+  private Member validationUserBy(String uuid) {
+    Member member = memberRepository.findByEmailAuthKey(uuid)
+        .orElseThrow(() -> new CustomException(MEMBER_NOT_FOUND));
 
-    if (user.getUserStatus() == USER_STATUS_ING) {
-      throw new CustomException(ALREADY_EMAIL_AUTH_USER);
+    if (member.getMemberStatus() == USER_STATUS_ING) {
+      throw new CustomException(ALREADY_EMAIL_AUTH_MEMBER);
     }
-    return user;
+    return member;
   }
-  private void reSendEmail(User user, String uuid) {
-    String email = user.getLoginId();
+  private void reSendEmail(Member member, String uuid) {
+    String email = member.getLoginId();
     String subject = "CafeApp의 이메일 인증만료 후 재발송 메시지입니다.";
     String text = "가입을 축하합니다. 아래 링크를 클릭하여서 가입을 완료하세요.<br>"
         + "<a href='http://localhost:8080/auth/email-auth?id=" + uuid + "'> 이메일 인증 </a>";
 
-    user.setUpdateDateTime();
-    userRepository.save(user);
+    member.setUpdateDateTime();
+    memberRepository.save(member);
     mailService.sendMail(email, subject, text);
   }
   @Override
-  public UserResponseDto emailAuth(String uuid) {
-    User user = validationUserBy(uuid);
+  public MemberResponseDto emailAuth(String uuid) {
+    Member member = validationUserBy(uuid);
 
     Instant requestTime = Instant.now();
-    Instant expiredTime = user.getUpdateDateTime()
+    Instant expiredTime = member.getUpdateDateTime()
           .atZone(ZoneId.systemDefault()).toInstant().plus(Duration.ofHours(24));
 
     if (requestTime.isAfter(expiredTime)) {
-      reSendEmail(user, uuid);
+      reSendEmail(member, uuid);
       throw new CustomException(EXPIRED_DATE_TIME_FOR_EMAIL_AUTH);
     }
-    user.setUserStatus(USER_STATUS_ING);
-    user.setAuthority(ROLE_USER);
-    User saveUser = userRepository.save(user);
+    member.setMemberStatus(USER_STATUS_ING);
+    member.setAuthority(ROLE_MEMBER);
+    Member saveMember = memberRepository.save(member);
 
-    return UserResponseDto.builder()
-        .loginId(saveUser.getLoginId())
-        .nickName(saveUser.getNickName())
-        .createDateTime(saveUser.getCreateDateTime())
+    return MemberResponseDto.builder()
+        .loginId(saveMember.getLoginId())
+        .nickName(saveMember.getNickName())
+        .createDateTime(saveMember.getCreateDateTime())
         .message("인증이 완료되었습니다. CafeApp 서비스를 이용 가능합니다.")
         .build();
   }
 
-  private User validationUserFromSignIn(SignInRequestDto signInRequestDto) {
-    User user = userRepository.findByLoginId(signInRequestDto.getUsername())
-        .orElseThrow(() -> new CustomException(NOT_EXISTS_USER_LOGIN_ID));
-    if (!this.passwordEncoder.matches(signInRequestDto.getPassword(), user.getPassword())) {
-      throw new CustomException(NOT_MATCH_USER_PASSWORD);
+  private Member validationUserFromSignIn(SignInRequestDto signInRequestDto) {
+    Member member = memberRepository.findByLoginId(signInRequestDto.getUsername())
+        .orElseThrow(() -> new CustomException(NOT_EXISTS_MEMBER_LOGIN_ID));
+    if (!this.passwordEncoder.matches(signInRequestDto.getPassword(), member.getPassword())) {
+      throw new CustomException(NOT_MATCH_MEMBER_PASSWORD);
     }
-    if (user.getAuthority() == ROLE_YET_USER) {
+    if (member.getAuthority() == ROLE_YET_MEMBER) {
       throw new CustomException(NOT_EMAIL_AUTH);
     }
-    return user;
+    return member;
   }
 
   private RefreshToken buildRefreshToken(Authentication authentication, TokenDto tokenDto) {
@@ -234,7 +234,7 @@ public class AuthServiceImpl implements AuthService, UserDetailsService {
   @Override
   @Transactional
   public TokenResponseDto signIn(SignInRequestDto signInRequestDto) {
-    User user = validationUserFromSignIn(signInRequestDto);
+    Member member = validationUserFromSignIn(signInRequestDto);
 
     UsernamePasswordAuthenticationToken authenticationToken = signInRequestDto.toAuthentication();
     Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
@@ -248,16 +248,16 @@ public class AuthServiceImpl implements AuthService, UserDetailsService {
     RefreshToken refreshToken = buildRefreshToken(authentication, tokenDto);
     refreshTokenRepository.save(refreshToken);
 
-    userService.updateLastLoginDateTime(user.getLoginId(), LocalDateTime.now());
+    memberService.updateLastLoginDateTime(member.getLoginId(), LocalDateTime.now());
     return new TokenResponseDto(tokenDto.getAccessToken(), tokenDto.getRefreshToken());
   }
 
   private Admin validationAdmin(SignInRequestDto signInRequestDto) {
     Admin admin = adminRepository.findByLoginId(signInRequestDto.getUsername())
-        .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+        .orElseThrow(() -> new CustomException(MEMBER_NOT_FOUND));
 
     if (!this.passwordEncoder.matches(signInRequestDto.getPassword(), admin.getPassword())) {
-      throw new CustomException(NOT_MATCH_USER_PASSWORD);
+      throw new CustomException(NOT_MATCH_MEMBER_PASSWORD);
     }
     return admin;
   }
@@ -289,7 +289,7 @@ public class AuthServiceImpl implements AuthService, UserDetailsService {
 
   private void validateRefreshTokenOwner(RefreshToken refreshToken, TokenRequestDto tokenRequestDto) {
     if (!refreshToken.getValue().equals(tokenRequestDto.getRefreshToken())) {
-      throw new CustomException(NOT_MATCH_REFRESH_TOKEN_USER);
+      throw new CustomException(NOT_MATCH_REFRESH_TOKEN_MEMBER);
     }
   }
   @Override
@@ -298,7 +298,7 @@ public class AuthServiceImpl implements AuthService, UserDetailsService {
     Authentication authentication = tokenProvider.getAuthentication(tokenRequestDto.getAccessToken());
 
     RefreshToken refreshToken = refreshTokenRepository.findByKey(authentication.getName())
-        .orElseThrow(() -> new CustomException(LOGOUT_USER));
+        .orElseThrow(() -> new CustomException(LOGOUT_MEMBER));
 
     validateRefreshTokenOwner(refreshToken, tokenRequestDto);
 
@@ -319,7 +319,7 @@ public class AuthServiceImpl implements AuthService, UserDetailsService {
     }
     String loginId = authentication.getName();
     refreshTokenRepository.findByKey(loginId)
-        .orElseThrow(() -> new CustomException(LOGOUT_USER));
+        .orElseThrow(() -> new CustomException(LOGOUT_MEMBER));
 
     refreshTokenRepository.deleteByKey(authentication.getName());
     tokenBlackList.addToBlacklist(accessToken);
@@ -327,16 +327,16 @@ public class AuthServiceImpl implements AuthService, UserDetailsService {
     return new LogOutResponse(loginId, "로그아웃 되었습니다.");
   }
 
-  private User validationUserByPasswordEdit(Authentication authentication, String originPassword) {
-    User user = userRepository.findByLoginId(authentication.getName())
-        .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
-    if (user.getAuthority() != ROLE_USER) {
+  private Member validationUserByPasswordEdit(Authentication authentication, String originPassword) {
+    Member member = memberRepository.findByLoginId(authentication.getName())
+        .orElseThrow(() -> new CustomException(MEMBER_NOT_FOUND));
+    if (member.getAuthority() != ROLE_MEMBER) {
       throw new CustomException(NOT_MATCH_ROLE);
     }
-    if (!passwordEncoder.matches(originPassword, user.getPassword())) {
+    if (!passwordEncoder.matches(originPassword, member.getPassword())) {
       throw new CustomException(NOT_MATCH_ORIGIN_PASSWORD);
     }
-    return user;
+    return member;
   }
 
   private Admin validationAdminByPasswordEdit(Authentication authentication, String originPassword) {
@@ -359,20 +359,20 @@ public class AuthServiceImpl implements AuthService, UserDetailsService {
     }
     String roleName = authority.iterator().next().getAuthority();
 
-    if (roleName.equals("ROLE_USER")) {
-      User user = validationUserByPasswordEdit(authentication, passwordEditInput.getOriginPassword());
-      user.changePassword(passwordEncoder.encode(passwordEditInput.getNewPassword()));
-      userRepository.save(user);
-      refreshTokenRepository.deleteByKey(user.getLoginId());
+    if (roleName.equals("ROLE_MEMBER")) {
+      Member member = validationUserByPasswordEdit(authentication, passwordEditInput.getOriginPassword());
+      member.changePassword(passwordEncoder.encode(passwordEditInput.getNewPassword()));
+      memberRepository.save(member);
+      refreshTokenRepository.deleteByKey(member.getLoginId());
 
-      String accessToken = tokenPrepareList.getAccessToken(user.getLoginId());
+      String accessToken = tokenPrepareList.getAccessToken(member.getLoginId());
       if (accessToken.equals(NO_ACCESS_TOKEN.getToken_value())) {
         throw new CustomException(NOTING_ACCESS_TOKEN);
       }
 
       tokenBlackList.addToBlacklist(accessToken);
-      tokenPrepareList.delete(user.getLoginId());
-      return new PasswordEditResponse(user.getLoginId(), "비밀번호가 변경되었습니다. 다시 로그인 후 이용해주세요.");
+      tokenPrepareList.delete(member.getLoginId());
+      return new PasswordEditResponse(member.getLoginId(), "비밀번호가 변경되었습니다. 다시 로그인 후 이용해주세요.");
     }
     if (roleName.equals("ROLE_ADMIN")) {
       Admin admin = validationAdminByPasswordEdit(authentication, passwordEditInput.getOriginPassword());

@@ -9,8 +9,6 @@ import static com.chs.cafeapp.order.type.OrderStatus.PaySuccess;
 
 import com.chs.cafeapp.cart.entity.Cart;
 import com.chs.cafeapp.cart.entity.CartMenu;
-import com.chs.cafeapp.cart.repository.CartMenusRepository;
-import com.chs.cafeapp.cart.repository.CartRepository;
 import com.chs.cafeapp.cart.service.CartMenuService;
 import com.chs.cafeapp.coupon.entity.Coupon;
 import com.chs.cafeapp.coupon.repository.CouponRepository;
@@ -25,10 +23,9 @@ import com.chs.cafeapp.order.entity.Order;
 import com.chs.cafeapp.order.entity.OrderedMenu;
 import com.chs.cafeapp.order.repository.OrderRepository;
 import com.chs.cafeapp.order.repository.OrderedMenuRepository;
-import com.chs.cafeapp.order.service.OrderUserService;
+import com.chs.cafeapp.order.service.OrderMemberService;
 import com.chs.cafeapp.order.service.validation.ValidationCheck;
-import com.chs.cafeapp.auth.user.entity.User;
-import com.chs.cafeapp.auth.user.repository.UserRepository;
+import com.chs.cafeapp.auth.member.entity.Member;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -43,14 +40,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-public class OrderUserServiceImpl implements OrderUserService {
+public class OrderMemberServiceImpl implements OrderMemberService {
 
   private final MenuRepository menuRepository;
-  private final UserRepository userRepository;
-  private final CartRepository cartRepository;
   private final OrderRepository orderRepository;
   private final CouponRepository couponRepository;
-  private final CartMenusRepository cartMenusRepository;
   private final OrderedMenuRepository orderedMenuRepository;
 
   private final CartMenuService cartMenuService;
@@ -58,15 +52,15 @@ public class OrderUserServiceImpl implements OrderUserService {
 
   @Override
   @Transactional
-  public OrderDto orderIndividualMenu(OrderInput orderInput, String userId) {
+  public OrderDto orderIndividualMenu(OrderInput orderInput, String memberId) {
 
 
-    User user = validationCheck.validationUser(userId);
+    Member user = validationCheck.validationUser(memberId);
     Menus menus = validationCheck.validationMenus(orderInput.getMenuId());
 
     OrderedMenu saveOrderedMenu = orderedMenuRepository.save(
         OrderedMenu.builder()
-            .userId(userId)
+            .userId(memberId)
             .quantity(orderInput.getQuantity())
             .totalPrice(orderInput.getMenuPrice() * orderInput.getQuantity())
             .menus(menus)
@@ -74,7 +68,7 @@ public class OrderUserServiceImpl implements OrderUserService {
 
     Order buildOrder = Order.builder()
         .couponUse(orderInput.isCouponUse())
-        .user(user)
+        .member(user)
         .totalQuantity(saveOrderedMenu.getQuantity())
         .totalPrice(saveOrderedMenu.getTotalPrice())
         .build();
@@ -107,9 +101,9 @@ public class OrderUserServiceImpl implements OrderUserService {
 
   @Override
   @Transactional
-  public OrderDto orderFromCart(OrderFromCartInput orderFromCartInput, String userId) {
+  public OrderDto orderFromCart(OrderFromCartInput orderFromCartInput, String memberId) {
 
-    User user = validationCheck.validationUser(userId);
+    Member user = validationCheck.validationUser(memberId);
     Cart cart = validationCheck.validationCart(orderFromCartInput.getCartId());
 
     if (orderFromCartInput.getIdList() == null) {
@@ -136,13 +130,13 @@ public class OrderUserServiceImpl implements OrderUserService {
         throw new CustomException(INVALID_REQUEST);
       }
 
-      cartMenuService.deleteSpecificCartMenu(cart.getId(), cartMenu.getId(), userId);
+      cartMenuService.deleteSpecificCartMenu(cart.getId(), cartMenu.getId(), memberId);
 
-      return orderIndividualMenu(orderInput, userId);
+      return orderIndividualMenu(orderInput, memberId);
     }
 
     Order buildOrder = Order.builder()
-        .user(user)
+        .member(user)
         .couponUse(orderFromCartInput.isCouponUse())
         .build();
 
@@ -163,7 +157,7 @@ public class OrderUserServiceImpl implements OrderUserService {
       OrderedMenu orderedMenu = OrderedMenu.fromCartMenu(cartMenu, order);
       OrderedMenu saveOrderedMenu = orderedMenuRepository.save(orderedMenu);
       order.getOrderedMenus().add(saveOrderedMenu);
-      cartMenuService.deleteSpecificCartMenu(cart.getId(), cartMenu.getId(), userId);
+      cartMenuService.deleteSpecificCartMenu(cart.getId(), cartMenu.getId(), memberId);
     }
 
     for (Menus menus : menusMap.keySet()) {
@@ -193,12 +187,12 @@ public class OrderUserServiceImpl implements OrderUserService {
 
   @Override
   @Transactional
-  public OrderDto orderAllFromCart(OrderAllFromCartInput orderAllFromCartInput, String userId) {
-    User user = validationCheck.validationUser(userId);
+  public OrderDto orderAllFromCart(OrderAllFromCartInput orderAllFromCartInput, String memberId) {
+    Member user = validationCheck.validationUser(memberId);
     Cart cart = validationCheck.validationCart(orderAllFromCartInput.getCartId());
 
     Order buildOrder = Order.builder()
-        .user(user)
+        .member(user)
         .couponUse(orderAllFromCartInput.isCouponUse())
         .build();
 
@@ -220,7 +214,7 @@ public class OrderUserServiceImpl implements OrderUserService {
       order.getOrderedMenus().add(saveOrderedMenu);
     }
 
-    cartMenuService.deleteAllCartMenu(orderAllFromCartInput.getCartId(), userId);
+    cartMenuService.deleteAllCartMenu(orderAllFromCartInput.getCartId(), memberId);
 
     order.setTotalPrice(order.getOrderedMenus());
     order.setTotalQuantity(order.getOrderedMenus());
@@ -248,8 +242,8 @@ public class OrderUserServiceImpl implements OrderUserService {
 
   @Override
   public Slice<OrderDto> viewAllOrders(String userId, Pageable pageable) {
-    User user = validationCheck.validationUser(userId);
-    Slice<Order> orderSlice = orderRepository.findAllByUserId(pageable, user.getId());
+    Member user = validationCheck.validationUser(userId);
+    Slice<Order> orderSlice = orderRepository.findAllByMemberId(pageable, user.getId());
     List<OrderDto> orderDtoList = OrderDto.convertListDtoFromPageEntity(orderSlice);
     return new SliceImpl<>(orderDtoList, pageable, orderSlice.hasNext());
   }
@@ -281,11 +275,11 @@ public class OrderUserServiceImpl implements OrderUserService {
   }
 
   @Override
-  public Slice<OrderDto> viewAllOrdersDuringDays(String userId, Pageable pageable) {
+  public Slice<OrderDto> viewAllOrdersDuringDays(String memberId, Pageable pageable) {
     LocalDate nowDate = LocalDate.now();
     LocalDateTime nowDateTime = nowDate.atTime(23, 59, 59);
-    User user = validationCheck.validationUser(userId);
-    Slice<Order> orderSlice = orderRepository.findAllByUserIdAndCreateDateTimeBetween(
+    Member user = validationCheck.validationUser(memberId);
+    Slice<Order> orderSlice = orderRepository.findAllByMemberIdAndCreateDateTimeBetween(
         user.getId(),
         nowDateTime.minusDays(1), nowDateTime,
         pageable);
@@ -294,11 +288,11 @@ public class OrderUserServiceImpl implements OrderUserService {
   }
 
   @Override
-  public Slice<OrderDto> viewAllOrdersDuringWeeks(String userId, Pageable pageable) {
+  public Slice<OrderDto> viewAllOrdersDuringWeeks(String memberId, Pageable pageable) {
     LocalDate nowDate = LocalDate.now();
     LocalDateTime nowDateTime = nowDate.atTime(23, 59, 59);
-    User user = validationCheck.validationUser(userId);
-    Slice<Order> orderSlice = orderRepository.findAllByUserIdAndCreateDateTimeBetween(
+    Member user = validationCheck.validationUser(memberId);
+    Slice<Order> orderSlice = orderRepository.findAllByMemberIdAndCreateDateTimeBetween(
         user.getId(),
         nowDateTime.minusDays(7), nowDateTime,
         pageable);
@@ -307,11 +301,11 @@ public class OrderUserServiceImpl implements OrderUserService {
   }
 
   @Override
-  public Slice<OrderDto> viewAllOrdersDuringMonths(String userId, Pageable pageable) {
+  public Slice<OrderDto> viewAllOrdersDuringMonths(String memberId, Pageable pageable) {
     LocalDate nowDate = LocalDate.now();
     LocalDateTime nowDateTime = nowDate.atTime(23, 59, 59);
-    User user = validationCheck.validationUser(userId);
-    Slice<Order> orderSlice = orderRepository.findAllByUserIdAndCreateDateTimeBetween(
+    Member user = validationCheck.validationUser(memberId);
+    Slice<Order> orderSlice = orderRepository.findAllByMemberIdAndCreateDateTimeBetween(
         user.getId(),
         nowDateTime.minusMonths(1), nowDateTime,
         pageable);
@@ -320,11 +314,11 @@ public class OrderUserServiceImpl implements OrderUserService {
   }
 
   @Override
-  public Slice<OrderDto> viewAllOrdersDuringThreeMonths(String userId, Pageable pageable) {
+  public Slice<OrderDto> viewAllOrdersDuringThreeMonths(String memberId, Pageable pageable) {
     LocalDate nowDate = LocalDate.now();
     LocalDateTime nowDateTime = nowDate.atTime(23, 59, 59);
-    User user = validationCheck.validationUser(userId);
-    Slice<Order> orderSlice = orderRepository.findAllByUserIdAndCreateDateTimeBetween(
+    Member user = validationCheck.validationUser(memberId);
+    Slice<Order> orderSlice = orderRepository.findAllByMemberIdAndCreateDateTimeBetween(
         user.getId(),
         nowDateTime.minusMonths(3), nowDateTime,
         pageable);
@@ -333,11 +327,11 @@ public class OrderUserServiceImpl implements OrderUserService {
   }
 
   @Override
-  public Slice<OrderDto> viewAllOrdersDuringSixMonths(String userId, Pageable pageable) {
+  public Slice<OrderDto> viewAllOrdersDuringSixMonths(String memberId, Pageable pageable) {
     LocalDate nowDate = LocalDate.now();
     LocalDateTime nowDateTime = nowDate.atTime(23, 59, 59);
-    User user = validationCheck.validationUser(userId);
-    Slice<Order> orderSlice = orderRepository.findAllByUserIdAndCreateDateTimeBetween(
+    Member user = validationCheck.validationUser(memberId);
+    Slice<Order> orderSlice = orderRepository.findAllByMemberIdAndCreateDateTimeBetween(
         user.getId(),
         nowDateTime.minusMonths(6), nowDateTime,
         pageable);
@@ -346,11 +340,11 @@ public class OrderUserServiceImpl implements OrderUserService {
   }
 
   @Override
-  public Slice<OrderDto> viewAllOrdersDuringYears(String userId, Pageable pageable) {
+  public Slice<OrderDto> viewAllOrdersDuringYears(String memberId, Pageable pageable) {
     LocalDate nowDate = LocalDate.now();
     LocalDateTime nowDateTime = nowDate.atTime(23, 59, 59);
-    User user = validationCheck.validationUser(userId);
-    Slice<Order> orderSlice = orderRepository.findAllByUserIdAndCreateDateTimeBetween(
+    Member user = validationCheck.validationUser(memberId);
+    Slice<Order> orderSlice = orderRepository.findAllByMemberIdAndCreateDateTimeBetween(
         user.getId(),
         nowDateTime.minusYears(1), nowDateTime,
         pageable);

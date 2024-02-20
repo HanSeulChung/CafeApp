@@ -1,9 +1,9 @@
-package com.chs.cafeapp.auth.user.service;
+package com.chs.cafeapp.auth.member.service;
 
-import com.chs.cafeapp.auth.user.entity.User;
+import com.chs.cafeapp.auth.member.entity.Member;
 import java.time.LocalDateTime;
 
-public interface UserService {
+public interface MemberService {
 
   /**
    * 사용자 로그인 날짜, 시간 저장
@@ -13,5 +13,5 @@ public interface UserService {
   /**
    * User 찾기
    */
-  User getUserById(String loginId);
+  Member getUserById(String loginId);
 }

@@ -3,7 +3,6 @@ package com.chs.cafeapp.order.entity;
 import com.chs.cafeapp.base.BaseEntity;
 import com.chs.cafeapp.cart.entity.CartMenu;
 import com.chs.cafeapp.menu.entity.Menus;
-import com.chs.cafeapp.order.dto.OrderedMenuDto;
 import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.Entity;
@@ -72,7 +71,7 @@ public class OrderedMenu extends BaseEntity {
 
   public static OrderedMenu fromCartMenu(CartMenu cartMenu) {
     return OrderedMenu.builder()
-        .userId(cartMenu.getCart().getUser().getLoginId())
+        .userId(cartMenu.getCart().getMember().getLoginId())
         .quantity(cartMenu.getQuantity())
         .totalPrice(cartMenu.getQuantity() * cartMenu.getMenus().getPrice())
         .menus(cartMenu.getMenus())
@@ -80,7 +79,7 @@ public class OrderedMenu extends BaseEntity {
   }
   public static OrderedMenu fromCartMenu(CartMenu cartMenu, Order order) {
     return OrderedMenu.builder()
-        .userId(cartMenu.getCart().getUser().getLoginId())
+        .userId(cartMenu.getCart().getMember().getLoginId())
         .quantity(cartMenu.getQuantity())
         .totalPrice(cartMenu.getQuantity() * cartMenu.getMenus().getPrice())
         .menus(cartMenu.getMenus())

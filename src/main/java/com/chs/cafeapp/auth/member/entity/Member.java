@@ -1,8 +1,8 @@
-package com.chs.cafeapp.auth.user.entity;
+package com.chs.cafeapp.auth.member.entity;
 
 import com.chs.cafeapp.auth.type.Authority;
-import com.chs.cafeapp.auth.user.type.UserSex;
-import com.chs.cafeapp.auth.user.type.UserStatus;
+import com.chs.cafeapp.auth.member.type.MemberSex;
+import com.chs.cafeapp.auth.member.type.MemberStatus;
 import com.chs.cafeapp.base.BaseEntity;
 import com.chs.cafeapp.cart.entity.Cart;
 import com.chs.cafeapp.coupon.entity.Coupon;
@@ -31,7 +31,7 @@ import lombok.ToString;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class User extends BaseEntity {
+public class Member extends BaseEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
@@ -46,9 +46,9 @@ public class User extends BaseEntity {
     private String emailAuthKey;
 
     @Enumerated(EnumType.STRING)
-    private UserSex sex;
+    private MemberSex sex;
     @Enumerated(EnumType.STRING)
-    private UserStatus userStatus; //이용 가능한상태, 정지상태
+    private MemberStatus memberStatus; //이용 가능한상태, 정지상태
     @Enumerated(EnumType.STRING)
     private Authority authority; // 사용자는 ROLE_USER
 
@@ -57,8 +57,8 @@ public class User extends BaseEntity {
     public void changePassword(String newPassword) {
         this.password = newPassword;
     }
-    public void setUserStatus(UserStatus userStatus) {
-        this.userStatus = userStatus;
+    public void setMemberStatus(MemberStatus memberStatus) {
+        this.memberStatus = memberStatus;
     }
 
     public void setAuthority(Authority authority) {
@@ -72,15 +72,15 @@ public class User extends BaseEntity {
         super.setUpdateDateTime();
     }
 
-    @OneToOne(cascade = CascadeType.ALL, mappedBy = "user")
+    @OneToOne(cascade = CascadeType.ALL, mappedBy = "member")
     @ToString.Exclude
     private Cart cart;
 
-    @OneToOne(cascade = CascadeType.ALL, mappedBy = "user")
+    @OneToOne(cascade = CascadeType.ALL, mappedBy = "member")
     @ToString.Exclude
     private Stamp stamp;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<Coupon> coupons;
     public void setCart(Cart cart) {
         this.cart = cart;

@@ -4,8 +4,8 @@ import static com.chs.cafeapp.exception.type.ErrorCode.CAN_NOT_CART_MENU_THAN_ST
 import static com.chs.cafeapp.exception.type.ErrorCode.CAN_NOT_MINUS_THAN_CART_MENU_QUANTITY;
 import static com.chs.cafeapp.exception.type.ErrorCode.CART_MENU_NOT_FOUND;
 import static com.chs.cafeapp.exception.type.ErrorCode.CART_NOT_FOUND;
-import static com.chs.cafeapp.exception.type.ErrorCode.NOT_MATCH_USER_AND_CART;
-import static com.chs.cafeapp.exception.type.ErrorCode.USER_NOT_FOUND;
+import static com.chs.cafeapp.exception.type.ErrorCode.NOT_MATCH_MEMBER_AND_CART;
+import static com.chs.cafeapp.exception.type.ErrorCode.MEMBER_NOT_FOUND;
 import static com.chs.cafeapp.exception.type.ErrorCode.ZERO_CART_MENU_IN_CART;
 
 import com.chs.cafeapp.cart.dto.CartMenuChangeQuantity;
@@ -16,8 +16,8 @@ import com.chs.cafeapp.cart.repository.CartMenusRepository;
 import com.chs.cafeapp.cart.repository.CartRepository;
 import com.chs.cafeapp.cart.service.CartMenuService;
 import com.chs.cafeapp.exception.CustomException;
-import com.chs.cafeapp.auth.user.entity.User;
-import com.chs.cafeapp.auth.user.repository.UserRepository;
+import com.chs.cafeapp.auth.member.entity.Member;
+import com.chs.cafeapp.auth.member.repository.MemberRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -26,14 +26,14 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class CartMenuServiceImpl implements CartMenuService {
   private final CartMenusRepository cartMenusRepository;
-  private final UserRepository userRepository;
+  private final MemberRepository userRepository;
   private final CartRepository cartRepository;
 
-  public User validationUser(Long cartId, String userId) {
-    User user = userRepository.findByLoginId(userId)
-        .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+  public Member validationUser(Long cartId, String userId) {
+    Member user = userRepository.findByLoginId(userId)
+        .orElseThrow(() -> new CustomException(MEMBER_NOT_FOUND));
     if (user.getCart().getId() != cartId) {
-      throw new CustomException(NOT_MATCH_USER_AND_CART);
+      throw new CustomException(NOT_MATCH_MEMBER_AND_CART);
     }
     return user;
   }
@@ -85,11 +85,11 @@ public class CartMenuServiceImpl implements CartMenuService {
     CartMenu cartMenu = cartMenusRepository.findById(cartMenuChangeQuantity.getCartMenuId())
         .orElseThrow(() -> new CustomException(CART_MENU_NOT_FOUND));
 
-    User user = validationUser(cartMenu.getCart().getId(), userId);
+    Member user = validationUser(cartMenu.getCart().getId(), userId);
     Cart cart = validationCart(cartMenu.getCart().getId());
 
     if (cartMenu.getCart().getId() != user.getCart().getId()) {
-      throw new CustomException(NOT_MATCH_USER_AND_CART);
+      throw new CustomException(NOT_MATCH_MEMBER_AND_CART);
     }
 
     if (cartMenu.getQuantity() + cartMenuChangeQuantity.getQuantity() > cartMenu.getMenus().getStock()) {
