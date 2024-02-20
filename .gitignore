@@ -36,7 +36,6 @@ out/
 ### VS Code ###
 .vscode/
 
-application.yml
 **.yml
 logs
 **.sql
