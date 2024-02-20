@@ -23,7 +23,7 @@ public class MemberServiceImpl implements MemberService {
     memberRepository.save(member);
   }
 
-  public Member getUserById(String memberId) {
+  public Member getMemberById(String memberId) {
     return memberRepository.findByLoginId(memberId).orElse(null);
   }
 }

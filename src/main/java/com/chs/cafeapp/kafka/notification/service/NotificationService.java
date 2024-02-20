@@ -13,7 +13,7 @@ public class NotificationService {
   private final MemberService memberService;
 
   public void sendNotificationToUser(String userId) {
-    Member user = memberService.getUserById(userId);
+    Member user = memberService.getMemberById(userId);
     if (user != null) {
       // TODO: 알람을 보내는 로직
 //      sendNotification(user);
