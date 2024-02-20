@@ -32,6 +32,9 @@ public class EmbeddedS3Config {
   @Value("${cloud.aws.s3.bucket}")
   private String bucket;
 
+  @Value("${cloud.aws.region.static}")
+  private String signingRegion;
+
   private final S3Mock s3Mock;
 
   @PostConstruct
@@ -50,7 +53,7 @@ public class EmbeddedS3Config {
   @Bean
   @Primary
   public AmazonS3 amazonS3Client() {
-    AwsClientBuilder.EndpointConfiguration endpoint = new EndpointConfiguration(getUri(), "ap-northeast-2");
+    AwsClientBuilder.EndpointConfiguration endpoint = new EndpointConfiguration(getUri(), signingRegion);
     AmazonS3 client = AmazonS3ClientBuilder
         .standard()
         .withPathStyleAccessEnabled(true)
