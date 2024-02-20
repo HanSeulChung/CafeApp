@@ -243,7 +243,7 @@ public class OrderMemberServiceImpl implements OrderMemberService {
   @Override
   public Slice<OrderDto> viewAllOrders(String userId, Pageable pageable) {
     Member user = validationCheck.validationUser(userId);
-    Slice<Order> orderSlice = orderRepository.findAllByUserId(pageable, user.getId());
+    Slice<Order> orderSlice = orderRepository.findAllByMemberId(pageable, user.getId());
     List<OrderDto> orderDtoList = OrderDto.convertListDtoFromPageEntity(orderSlice);
     return new SliceImpl<>(orderDtoList, pageable, orderSlice.hasNext());
   }
@@ -279,7 +279,7 @@ public class OrderMemberServiceImpl implements OrderMemberService {
     LocalDate nowDate = LocalDate.now();
     LocalDateTime nowDateTime = nowDate.atTime(23, 59, 59);
     Member user = validationCheck.validationUser(memberId);
-    Slice<Order> orderSlice = orderRepository.findAllByUserIdAndCreateDateTimeBetween(
+    Slice<Order> orderSlice = orderRepository.findAllByMemberIdAndCreateDateTimeBetween(
         user.getId(),
         nowDateTime.minusDays(1), nowDateTime,
         pageable);
@@ -292,7 +292,7 @@ public class OrderMemberServiceImpl implements OrderMemberService {
     LocalDate nowDate = LocalDate.now();
     LocalDateTime nowDateTime = nowDate.atTime(23, 59, 59);
     Member user = validationCheck.validationUser(memberId);
-    Slice<Order> orderSlice = orderRepository.findAllByUserIdAndCreateDateTimeBetween(
+    Slice<Order> orderSlice = orderRepository.findAllByMemberIdAndCreateDateTimeBetween(
         user.getId(),
         nowDateTime.minusDays(7), nowDateTime,
         pageable);
@@ -305,7 +305,7 @@ public class OrderMemberServiceImpl implements OrderMemberService {
     LocalDate nowDate = LocalDate.now();
     LocalDateTime nowDateTime = nowDate.atTime(23, 59, 59);
     Member user = validationCheck.validationUser(memberId);
-    Slice<Order> orderSlice = orderRepository.findAllByUserIdAndCreateDateTimeBetween(
+    Slice<Order> orderSlice = orderRepository.findAllByMemberIdAndCreateDateTimeBetween(
         user.getId(),
         nowDateTime.minusMonths(1), nowDateTime,
         pageable);
@@ -318,7 +318,7 @@ public class OrderMemberServiceImpl implements OrderMemberService {
     LocalDate nowDate = LocalDate.now();
     LocalDateTime nowDateTime = nowDate.atTime(23, 59, 59);
     Member user = validationCheck.validationUser(memberId);
-    Slice<Order> orderSlice = orderRepository.findAllByUserIdAndCreateDateTimeBetween(
+    Slice<Order> orderSlice = orderRepository.findAllByMemberIdAndCreateDateTimeBetween(
         user.getId(),
         nowDateTime.minusMonths(3), nowDateTime,
         pageable);
@@ -331,7 +331,7 @@ public class OrderMemberServiceImpl implements OrderMemberService {
     LocalDate nowDate = LocalDate.now();
     LocalDateTime nowDateTime = nowDate.atTime(23, 59, 59);
     Member user = validationCheck.validationUser(memberId);
-    Slice<Order> orderSlice = orderRepository.findAllByUserIdAndCreateDateTimeBetween(
+    Slice<Order> orderSlice = orderRepository.findAllByMemberIdAndCreateDateTimeBetween(
         user.getId(),
         nowDateTime.minusMonths(6), nowDateTime,
         pageable);
@@ -344,7 +344,7 @@ public class OrderMemberServiceImpl implements OrderMemberService {
     LocalDate nowDate = LocalDate.now();
     LocalDateTime nowDateTime = nowDate.atTime(23, 59, 59);
     Member user = validationCheck.validationUser(memberId);
-    Slice<Order> orderSlice = orderRepository.findAllByUserIdAndCreateDateTimeBetween(
+    Slice<Order> orderSlice = orderRepository.findAllByMemberIdAndCreateDateTimeBetween(
         user.getId(),
         nowDateTime.minusYears(1), nowDateTime,
         pageable);

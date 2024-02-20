@@ -18,12 +18,12 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
   Optional<Member> findByEmailAuthKey(String uuid);
   boolean existsByLoginId(String loginId);
   boolean existsByNickName(String nickName);
-  List<Member> findAllByUserStatusAndUpdateDateTimeLessThan(MemberStatus userStatus, LocalDateTime nowLocalDateTime);
+  List<Member> findAllByMemberStatusAndUpdateDateTimeLessThan(MemberStatus userStatus, LocalDateTime nowLocalDateTime);
 
   @Transactional
-  void deleteAllByUserStatusAndUpdateDateTimeLessThan(MemberStatus userStatus, LocalDateTime nowLocalDateTime);
+  void deleteAllByMemberStatusAndUpdateDateTimeLessThan(MemberStatus userStatus, LocalDateTime nowLocalDateTime);
 
   @Modifying
-  @Query("UPDATE Member u SET u.memberStatus = 'USER_STATUS_STOP' WHERE u.lastLoginDateTime < :cutoffDateTime")
+  @Query("UPDATE Member u SET u.memberStatus = 'MEMBER_STATUS_STOP' WHERE u.lastLoginDateTime < :cutoffDateTime")
   void updateUserStatusForOldLogins(@Param("cutoffDateTime") LocalDateTime cutoffDateTime);
 }

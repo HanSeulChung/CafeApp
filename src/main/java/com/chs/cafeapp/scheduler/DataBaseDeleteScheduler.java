@@ -25,7 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 @AllArgsConstructor
 public class DataBaseDeleteScheduler {
 
-  private final MemberRepository userRepository;
+  private final MemberRepository memberRepository;
   private final OrderRepository orderRepository;
   private final CouponRepository couponRepository;
   private final DeleteMemberRepository deleteUserRepository;
@@ -59,22 +59,22 @@ public class DataBaseDeleteScheduler {
   // 매일 12시에 체크
   // 탈퇴한 회원 정보 수집 기간(2년 뒤 파기)
   @Scheduled(cron = "0 0 0 * * *", zone = SEOUL_TIME_ZONE)
-  public void userAutoDeleteScheduling() {
+  public void memberAutoDeleteScheduling() {
     LocalDateTime nowLocalDateTime = LocalDateTime.now();
-    List<Member> userList = userRepository.findAllByUserStatusAndUpdateDateTimeLessThan(
+    List<Member> memberList = memberRepository.findAllByMemberStatusAndUpdateDateTimeLessThan(
         USER_STATUS_WITHDRAW, nowLocalDateTime.minusYears(2));
 
-    if (userList.size() != 0) {
+    if (memberList.size() != 0) {
       List<DeleteMember> deleteMemberList = new ArrayList<>();
-      for (Member user : userList) {
+      for (Member member : memberList) {
         DeleteMember deleteMember = DeleteMember.builder()
-            .loginId(user.getLoginId())
-            .userName(user.getUserName())
+            .loginId(member.getLoginId())
+            .userName(member.getUserName())
             .deleteDateTime(nowLocalDateTime)
             .build();
         deleteMemberList.add(deleteMember);
       }
-      userRepository.deleteAllByUserStatusAndUpdateDateTimeLessThan(USER_STATUS_WITHDRAW, nowLocalDateTime.minusYears(2));
+      memberRepository.deleteAllByMemberStatusAndUpdateDateTimeLessThan(USER_STATUS_WITHDRAW, nowLocalDateTime.minusYears(2));
       deleteUserRepository.saveAll(deleteMemberList);
       log.info("[현재 날짜와 시간] -> {} 지금 시간으로부터 탈퇴한지 2년이상 초과된 사용자들 총 {}명이 삭제되었습니다.", nowLocalDateTime, deleteMemberList.size());
     }
