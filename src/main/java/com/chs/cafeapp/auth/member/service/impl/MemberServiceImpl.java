@@ -17,7 +17,7 @@ public class MemberServiceImpl implements MemberService {
   @Override
   public void updateLastLoginDateTime(String loginId, LocalDateTime localDateTime) {
     Member member = memberRepository.findByLoginId(loginId)
-        .orElseThrow(() -> new CustomException(ErrorCode.NOT_EXISTS_MEMBER_LOGIN_ID));
+        .orElseThrow(() -> new CustomException(ErrorCode.NOT_EXISTS_LOGIN_ID));
 
     member.setLastLoginDateTime(localDateTime);
     memberRepository.save(member);
