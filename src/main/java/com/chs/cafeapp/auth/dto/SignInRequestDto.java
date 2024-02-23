@@ -1,4 +1,4 @@
-package com.chs.cafeapp.auth.member.dto;
+package com.chs.cafeapp.auth.dto;
 
 import javax.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;

@@ -1,4 +1,4 @@
-package com.chs.cafeapp.auth.member.dto;
+package com.chs.cafeapp.auth.dto;
 
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;

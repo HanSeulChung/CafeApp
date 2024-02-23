@@ -1,13 +1,11 @@
 package com.chs.cafeapp.auth.service;
 
-import com.chs.cafeapp.auth.dto.LogOutResponse;
 import com.chs.cafeapp.auth.dto.PasswordEditInput;
 import com.chs.cafeapp.auth.dto.PasswordEditResponse;
-import com.chs.cafeapp.auth.token.dto.TokenRequestDto;
 import com.chs.cafeapp.auth.token.dto.TokenResponseDto;
-import com.chs.cafeapp.auth.member.dto.SignInRequestDto;
+import com.chs.cafeapp.auth.dto.SignInRequestDto;
 import com.chs.cafeapp.auth.member.dto.SignUpRequestDto;
-import com.chs.cafeapp.auth.member.dto.AuthResponseDto;
+import com.chs.cafeapp.auth.dto.AuthResponseDto;
 
 public interface AuthService {
 
