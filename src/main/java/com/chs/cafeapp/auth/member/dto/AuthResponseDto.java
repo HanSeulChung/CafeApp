@@ -8,9 +8,8 @@ import lombok.Getter;
 @Getter
 @Builder
 @AllArgsConstructor
-public class MemberResponseDto {
+public class AuthResponseDto {
   private String loginId;
-  private String nickName;
   private LocalDateTime createDateTime;
   private String message;
   public void setMessage(String message) {

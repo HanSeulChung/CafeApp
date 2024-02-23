@@ -13,5 +13,5 @@ public interface MemberService {
   /**
    * User 찾기
    */
-  Member getUserById(String loginId);
+  Member getMemberById(String loginId);
 }

@@ -3,6 +3,7 @@ package com.chs.cafeapp.config.security;
 import com.chs.cafeapp.auth.component.TokenPrepareList;
 import com.chs.cafeapp.security.JwtAccessDeniedHandler;
 import com.chs.cafeapp.security.JwtAuthenticationEntryPoint;
+import com.chs.cafeapp.security.JwtAuthenticationFilter;
 import com.chs.cafeapp.security.TokenProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -42,19 +43,22 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             "/webjars/**",
             "/menus/**",
             "/h2-console/**",
-            "/auth"
+            "auth/members/sign-up",
+            "auth/members/sign-in",
+            "auth/members/email-auth"
     };
 
     private static final String[] AUTH_ADMINLIST = {
-        "/admin/**"
+        "auth/admins/passwords"
     };
 
-    private static final String[] AUTH_USERLIST = {
+    private static final String[] AUTH_MEMBERLIST = {
         "/orders/**",
         "/carts/**",
         "/stamps/**",
         "/coupons/**",
-        "/user/**"
+        "auth/members/passwords",
+        "auth/members/logout"
     };
     @Override
     public void configure(WebSecurity web) throws Exception {
@@ -64,7 +68,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
-            .addFilterBefore(corsFilter, UsernamePasswordAuthenticationFilter.class)
+            .addFilterBefore(new JwtAuthenticationFilter(tokenProvider, tokenPrepareList), UsernamePasswordAuthenticationFilter.class)
             .httpBasic().disable()
             .csrf().disable()
             .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
@@ -76,7 +80,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .authorizeRequests()
             .antMatchers(AUTH_WHITELIST).permitAll()
             .antMatchers(AUTH_ADMINLIST).hasAuthority("ROLE_ADMIN")
-            .antMatchers(AUTH_USERLIST).hasAuthority("ROLE_USER")
+            .antMatchers(AUTH_MEMBERLIST).hasAuthority("ROLE_USER")
             .and()
             .apply(new JwtSecurityConfig(tokenProvider, tokenPrepareList));
     }
