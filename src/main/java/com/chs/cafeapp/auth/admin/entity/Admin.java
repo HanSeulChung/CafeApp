@@ -1,6 +1,7 @@
 package com.chs.cafeapp.auth.admin.entity;
 
 
+import com.chs.cafeapp.auth.type.UserSex;
 import com.chs.cafeapp.auth.type.UserStatus;
 import com.chs.cafeapp.auth.type.Authority;
 import com.chs.cafeapp.base.BaseEntity;
@@ -38,7 +39,11 @@ public class Admin extends BaseEntity implements UserDetails {
   private String loginId; // 이메일
   @Setter
   private String password;
-  private String userName;
+  private String name;
+
+  @Enumerated(EnumType.STRING)
+  private UserSex sex;
+
   @Setter
   @Enumerated(EnumType.STRING)
   private UserStatus adminStatus; //이용 가능한상태, 정지상태

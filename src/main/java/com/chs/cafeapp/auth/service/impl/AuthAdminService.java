@@ -83,8 +83,9 @@ public class AuthAdminService implements AuthService {
     Admin admin = Admin.builder()
         .loginId(adminSignUpRequestDto.getUsername())
         .password(encPassword)
-        .userName(adminSignUpRequestDto.getName())
+        .name(adminSignUpRequestDto.getName())
         .adminStatus(USER_STATUS_REQ)
+        .sex(adminSignUpRequestDto.getSex())
         .authority(ROLE_YET_ADMIN)
         .build();
 
