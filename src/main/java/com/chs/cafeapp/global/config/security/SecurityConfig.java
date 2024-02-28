@@ -43,16 +43,18 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             "/webjars/**",
             "/menus/**",
             "/h2-console/**",
-            "auth/members/sign-up",
-            "auth/members/sign-in",
-            "auth/members/email-auth",
-            "auth/admins/sign-up",
-            "auth/admins/sign-in",
-            "auth/admins/email-auth"
+            "/auth/members/sign-up",
+            "/auth/members/sign-in",
+            "/auth/members/email-auth",
+            "/auth/admins/sign-up",
+            "/auth/admins/sign-in",
+            "/auth/admins/email-auth"
     };
 
     private static final String[] AUTH_ADMINLIST = {
-        "auth/admins/passwords"
+        "/auth/admins/passwords",
+        "/auth/admins/logout",
+        "/admins/**"
     };
 
     private static final String[] AUTH_MEMBERLIST = {
@@ -60,10 +62,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         "/carts/**",
         "/stamps/**",
         "/coupons/**",
-        "auth/members/passwords",
-        "auth/members/logout",
-        "auth/admins/passwords",
-        "auth/admins/logout"
+        "/auth/members/passwords",
+        "/auth/members/logout"
     };
     @Override
     public void configure(WebSecurity web) throws Exception {
