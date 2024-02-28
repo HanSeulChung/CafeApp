@@ -5,11 +5,11 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
-import com.chs.cafeapp.coupon.service.impl.CouponServiceImpl;
-import com.chs.cafeapp.stamp.dto.StampDto;
-import com.chs.cafeapp.stamp.entity.Stamp;
-import com.chs.cafeapp.stamp.repository.StampRepository;
-import com.chs.cafeapp.stamp.service.impl.StampServiceImpl;
+import com.chs.cafeapp.domain.coupon.service.impl.CouponServiceImpl;
+import com.chs.cafeapp.domain.stamp.dto.StampDto;
+import com.chs.cafeapp.domain.stamp.entity.Stamp;
+import com.chs.cafeapp.domain.stamp.repository.StampRepository;
+import com.chs.cafeapp.domain.stamp.service.impl.StampServiceImpl;
 import com.chs.cafeapp.auth.member.entity.Member;
 import com.chs.cafeapp.auth.member.repository.MemberRepository;
 import java.util.Optional;
@@ -43,7 +43,7 @@ class StampServiceImplTest {
     Stamp stamp = Stamp.builder()
         .id(1L)
         .stampNumbers(8)
-        .user(user)
+        .member(user)
         .build();
     user.setStamp(stamp);
 

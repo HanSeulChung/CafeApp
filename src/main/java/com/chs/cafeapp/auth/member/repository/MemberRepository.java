@@ -1,7 +1,7 @@
 package com.chs.cafeapp.auth.member.repository;
 
 import com.chs.cafeapp.auth.member.entity.Member;
-import com.chs.cafeapp.auth.member.type.MemberStatus;
+import com.chs.cafeapp.auth.type.UserStatus;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -15,15 +15,14 @@ import org.springframework.transaction.annotation.Transactional;
 @Repository
 public interface MemberRepository extends JpaRepository<Member, Long> {
   Optional<Member> findByLoginId(String loginId);
-  Optional<Member> findByEmailAuthKey(String uuid);
   boolean existsByLoginId(String loginId);
   boolean existsByNickName(String nickName);
-  List<Member> findAllByMemberStatusAndUpdateDateTimeLessThan(MemberStatus userStatus, LocalDateTime nowLocalDateTime);
+  List<Member> findAllByMemberStatusAndUpdateDateTimeLessThan(UserStatus userStatus, LocalDateTime nowLocalDateTime);
 
   @Transactional
-  void deleteAllByMemberStatusAndUpdateDateTimeLessThan(MemberStatus userStatus, LocalDateTime nowLocalDateTime);
+  void deleteAllByMemberStatusAndUpdateDateTimeLessThan(UserStatus userStatus, LocalDateTime nowLocalDateTime);
 
   @Modifying
-  @Query("UPDATE Member u SET u.memberStatus = 'MEMBER_STATUS_STOP' WHERE u.lastLoginDateTime < :cutoffDateTime")
+  @Query("UPDATE Member u SET u.memberStatus = 'USER_STATUS_STOP' WHERE u.lastLoginDateTime < :cutoffDateTime")
   void updateUserStatusForOldLogins(@Param("cutoffDateTime") LocalDateTime cutoffDateTime);
 }

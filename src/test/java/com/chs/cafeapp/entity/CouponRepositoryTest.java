@@ -3,8 +3,8 @@ package com.chs.cafeapp.entity;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import com.chs.cafeapp.coupon.entity.Coupon;
-import com.chs.cafeapp.coupon.repository.CouponRepository;
+import com.chs.cafeapp.domain.coupon.entity.Coupon;
+import com.chs.cafeapp.domain.coupon.repository.CouponRepository;
 import com.chs.cafeapp.auth.member.entity.Member;
 import java.util.Arrays;
 import java.util.List;

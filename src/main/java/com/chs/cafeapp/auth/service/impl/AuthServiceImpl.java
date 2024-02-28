@@ -1,10 +1,10 @@
 package com.chs.cafeapp.auth.service.impl;
 
-import static com.chs.cafeapp.exception.type.ErrorCode.INVALID_ACCESS_TOKEN;
-import static com.chs.cafeapp.exception.type.ErrorCode.LOGOUT_MEMBER;
-import static com.chs.cafeapp.exception.type.ErrorCode.NOT_EXISTS_LOGIN_ID;
-import static com.chs.cafeapp.exception.type.ErrorCode.NOT_MATCH_REFRESH_TOKEN_MEMBER;
-import static com.chs.cafeapp.exception.type.ErrorCode.NOT_VALID_REFRESH_TOKEN;
+import static com.chs.cafeapp.global.exception.type.ErrorCode.INVALID_ACCESS_TOKEN;
+import static com.chs.cafeapp.global.exception.type.ErrorCode.LOGOUT_MEMBER;
+import static com.chs.cafeapp.global.exception.type.ErrorCode.NOT_EXISTS_LOGIN_ID;
+import static com.chs.cafeapp.global.exception.type.ErrorCode.NOT_MATCH_REFRESH_TOKEN_MEMBER;
+import static com.chs.cafeapp.global.exception.type.ErrorCode.NOT_VALID_REFRESH_TOKEN;
 
 import com.chs.cafeapp.auth.admin.entity.Admin;
 import com.chs.cafeapp.auth.admin.repository.AdminRepository;
@@ -18,8 +18,8 @@ import com.chs.cafeapp.auth.token.dto.TokenRequestDto;
 import com.chs.cafeapp.auth.token.dto.TokenResponseDto;
 import com.chs.cafeapp.auth.token.entity.RefreshToken;
 import com.chs.cafeapp.auth.token.repository.RefreshTokenRepository;
-import com.chs.cafeapp.exception.CustomException;
-import com.chs.cafeapp.security.TokenProvider;
+import com.chs.cafeapp.global.exception.CustomException;
+import com.chs.cafeapp.global.security.TokenProvider;
 import java.util.Collections;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
@@ -113,7 +113,7 @@ public class AuthServiceImpl implements AuthTokenService, UserDetailsService  {
     GrantedAuthority grantedAuthority = new SimpleGrantedAuthority(
         admin.getAuthority().toString());
 
-    return new org.springframework.security.core.userdetails.User(
+    return new User(
         admin.getLoginId(),
         admin.getPassword(),
         Collections.singleton(grantedAuthority)

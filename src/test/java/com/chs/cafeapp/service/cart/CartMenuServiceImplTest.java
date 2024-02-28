@@ -5,15 +5,15 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
-import com.chs.cafeapp.auth.member.type.MemberSex;
-import com.chs.cafeapp.cart.dto.CartMenuChangeQuantity;
-import com.chs.cafeapp.cart.entity.Cart;
-import com.chs.cafeapp.cart.entity.CartMenu;
-import com.chs.cafeapp.cart.repository.CartMenusRepository;
-import com.chs.cafeapp.cart.repository.CartRepository;
-import com.chs.cafeapp.cart.service.impl.CartMenuServiceImpl;
-import com.chs.cafeapp.menu.entity.Menus;
-import com.chs.cafeapp.menu.repository.MenuRepository;
+import com.chs.cafeapp.auth.type.UserSex;
+import com.chs.cafeapp.domain.cart.dto.CartMenuChangeQuantity;
+import com.chs.cafeapp.domain.cart.entity.Cart;
+import com.chs.cafeapp.domain.cart.entity.CartMenu;
+import com.chs.cafeapp.domain.cart.repository.CartMenusRepository;
+import com.chs.cafeapp.domain.cart.repository.CartRepository;
+import com.chs.cafeapp.domain.cart.service.impl.CartMenuServiceImpl;
+import com.chs.cafeapp.domain.menu.entity.Menus;
+import com.chs.cafeapp.domain.menu.repository.MenuRepository;
 import com.chs.cafeapp.auth.member.entity.Member;
 import com.chs.cafeapp.auth.member.repository.MemberRepository;
 import java.util.Optional;
@@ -49,9 +49,9 @@ class CartMenuServiceImplTest {
         .id(4L)
         .loginId("user2@naver.com")
         .password("user2비밀번호")
-        .userName("user2 이름")
+        .name("user2 이름")
         .nickName("user2 닉네임")
-        .sex(MemberSex.MALE)
+        .sex(UserSex.MALE)
         .age(32)
         .build();
 
@@ -114,9 +114,9 @@ class CartMenuServiceImplTest {
         .id(4L)
         .loginId("user2@naver.com")
         .password("user2비밀번호")
-        .userName("user2 이름")
+        .name("user2 이름")
         .nickName("user2 닉네임")
-        .sex(MemberSex.MALE)
+        .sex(UserSex.MALE)
         .age(32)
         .build();
 
@@ -181,9 +181,9 @@ class CartMenuServiceImplTest {
         .id(4L)
         .loginId("user2@naver.com")
         .password("user2비밀번호")
-        .userName("user2 이름")
+        .name("user2 이름")
         .nickName("user2 닉네임")
-        .sex(MemberSex.MALE)
+        .sex(UserSex.MALE)
         .age(32)
         .build();
 
@@ -231,9 +231,9 @@ class CartMenuServiceImplTest {
         .id(4L)
         .loginId("user2@naver.com")
         .password("user2비밀번호")
-        .userName("user2 이름")
+        .name("user2 이름")
         .nickName("user2 닉네임")
-        .sex(MemberSex.MALE)
+        .sex(UserSex.MALE)
         .age(32)
         .build();
 

@@ -24,7 +24,7 @@ public class DeleteMember {
 
   @Column(unique = true)
   private String loginId; // 이메일
-  private String userName;
+  private String name;
 
   private LocalDateTime deleteDateTime;
 

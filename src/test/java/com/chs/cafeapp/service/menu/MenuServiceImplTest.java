@@ -2,17 +2,15 @@ package com.chs.cafeapp.service.menu;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 
-import com.chs.cafeapp.menu.category.entity.Category;
-import com.chs.cafeapp.menu.dto.MenuChangeStockQuantity;
-import com.chs.cafeapp.menu.dto.MenuDto;
-import com.chs.cafeapp.menu.entity.Menus;
-import com.chs.cafeapp.menu.repository.MenuRepository;
-import com.chs.cafeapp.menu.service.impl.MenuServiceImpl;
+import com.chs.cafeapp.domain.menu.category.entity.Category;
+import com.chs.cafeapp.domain.menu.dto.MenuChangeStockQuantity;
+import com.chs.cafeapp.domain.menu.dto.MenuDto;
+import com.chs.cafeapp.domain.menu.entity.Menus;
+import com.chs.cafeapp.domain.menu.repository.MenuRepository;
+import com.chs.cafeapp.domain.menu.service.impl.MenuServiceImpl;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

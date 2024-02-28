@@ -7,12 +7,12 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
-import com.chs.cafeapp.coupon.dto.CouponDto;
-import com.chs.cafeapp.coupon.dto.CouponResponse;
-import com.chs.cafeapp.coupon.entity.Coupon;
-import com.chs.cafeapp.coupon.repository.CouponRepository;
-import com.chs.cafeapp.coupon.service.impl.CouponServiceImpl;
-import com.chs.cafeapp.stamp.entity.Stamp;
+import com.chs.cafeapp.domain.coupon.dto.CouponDto;
+import com.chs.cafeapp.domain.coupon.dto.CouponResponse;
+import com.chs.cafeapp.domain.coupon.entity.Coupon;
+import com.chs.cafeapp.domain.coupon.repository.CouponRepository;
+import com.chs.cafeapp.domain.coupon.service.impl.CouponServiceImpl;
+import com.chs.cafeapp.domain.stamp.entity.Stamp;
 import com.chs.cafeapp.auth.member.entity.Member;
 import com.chs.cafeapp.auth.member.repository.MemberRepository;
 import java.time.LocalDateTime;
@@ -154,13 +154,13 @@ class CouponServiceImplTest {
     Stamp stamp = Stamp.builder()
         .id(1L)
         .stampNumbers(8)
-        .user(user3)
+        .member(user3)
         .build();
 
     LocalDateTime expirationDateTime = LocalDateTime.now().plusMonths(2);
     Coupon coupon = Coupon.builder()
         .id(100L)
-        .user(user3)
+        .member(user3)
         .price(4100)
         .expirationDateTime(expirationDateTime)
         .build();

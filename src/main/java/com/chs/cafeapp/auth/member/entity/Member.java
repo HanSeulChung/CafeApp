@@ -1,14 +1,15 @@
 package com.chs.cafeapp.auth.member.entity;
 
+import com.chs.cafeapp.auth.type.UserSex;
+import com.chs.cafeapp.auth.type.UserStatus;
 import com.chs.cafeapp.auth.type.Authority;
-import com.chs.cafeapp.auth.member.type.MemberSex;
-import com.chs.cafeapp.auth.member.type.MemberStatus;
 import com.chs.cafeapp.base.BaseEntity;
-import com.chs.cafeapp.cart.entity.Cart;
-import com.chs.cafeapp.coupon.entity.Coupon;
-import com.chs.cafeapp.stamp.entity.Stamp;
+import com.chs.cafeapp.domain.cart.entity.Cart;
+import com.chs.cafeapp.domain.coupon.entity.Coupon;
+import com.chs.cafeapp.domain.stamp.entity.Stamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -24,53 +25,45 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.ToString;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 @Entity
 @Builder
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Member extends BaseEntity {
+public class Member extends BaseEntity implements UserDetails {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
     @Column(unique = true)
     private String loginId; // 이메일
+
+    @Setter
     private String password;
-    private String userName;
+    private String name;
 
     @Column(unique = true)
     private String nickName;
     private int age;
-    private String emailAuthKey;
 
     @Enumerated(EnumType.STRING)
-    private MemberSex sex;
+    private UserSex sex;
+
+    @Setter
     @Enumerated(EnumType.STRING)
-    private MemberStatus memberStatus; //이용 가능한상태, 정지상태
+    private UserStatus memberStatus; //이용 가능한상태, 정지상태
+
+    @Setter
     @Enumerated(EnumType.STRING)
     private Authority authority; // 사용자는 ROLE_USER
 
+    @Setter
     private LocalDateTime lastLoginDateTime;
-
-    public void changePassword(String newPassword) {
-        this.password = newPassword;
-    }
-    public void setMemberStatus(MemberStatus memberStatus) {
-        this.memberStatus = memberStatus;
-    }
-
-    public void setAuthority(Authority authority) {
-        this.authority = authority;
-    }
-
-    public void setLastLoginDateTime(LocalDateTime lastLoginDateTime) {
-        this.lastLoginDateTime = lastLoginDateTime;
-    }
-    public void setUpdateDateTime() {
-        super.setUpdateDateTime();
-    }
 
     @OneToOne(cascade = CascadeType.ALL, mappedBy = "member")
     @ToString.Exclude
@@ -94,5 +87,37 @@ public class Member extends BaseEntity {
             this.coupons = new ArrayList<>();
         }
         this.coupons.add(coupon);
+    }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        Collection<GrantedAuthority> authority = new ArrayList<>();
+        authority.add(new SimpleGrantedAuthority(this.authority.toString()));
+        return authority;
+    }
+
+    @Override
+    public String getUsername() {
+        return this.loginId;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
     }
 }
