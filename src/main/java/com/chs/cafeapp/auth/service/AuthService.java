@@ -1,18 +1,12 @@
 package com.chs.cafeapp.auth.service;
 
+import com.chs.cafeapp.auth.dto.AuthResponseDto;
 import com.chs.cafeapp.auth.dto.PasswordEditInput;
 import com.chs.cafeapp.auth.dto.PasswordEditResponse;
-import com.chs.cafeapp.auth.token.dto.TokenResponseDto;
 import com.chs.cafeapp.auth.dto.SignInRequestDto;
-import com.chs.cafeapp.auth.member.dto.SignUpRequestDto;
-import com.chs.cafeapp.auth.dto.AuthResponseDto;
+import com.chs.cafeapp.auth.token.dto.TokenResponseDto;
 
 public interface AuthService {
-
-  /**
-   * 일반 회원가입
-   */
-  AuthResponseDto signUp(SignUpRequestDto signUpRequestDto);
 
   /**
    * 로그인
@@ -20,13 +14,9 @@ public interface AuthService {
   TokenResponseDto signIn(SignInRequestDto signInRequestDto);
 
   /**
-   * 소셜 로그인 및 회원가입
-   */
-
-  /**
    * 메일 인증
    */
-  AuthResponseDto emailAuth(String uuid);
+  AuthResponseDto emailAuth(String email, String certifiedNumber);
 
   /**
    * 비밀번호 변경
