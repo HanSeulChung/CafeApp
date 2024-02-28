@@ -2,12 +2,14 @@ package com.chs.cafeapp.auth.controller;
 
 import com.chs.cafeapp.auth.dto.PasswordEditInput;
 import com.chs.cafeapp.auth.dto.PasswordEditResponse;
+import com.chs.cafeapp.auth.member.dto.MemberSignUpRequestDto;
 import com.chs.cafeapp.auth.service.impl.AuthMemberService;
-import com.chs.cafeapp.exception.CustomException;
+import com.chs.cafeapp.global.exception.CustomException;
 import com.chs.cafeapp.auth.token.dto.TokenResponseDto;
-import com.chs.cafeapp.auth.member.dto.SignUpRequestDto;
 import com.chs.cafeapp.auth.dto.SignInRequestDto;
 import com.chs.cafeapp.auth.dto.AuthResponseDto;
+import java.security.NoSuchAlgorithmException;
+import javax.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,13 +28,13 @@ public class AuthMemberController {
 
   /**
    * 일반 회원가입 Controller
-   * @param signUpRequestDto: 일반 회원가입 입력 값
+   * @param memberSignUpRequestDto: 일반 회원가입 입력 값
    * @exception CustomException: 이미 존재하는 아이디, 닉네임일 경우, repassword와 password값이 다를 경우
    * @return UserResponseDto: 아이디, 생성 날짜, 가입 축하 멘트
    */
   @PostMapping("/sign-up")
-  public ResponseEntity<AuthResponseDto> signUp(@RequestBody SignUpRequestDto signUpRequestDto) {
-    return ResponseEntity.ok(authService.signUp(signUpRequestDto));
+  public ResponseEntity<AuthResponseDto> signUp(@RequestBody MemberSignUpRequestDto memberSignUpRequestDto) throws MessagingException, NoSuchAlgorithmException {
+    return ResponseEntity.ok(authService.signUp(memberSignUpRequestDto));
   }
 
   /**
@@ -68,7 +70,8 @@ public class AuthMemberController {
    * @return 해당 링크 페이지에서 json 형태로 UserResponse 값
    */
   @GetMapping("/email-auth")
-  public ResponseEntity<AuthResponseDto> emailAuth(@RequestParam String id) {
-    return ResponseEntity.ok(authService.emailAuth(id));
+  public ResponseEntity<AuthResponseDto> emailAuth(@RequestParam String id,
+                                                    @RequestParam String certifiedNumber) throws MessagingException{
+    return ResponseEntity.ok(authService.emailAuth(id, certifiedNumber));
   }
 }

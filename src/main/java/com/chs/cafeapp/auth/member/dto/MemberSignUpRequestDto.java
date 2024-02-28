@@ -1,5 +1,6 @@
 package com.chs.cafeapp.auth.member.dto;
 
+import com.chs.cafeapp.auth.type.UserSex;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -9,7 +10,7 @@ import lombok.Getter;
 @Getter
 @Builder
 @AllArgsConstructor
-public class SignUpRequestDto {
+public class MemberSignUpRequestDto {
   @NotBlank
   private String username; //loginId
   @NotBlank
@@ -23,6 +24,5 @@ public class SignUpRequestDto {
   @NotNull
   private int age;
   @NotNull
-  private int sex; // 0이면 MALE, 1이면 FEMALE
-
+  private UserSex sex;
 }
