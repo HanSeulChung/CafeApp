@@ -4,7 +4,7 @@ import com.chs.cafeapp.auth.dto.LogOutResponse;
 import com.chs.cafeapp.auth.service.impl.AuthServiceImpl;
 import com.chs.cafeapp.auth.token.dto.TokenRequestDto;
 import com.chs.cafeapp.auth.token.dto.TokenResponseDto;
-import com.chs.cafeapp.exception.CustomException;
+import com.chs.cafeapp.global.exception.CustomException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;

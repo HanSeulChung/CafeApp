@@ -1,15 +1,13 @@
 package com.chs.cafeapp.base;
 
+import java.time.LocalDateTime;
 import javax.persistence.Column;
-import lombok.Getter;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedBy;
-import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
 import javax.persistence.EntityListeners;
 import javax.persistence.MappedSuperclass;
-import java.time.LocalDateTime;
+import lombok.Getter;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Getter
 @EntityListeners(AuditingEntityListener.class)
@@ -21,8 +19,4 @@ public abstract class BaseEntity {
 
     @LastModifiedDate
     private LocalDateTime updateDateTime;
-
-    protected void setUpdateDateTime() {
-        this.updateDateTime = LocalDateTime.now();
-    }
 }
