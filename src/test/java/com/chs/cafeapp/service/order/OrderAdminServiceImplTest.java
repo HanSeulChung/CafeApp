@@ -1,6 +1,6 @@
 package com.chs.cafeapp.service.order;
 
-import static com.chs.cafeapp.order.type.OrderStatus.CancelByCafe;
+import static com.chs.cafeapp.domain.order.type.OrderStatus.CancelByCafe;
 import static org.hibernate.validator.internal.util.Contracts.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -11,28 +11,28 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.chs.cafeapp.auth.member.type.MemberSex;
-import com.chs.cafeapp.cart.entity.Cart;
-import com.chs.cafeapp.cart.entity.CartMenu;
-import com.chs.cafeapp.cart.repository.CartMenusRepository;
-import com.chs.cafeapp.cart.repository.CartRepository;
-import com.chs.cafeapp.cart.service.impl.CartMenuServiceImpl;
-import com.chs.cafeapp.menu.category.entity.Category;
-import com.chs.cafeapp.menu.entity.Menus;
-import com.chs.cafeapp.menu.repository.MenuRepository;
-import com.chs.cafeapp.order.dto.OrderAllFromCartInput;
-import com.chs.cafeapp.order.dto.OrderDto;
-import com.chs.cafeapp.order.dto.OrderFromCartInput;
-import com.chs.cafeapp.order.dto.OrderInput;
-import com.chs.cafeapp.order.entity.Order;
-import com.chs.cafeapp.order.entity.OrderedMenu;
-import com.chs.cafeapp.order.repository.OrderRepository;
-import com.chs.cafeapp.order.repository.OrderedMenuRepository;
-import com.chs.cafeapp.order.service.impl.OrderAdminServiceImpl;
-import com.chs.cafeapp.order.service.impl.OrderMemberServiceImpl;
-import com.chs.cafeapp.order.service.validation.ValidationCheck;
-import com.chs.cafeapp.order.type.OrderStatus;
-import com.chs.cafeapp.stamp.service.impl.StampServiceImpl;
+import com.chs.cafeapp.auth.type.UserSex;
+import com.chs.cafeapp.domain.cart.entity.Cart;
+import com.chs.cafeapp.domain.cart.entity.CartMenu;
+import com.chs.cafeapp.domain.cart.repository.CartMenusRepository;
+import com.chs.cafeapp.domain.cart.repository.CartRepository;
+import com.chs.cafeapp.domain.cart.service.impl.CartMenuServiceImpl;
+import com.chs.cafeapp.domain.menu.category.entity.Category;
+import com.chs.cafeapp.domain.menu.entity.Menus;
+import com.chs.cafeapp.domain.menu.repository.MenuRepository;
+import com.chs.cafeapp.domain.order.dto.OrderAllFromCartInput;
+import com.chs.cafeapp.domain.order.dto.OrderDto;
+import com.chs.cafeapp.domain.order.dto.OrderFromCartInput;
+import com.chs.cafeapp.domain.order.dto.OrderInput;
+import com.chs.cafeapp.domain.order.entity.Order;
+import com.chs.cafeapp.domain.order.entity.OrderedMenu;
+import com.chs.cafeapp.domain.order.repository.OrderRepository;
+import com.chs.cafeapp.domain.order.repository.OrderedMenuRepository;
+import com.chs.cafeapp.domain.order.service.impl.OrderAdminServiceImpl;
+import com.chs.cafeapp.domain.order.service.impl.OrderMemberServiceImpl;
+import com.chs.cafeapp.domain.order.service.validation.ValidationCheck;
+import com.chs.cafeapp.domain.order.type.OrderStatus;
+import com.chs.cafeapp.domain.stamp.service.impl.StampServiceImpl;
 import com.chs.cafeapp.auth.member.entity.Member;
 import com.chs.cafeapp.auth.member.repository.MemberRepository;
 import java.util.Arrays;
@@ -93,9 +93,9 @@ class OrderAdminServiceImplTest {
         .id(4L)
         .loginId("user2@naver.com")
         .password("user2비밀번호")
-        .userName("user2 이름")
+        .name("user2 이름")
         .nickName("user2 닉네임")
-        .sex(MemberSex.MALE)
+        .sex(UserSex.MALE)
         .age(32)
         .build();
 
@@ -170,7 +170,7 @@ class OrderAdminServiceImplTest {
     Cart cart = Cart.builder()
         .id(1L)
         .cartMenu(Arrays.asList(cartMenu1, cartMenu2)) // Set cartMenu list
-        .user(user)
+        .member(user)
         .build();
 
     Order order = Order.builder()
@@ -258,7 +258,7 @@ class OrderAdminServiceImplTest {
     Cart cart = Cart.builder()
         .id(1L)
         .cartMenu(Arrays.asList(cartMenu1, cartMenu2, cartMenu3))
-        .user(user)
+        .member(user)
         .build();
 
     Order order = Order.builder()

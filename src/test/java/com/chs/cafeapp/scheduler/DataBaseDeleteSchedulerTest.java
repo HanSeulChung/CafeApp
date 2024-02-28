@@ -2,11 +2,12 @@ package com.chs.cafeapp.scheduler;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.chs.cafeapp.coupon.entity.Coupon;
-import com.chs.cafeapp.coupon.repository.CouponRepository;
-import com.chs.cafeapp.order.entity.Order;
-import com.chs.cafeapp.order.repository.OrderRepository;
-import com.chs.cafeapp.order.type.OrderStatus;
+import com.chs.cafeapp.domain.coupon.entity.Coupon;
+import com.chs.cafeapp.domain.coupon.repository.CouponRepository;
+import com.chs.cafeapp.global.scheduler.DataBaseDeleteScheduler;
+import com.chs.cafeapp.domain.order.entity.Order;
+import com.chs.cafeapp.domain.order.repository.OrderRepository;
+import com.chs.cafeapp.domain.order.type.OrderStatus;
 import com.chs.cafeapp.auth.member.entity.Member;
 import com.chs.cafeapp.auth.member.repository.MemberRepository;
 import java.time.Clock;
@@ -68,7 +69,7 @@ class DataBaseDeleteSchedulerTest {
 
     Member user = Member.builder()
         .id(2L)
-        .userName("신생사용자 이름")
+        .name("신생사용자 이름")
         .build();
 
     em.merge(user);

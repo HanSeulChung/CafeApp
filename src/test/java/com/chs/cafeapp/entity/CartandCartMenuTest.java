@@ -4,13 +4,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-import com.chs.cafeapp.auth.member.type.MemberSex;
-import com.chs.cafeapp.cart.entity.Cart;
-import com.chs.cafeapp.cart.entity.CartMenu;
-import com.chs.cafeapp.cart.repository.CartMenusRepository;
-import com.chs.cafeapp.cart.repository.CartRepository;
-import com.chs.cafeapp.menu.entity.Menus;
-import com.chs.cafeapp.menu.repository.MenuRepository;
+import com.chs.cafeapp.auth.type.UserSex;
+import com.chs.cafeapp.domain.cart.entity.Cart;
+import com.chs.cafeapp.domain.cart.entity.CartMenu;
+import com.chs.cafeapp.domain.cart.repository.CartMenusRepository;
+import com.chs.cafeapp.domain.cart.repository.CartRepository;
+import com.chs.cafeapp.domain.menu.entity.Menus;
+import com.chs.cafeapp.domain.menu.repository.MenuRepository;
 import com.chs.cafeapp.auth.member.entity.Member;
 import com.chs.cafeapp.auth.member.repository.MemberRepository;
 import java.util.List;
@@ -81,9 +81,9 @@ public class CartandCartMenuTest {
         .id(1L)
         .loginId("user2@naver.com")
         .password("user2비밀번호")
-        .userName("user2 이름")
+        .name("user2 이름")
         .nickName("user2 닉네임")
-        .sex(MemberSex.MALE)
+        .sex(UserSex.MALE)
         .age(32)
         .build();
 

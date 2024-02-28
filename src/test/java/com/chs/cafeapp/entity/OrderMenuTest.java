@@ -3,17 +3,16 @@ package com.chs.cafeapp.entity;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import com.chs.cafeapp.menu.category.entity.Category;
-import com.chs.cafeapp.menu.entity.Menus;
-import com.chs.cafeapp.menu.repository.MenuRepository;
-import com.chs.cafeapp.order.entity.Order;
-import com.chs.cafeapp.order.entity.OrderedMenu;
-import com.chs.cafeapp.order.repository.OrderRepository;
-import com.chs.cafeapp.order.repository.OrderedMenuRepository;
-import com.chs.cafeapp.order.type.OrderStatus;
+import com.chs.cafeapp.domain.menu.category.entity.Category;
+import com.chs.cafeapp.domain.menu.entity.Menus;
+import com.chs.cafeapp.domain.menu.repository.MenuRepository;
+import com.chs.cafeapp.domain.order.entity.Order;
+import com.chs.cafeapp.domain.order.entity.OrderedMenu;
+import com.chs.cafeapp.domain.order.repository.OrderRepository;
+import com.chs.cafeapp.domain.order.repository.OrderedMenuRepository;
+import com.chs.cafeapp.domain.order.type.OrderStatus;
 import java.util.Arrays;
 import javax.persistence.EntityManager;
-import org.aspectj.weaver.ast.Or;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
