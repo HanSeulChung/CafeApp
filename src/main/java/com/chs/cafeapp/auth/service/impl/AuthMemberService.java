@@ -20,8 +20,6 @@ import static com.chs.cafeapp.global.mail.MailConstant.MAIL_CERTIFICATION_GUIDE;
 import static com.chs.cafeapp.global.mail.MailConstant.MAIL_CERTIFICATION_SUCCESS;
 import static com.chs.cafeapp.global.mail.MailConstant.TO_MEMBER;
 
-import com.chs.cafeapp.auth.component.TokenBlackList;
-import com.chs.cafeapp.auth.component.TokenPrepareList;
 import com.chs.cafeapp.auth.dto.AuthResponseDto;
 import com.chs.cafeapp.auth.dto.PasswordEditInput;
 import com.chs.cafeapp.auth.dto.PasswordEditResponse;
@@ -33,7 +31,6 @@ import com.chs.cafeapp.auth.member.service.MemberService;
 import com.chs.cafeapp.auth.service.AuthService;
 import com.chs.cafeapp.auth.token.dto.TokenDto;
 import com.chs.cafeapp.auth.token.dto.TokenResponseDto;
-import com.chs.cafeapp.auth.token.repository.RefreshTokenRepository;
 import com.chs.cafeapp.global.exception.CustomException;
 import com.chs.cafeapp.global.mail.service.MailSendService;
 import com.chs.cafeapp.global.mail.service.MailVerifyService;
@@ -61,10 +58,6 @@ public class AuthMemberService implements AuthService{
   private final TokenProvider tokenProvider;
   private final MemberRepository memberRepository;
   private final PasswordEncoder passwordEncoder;
-
-  private final TokenBlackList tokenBlackList;
-  private final TokenPrepareList tokenPrepareList;
-  private final RefreshTokenRepository refreshTokenRepository;
   private final AuthenticationManagerBuilder authenticationManagerBuilder;
 
 
@@ -134,11 +127,7 @@ public class AuthMemberService implements AuthService{
     Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
     TokenDto tokenDto = tokenProvider.generateTokenDto(authentication);
 
-    // 프로그램 종료 후 다시 로그인할 때 저장되어있던 것 삭제 후 refresh 저장
-    boolean existsRefreshToken = refreshTokenRepository.existsByKey(signInRequestDto.getUsername());
-    if (existsRefreshToken) {
-      refreshTokenRepository.deleteAllByKey(signInRequestDto.getUsername());
-    }
+
 //    RefreshToken refreshToken = buildRefreshToken(authentication, tokenDto);
 //    refreshTokenRepository.save(refreshToken);
 
@@ -161,15 +150,12 @@ public class AuthMemberService implements AuthService{
     Member member = validationMemberByPasswordEdit(authentication, passwordEditInput.getOriginPassword());
     member.setPassword(passwordEncoder.encode(passwordEditInput.getNewPassword()));
     memberRepository.save(member);
-    refreshTokenRepository.deleteByKey(member.getLoginId());
 
-    String accessToken = tokenPrepareList.getAccessToken(member.getLoginId());
+    String accessToken = null;
     if (accessToken == null) {
       throw new CustomException(NOTING_ACCESS_TOKEN);
     }
 
-    tokenBlackList.addToBlacklist(accessToken);
-    tokenPrepareList.delete(member.getLoginId());
     return new PasswordEditResponse(member.getLoginId(), "비밀번호가 변경되었습니다. 다시 로그인 후 이용해주세요.");
   }
 

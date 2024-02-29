@@ -2,7 +2,6 @@ package com.chs.cafeapp.global.security;
 
 import static com.chs.cafeapp.global.exception.type.ErrorCode.NO_ROLE_TOKEN;
 
-import com.chs.cafeapp.auth.service.AccessTokenValidator;
 import com.chs.cafeapp.auth.token.dto.TokenDto;
 import com.chs.cafeapp.global.exception.CustomException;
 import com.chs.cafeapp.global.exception.type.ErrorCode;
@@ -12,13 +11,13 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.UnsupportedJwtException;
-import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SignatureException;
 import java.security.Key;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -30,8 +29,9 @@ import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class TokenProvider {
-  private final AccessTokenValidator accessTokenValidator;
+
   private static final String AUTHORITIES_KEY = "auth";
   private static final String BEARER_TYPE = "Bearer";
   private static final long  ACCESS_TOKEN_EXPIRE_TIME = 1000 * 60 * 60; // 1 hour
@@ -41,12 +41,7 @@ public class TokenProvider {
 //  private static final long  ACCESS_TOKEN_EXPIRE_TIME = 1000 * 60 * 3; // 3 minute (test)
 //  private static final long  REFRESH_TOKEN_EXPIRE_TIME = 1000 * 60 * 15;  //  15 minute (test)
 
-  private final Key key;
-
-  public TokenProvider(AccessTokenValidator accessTokenValidator) {
-    this.accessTokenValidator = accessTokenValidator;
-    this.key = Keys.secretKeyFor(SignatureAlgorithm.HS512);
-  }
+  private Key key;
 
   /**
    * 토큰 생성(발급)
@@ -109,10 +104,10 @@ public class TokenProvider {
 
   public boolean validateToken(String token) {
 
-    if (!accessTokenValidator.isValidateToken(token)) {
-      log.info("로그아웃이나 재발급으로 tokenBlackList에 있는 token입니다.");
-      return false;
-    }
+//    if (!accessTokenValidator.isValidateToken(token)) {
+//      log.info("로그아웃이나 재발급으로 tokenBlackList에 있는 token입니다.");
+//      return false;
+//    }
 
     try {
       Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);

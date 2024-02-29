@@ -22,8 +22,6 @@ import com.chs.cafeapp.auth.admin.dto.AdminSignUpRequestDto;
 import com.chs.cafeapp.auth.admin.entity.Admin;
 import com.chs.cafeapp.auth.admin.repository.AdminRepository;
 import com.chs.cafeapp.auth.admin.service.AdminService;
-import com.chs.cafeapp.auth.component.TokenBlackList;
-import com.chs.cafeapp.auth.component.TokenPrepareList;
 import com.chs.cafeapp.auth.dto.AuthResponseDto;
 import com.chs.cafeapp.auth.dto.PasswordEditInput;
 import com.chs.cafeapp.auth.dto.PasswordEditResponse;
@@ -31,7 +29,6 @@ import com.chs.cafeapp.auth.dto.SignInRequestDto;
 import com.chs.cafeapp.auth.service.AuthService;
 import com.chs.cafeapp.auth.token.dto.TokenDto;
 import com.chs.cafeapp.auth.token.dto.TokenResponseDto;
-import com.chs.cafeapp.auth.token.repository.RefreshTokenRepository;
 import com.chs.cafeapp.global.exception.CustomException;
 import com.chs.cafeapp.global.mail.service.MailSendService;
 import com.chs.cafeapp.global.mail.service.MailVerifyService;
@@ -59,11 +56,7 @@ public class AuthAdminService implements AuthService {
   private final AdminRepository adminRepository;
   private final PasswordEncoder passwordEncoder;
   private final TokenProvider tokenProvider;
-  private final TokenBlackList tokenBlackList;
-  private final TokenPrepareList tokenPrepareList;
-  private final RefreshTokenRepository refreshTokenRepository;
   private final AuthenticationManagerBuilder authenticationManagerBuilder;
-
 
   @Transactional
   public AuthResponseDto signUp(AdminSignUpRequestDto adminSignUpRequestDto) throws MessagingException, NoSuchAlgorithmException {
@@ -106,14 +99,6 @@ public class AuthAdminService implements AuthService {
     Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
     TokenDto tokenDto = tokenProvider.generateTokenDto(authentication);
 
-    // 프로그램 종료 후 다시 로그인할 때 저장되어있던 것 삭제 후 refresh 저장
-    boolean existsRefreshToken = refreshTokenRepository.existsByKey(signInRequestDto.getUsername());
-    if (existsRefreshToken) {
-      refreshTokenRepository.deleteAllByKey(signInRequestDto.getUsername());
-    }
-//    RefreshToken refreshToken = buildRefreshToken(authentication, tokenDto);
-//    refreshTokenRepository.save(refreshToken);
-
     adminService.updateLastLoginDateTime(admin.getLoginId(), LocalDateTime.now());
     return new TokenResponseDto(tokenDto.getAccessToken(), tokenDto.getRefreshToken());
   }
@@ -134,15 +119,12 @@ public class AuthAdminService implements AuthService {
     Admin admin = validationAdminByPasswordEdit(authentication, passwordEditInput.getOriginPassword());
     admin.setPassword(passwordEncoder.encode(passwordEditInput.getNewPassword()));
     adminRepository.save(admin);
-    refreshTokenRepository.deleteByKey(admin.getLoginId());
 
-    String accessToken = tokenPrepareList.getAccessToken(admin.getLoginId());
+    String accessToken = null;
     if (accessToken == null) {
       throw new CustomException(NOTING_ACCESS_TOKEN);
     }
 
-    tokenBlackList.addToBlacklist(accessToken);
-    tokenPrepareList.delete(admin.getLoginId());
     return new PasswordEditResponse(admin.getLoginId(), "비밀번호가 변경되었습니다. 다시 로그인 후 이용해주세요.");
   }
 

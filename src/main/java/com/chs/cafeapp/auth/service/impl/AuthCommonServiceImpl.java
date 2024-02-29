@@ -3,9 +3,7 @@ package com.chs.cafeapp.auth.service.impl;
 import static com.chs.cafeapp.auth.type.UserType.ADMIN;
 import static com.chs.cafeapp.auth.type.UserType.MEMBER;
 import static com.chs.cafeapp.global.exception.type.ErrorCode.INVALID_ACCESS_TOKEN;
-import static com.chs.cafeapp.global.exception.type.ErrorCode.LOGOUT_MEMBER;
 import static com.chs.cafeapp.global.exception.type.ErrorCode.NOT_EXISTS_LOGIN_ID;
-import static com.chs.cafeapp.global.exception.type.ErrorCode.NOT_MATCH_REFRESH_TOKEN_MEMBER;
 import static com.chs.cafeapp.global.exception.type.ErrorCode.NOT_VALID_REFRESH_TOKEN;
 import static com.chs.cafeapp.global.mail.MailConstant.RE_MAIL_SENDING_SUCCESS;
 import static com.chs.cafeapp.global.mail.MailConstant.TO_ADMIN;
@@ -13,19 +11,14 @@ import static com.chs.cafeapp.global.mail.MailConstant.TO_MEMBER;
 
 import com.chs.cafeapp.auth.admin.entity.Admin;
 import com.chs.cafeapp.auth.admin.repository.AdminRepository;
-import com.chs.cafeapp.auth.component.TokenBlackList;
 import com.chs.cafeapp.auth.dto.LogOutResponse;
 import com.chs.cafeapp.auth.member.entity.Member;
 import com.chs.cafeapp.auth.member.repository.MemberRepository;
 import com.chs.cafeapp.auth.service.AuthCommonService;
-import com.chs.cafeapp.auth.token.dto.TokenDto;
 import com.chs.cafeapp.auth.token.dto.TokenRequestDto;
 import com.chs.cafeapp.auth.token.dto.TokenResponseDto;
-import com.chs.cafeapp.auth.token.entity.RefreshToken;
-import com.chs.cafeapp.auth.token.repository.RefreshTokenRepository;
 import com.chs.cafeapp.auth.type.UserType;
 import com.chs.cafeapp.global.exception.CustomException;
-import com.chs.cafeapp.global.mail.dto.EmailAuthRequest;
 import com.chs.cafeapp.global.mail.service.MailSendService;
 import com.chs.cafeapp.global.mail.service.MailVerifyService;
 import com.chs.cafeapp.global.security.TokenProvider;
@@ -48,10 +41,9 @@ public class AuthCommonServiceImpl implements AuthCommonService, UserDetailsServ
   private final TokenProvider tokenProvider;
   private final MailSendService mailSendService;
   private final MailVerifyService mailVerifyService;
-  private final TokenBlackList tokenBlackList;
   private final AdminRepository adminRepository;
   private final MemberRepository memberRepository;
-  private final RefreshTokenRepository refreshTokenRepository;
+
 
   @Override
   public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -109,19 +101,21 @@ public class AuthCommonServiceImpl implements AuthCommonService, UserDetailsServ
   public TokenResponseDto reIssue(TokenRequestDto tokenRequestDto) {
     validateRefreshToken(tokenRequestDto);
     Authentication authentication = tokenProvider.getAuthentication(tokenRequestDto.getAccessToken());
+//
+//    RefreshToken refreshToken = refreshTokenRepository.findByKey(authentication.getName())
+//        .orElseThrow(() -> new CustomException(LOGOUT_MEMBER));
+//
+//    validateRefreshTokenOwner(refreshToken, tokenRequestDto);
+//
+//    TokenDto tokenDto = tokenProvider.generateTokenDto(authentication);
+//    RefreshToken newRefreshToken = refreshToken.updateValue(tokenDto.getRefreshToken());
+//    refreshTokenRepository.save(newRefreshToken);
+//
+//    tokenBlackList.addToBlacklist(tokenRequestDto.getAccessToken());
+//
+//    return new TokenResponseDto(tokenDto.getAccessToken(), tokenDto.getRefreshToken());
 
-    RefreshToken refreshToken = refreshTokenRepository.findByKey(authentication.getName())
-        .orElseThrow(() -> new CustomException(LOGOUT_MEMBER));
-
-    validateRefreshTokenOwner(refreshToken, tokenRequestDto);
-
-    TokenDto tokenDto = tokenProvider.generateTokenDto(authentication);
-    RefreshToken newRefreshToken = refreshToken.updateValue(tokenDto.getRefreshToken());
-    refreshTokenRepository.save(newRefreshToken);
-
-    tokenBlackList.addToBlacklist(tokenRequestDto.getAccessToken());
-
-    return new TokenResponseDto(tokenDto.getAccessToken(), tokenDto.getRefreshToken());
+    return null;
   }
 
   @Override
@@ -131,11 +125,11 @@ public class AuthCommonServiceImpl implements AuthCommonService, UserDetailsServ
       throw new CustomException(INVALID_ACCESS_TOKEN);
     }
     String loginId = authentication.getName();
-    refreshTokenRepository.findByKey(loginId)
-        .orElseThrow(() -> new CustomException(LOGOUT_MEMBER));
-
-    refreshTokenRepository.deleteByKey(authentication.getName());
-    tokenBlackList.addToBlacklist(accessToken);
+//    refreshTokenRepository.findByKey(loginId)
+//        .orElseThrow(() -> new CustomException(LOGOUT_MEMBER));
+//
+//    refreshTokenRepository.deleteByKey(authentication.getName());
+//    tokenBlackList.addToBlacklist(accessToken);
 
     return new LogOutResponse(loginId, "로그아웃 되었습니다.");
   }
@@ -147,11 +141,11 @@ public class AuthCommonServiceImpl implements AuthCommonService, UserDetailsServ
     }
   }
 
-  private void validateRefreshTokenOwner(RefreshToken refreshToken, TokenRequestDto tokenRequestDto) {
-    if (!refreshToken.getValue().equals(tokenRequestDto.getRefreshToken())) {
-      throw new CustomException(NOT_MATCH_REFRESH_TOKEN_MEMBER);
-    }
-  }
+//  private void validateRefreshTokenOwner(RefreshToken refreshToken, TokenRequestDto tokenRequestDto) {
+//    if (!refreshToken.getValue().equals(tokenRequestDto.getRefreshToken())) {
+//      throw new CustomException(NOT_MATCH_REFRESH_TOKEN_MEMBER);
+//    }
+//  }
 
   private UserDetails createAdminUserDetails(Admin admin) {
     GrantedAuthority grantedAuthority = new SimpleGrantedAuthority(
