@@ -1,5 +1,7 @@
 package com.chs.cafeapp.auth.service.impl;
 
+import static com.chs.cafeapp.auth.type.UserType.ADMIN;
+import static com.chs.cafeapp.auth.type.UserType.MEMBER;
 import static com.chs.cafeapp.global.exception.type.ErrorCode.INVALID_ACCESS_TOKEN;
 import static com.chs.cafeapp.global.exception.type.ErrorCode.LOGOUT_MEMBER;
 import static com.chs.cafeapp.global.exception.type.ErrorCode.NOT_EXISTS_LOGIN_ID;
@@ -12,13 +14,16 @@ import com.chs.cafeapp.auth.component.TokenBlackList;
 import com.chs.cafeapp.auth.dto.LogOutResponse;
 import com.chs.cafeapp.auth.member.entity.Member;
 import com.chs.cafeapp.auth.member.repository.MemberRepository;
-import com.chs.cafeapp.auth.service.AuthTokenService;
+import com.chs.cafeapp.auth.service.AuthCommonService;
 import com.chs.cafeapp.auth.token.dto.TokenDto;
 import com.chs.cafeapp.auth.token.dto.TokenRequestDto;
 import com.chs.cafeapp.auth.token.dto.TokenResponseDto;
 import com.chs.cafeapp.auth.token.entity.RefreshToken;
 import com.chs.cafeapp.auth.token.repository.RefreshTokenRepository;
+import com.chs.cafeapp.auth.type.UserType;
 import com.chs.cafeapp.global.exception.CustomException;
+import com.chs.cafeapp.global.mail.dto.EmailAuthRequest;
+import com.chs.cafeapp.global.mail.service.MailVerifyService;
 import com.chs.cafeapp.global.security.TokenProvider;
 import java.util.Collections;
 import lombok.RequiredArgsConstructor;
@@ -33,8 +38,9 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class AuthServiceImpl implements AuthTokenService, UserDetailsService  {
+public class AuthCommonServiceImpl implements AuthCommonService, UserDetailsService  {
   private final TokenProvider tokenProvider;
+  private final MailVerifyService mailVerifyService;
   private final TokenBlackList tokenBlackList;
   private final AdminRepository adminRepository;
   private final MemberRepository memberRepository;
@@ -59,6 +65,24 @@ public class AuthServiceImpl implements AuthTokenService, UserDetailsService  {
     }
 
     throw new CustomException(NOT_EXISTS_LOGIN_ID);
+  }
+
+  @Override
+  public Boolean emailAuth(String email, String certifiedNumber) {
+    mailVerifyService.verifyEmail(email, certifiedNumber);
+    return Boolean.TRUE;
+  }
+
+  @Override
+  public Boolean checkEmail(String email, UserType userType) {
+    if (userType == ADMIN) {
+      return !adminRepository.existsByLoginId(email);
+    }
+
+    if (userType == MEMBER) {
+      return !memberRepository.existsByLoginId(email);
+    }
+    throw new IllegalArgumentException("UserType이 올바르지 않습니다.");
   }
 
   @Override

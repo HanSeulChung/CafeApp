@@ -8,6 +8,7 @@ import com.chs.cafeapp.global.exception.CustomException;
 import com.chs.cafeapp.auth.token.dto.TokenResponseDto;
 import com.chs.cafeapp.auth.dto.SignInRequestDto;
 import com.chs.cafeapp.auth.dto.AuthResponseDto;
+import com.chs.cafeapp.global.mail.dto.EmailRequest;
 import java.security.NoSuchAlgorithmException;
 import javax.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
@@ -38,6 +39,19 @@ public class AuthMemberController {
   }
 
   /**
+   * 프론트가 존재하지 않을 때 이메일 인증 Controller
+   * @param -: 사용자의 이메일에서 확인한 랜덤한 6자리 수
+   * @exception CustomException : 이메일 인증기한(24시간)이 지났을 경우, 이미 인증이 끝난 사용자일 경우,
+   *                              해당 랜덤한 6자리 수 값으로 유효한 사용자가 없을 경우 CustomException 발생
+   * @return AuthResponseDto
+   */
+  @GetMapping("/email-auth")
+  public ResponseEntity<AuthResponseDto> emailAuth(@RequestParam String id,
+      @RequestParam String certifiedNumber) throws MessagingException {
+    return ResponseEntity.ok(authService.emailAuth(id, certifiedNumber));
+  }
+
+  /**
    *  일반 사용자(Member)일반 로그인 Controller
    * @param signInRequestDto: 로그인 입력값 (username(loginId), password)
    * @exception CustomException: 로그인 아이디로 사용자가 존재하지 않을 경우, 비밀번호가 틀릴 경우,
@@ -60,18 +74,5 @@ public class AuthMemberController {
   @PostMapping("/passwords")
   public ResponseEntity<PasswordEditResponse> memberPassword(@RequestBody PasswordEditInput passwordEditInput) {
     return ResponseEntity.ok(authService.changePassword(passwordEditInput));
-  }
-
-  /**
-   * 이메일 인증 Controller
-   * @param -: 사용자의 이메일에서 링크를 누른 servletRequest 값
-   * @exception CustomException : 이메일 인증기한(24시간)이 지났을 경우, 이미 인증이 끝난 사용자일 경우,
-   *                              해당 uuid링크 값으로 유효한 사용자가 없을 경우 CustomException 발생
-   * @return 해당 링크 페이지에서 json 형태로 UserResponse 값
-   */
-  @GetMapping("/email-auth")
-  public ResponseEntity<AuthResponseDto> emailAuth(@RequestParam String id,
-                                                    @RequestParam String certifiedNumber) throws MessagingException{
-    return ResponseEntity.ok(authService.emailAuth(id, certifiedNumber));
   }
 }
