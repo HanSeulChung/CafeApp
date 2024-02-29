@@ -1,6 +1,5 @@
 package com.chs.cafeapp.auth.service.impl;
 
-import static com.chs.cafeapp.auth.token.type.ACCESS_TOKEN_TYPE.NO_ACCESS_TOKEN;
 import static com.chs.cafeapp.auth.type.Authority.ROLE_ADMIN;
 import static com.chs.cafeapp.auth.type.Authority.ROLE_YET_ADMIN;
 import static com.chs.cafeapp.auth.type.UserStatus.USER_STATUS_ING;
@@ -32,7 +31,6 @@ import com.chs.cafeapp.auth.dto.SignInRequestDto;
 import com.chs.cafeapp.auth.service.AuthService;
 import com.chs.cafeapp.auth.token.dto.TokenDto;
 import com.chs.cafeapp.auth.token.dto.TokenResponseDto;
-import com.chs.cafeapp.auth.token.entity.RefreshToken;
 import com.chs.cafeapp.auth.token.repository.RefreshTokenRepository;
 import com.chs.cafeapp.global.exception.CustomException;
 import com.chs.cafeapp.global.mail.service.MailSendService;
@@ -113,8 +111,8 @@ public class AuthAdminService implements AuthService {
     if (existsRefreshToken) {
       refreshTokenRepository.deleteAllByKey(signInRequestDto.getUsername());
     }
-    RefreshToken refreshToken = buildRefreshToken(authentication, tokenDto);
-    refreshTokenRepository.save(refreshToken);
+//    RefreshToken refreshToken = buildRefreshToken(authentication, tokenDto);
+//    refreshTokenRepository.save(refreshToken);
 
     adminService.updateLastLoginDateTime(admin.getLoginId(), LocalDateTime.now());
     return new TokenResponseDto(tokenDto.getAccessToken(), tokenDto.getRefreshToken());
@@ -139,7 +137,7 @@ public class AuthAdminService implements AuthService {
     refreshTokenRepository.deleteByKey(admin.getLoginId());
 
     String accessToken = tokenPrepareList.getAccessToken(admin.getLoginId());
-    if (accessToken.equals(NO_ACCESS_TOKEN.getToken_value())) {
+    if (accessToken == null) {
       throw new CustomException(NOTING_ACCESS_TOKEN);
     }
 
@@ -165,12 +163,12 @@ public class AuthAdminService implements AuthService {
         .build();
   }
 
-  private RefreshToken buildRefreshToken(Authentication authentication, TokenDto tokenDto) {
-    return RefreshToken.builder()
-        .key(authentication.getName())
-        .value(tokenDto.getRefreshToken())
-        .build();
-  }
+//  private RefreshToken buildRefreshToken(Authentication authentication, TokenDto tokenDto) {
+//    return RefreshToken.builder()
+//        .key(authentication.getName())
+//        .value(tokenDto.getRefreshToken())
+//        .build();
+//  }
   private Admin validationAdmin(SignInRequestDto signInRequestDto) {
     Admin admin = adminRepository.findByLoginId(signInRequestDto.getUsername())
         .orElseThrow(() -> new CustomException(MEMBER_NOT_FOUND));

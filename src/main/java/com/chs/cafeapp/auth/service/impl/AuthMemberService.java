@@ -1,6 +1,5 @@
 package com.chs.cafeapp.auth.service.impl;
 
-import static com.chs.cafeapp.auth.token.type.ACCESS_TOKEN_TYPE.NO_ACCESS_TOKEN;
 import static com.chs.cafeapp.auth.type.Authority.ROLE_MEMBER;
 import static com.chs.cafeapp.auth.type.Authority.ROLE_YET_MEMBER;
 import static com.chs.cafeapp.auth.type.UserStatus.USER_STATUS_ING;
@@ -34,7 +33,6 @@ import com.chs.cafeapp.auth.member.service.MemberService;
 import com.chs.cafeapp.auth.service.AuthService;
 import com.chs.cafeapp.auth.token.dto.TokenDto;
 import com.chs.cafeapp.auth.token.dto.TokenResponseDto;
-import com.chs.cafeapp.auth.token.entity.RefreshToken;
 import com.chs.cafeapp.auth.token.repository.RefreshTokenRepository;
 import com.chs.cafeapp.global.exception.CustomException;
 import com.chs.cafeapp.global.mail.service.MailSendService;
@@ -141,8 +139,8 @@ public class AuthMemberService implements AuthService{
     if (existsRefreshToken) {
       refreshTokenRepository.deleteAllByKey(signInRequestDto.getUsername());
     }
-    RefreshToken refreshToken = buildRefreshToken(authentication, tokenDto);
-    refreshTokenRepository.save(refreshToken);
+//    RefreshToken refreshToken = buildRefreshToken(authentication, tokenDto);
+//    refreshTokenRepository.save(refreshToken);
 
     memberService.updateLastLoginDateTime(member.getLoginId(), LocalDateTime.now());
     return new TokenResponseDto(tokenDto.getAccessToken(), tokenDto.getRefreshToken());
@@ -166,7 +164,7 @@ public class AuthMemberService implements AuthService{
     refreshTokenRepository.deleteByKey(member.getLoginId());
 
     String accessToken = tokenPrepareList.getAccessToken(member.getLoginId());
-    if (accessToken.equals(NO_ACCESS_TOKEN.getToken_value())) {
+    if (accessToken == null) {
       throw new CustomException(NOTING_ACCESS_TOKEN);
     }
 
@@ -196,12 +194,12 @@ public class AuthMemberService implements AuthService{
     return member;
   }
 
-  private RefreshToken buildRefreshToken(Authentication authentication, TokenDto tokenDto) {
-    return RefreshToken.builder()
-        .key(authentication.getName())
-        .value(tokenDto.getRefreshToken())
-        .build();
-  }
+//  private RefreshToken buildRefreshToken(Authentication authentication, TokenDto tokenDto) {
+//    return RefreshToken.builder()
+//        .key(authentication.getName())
+//        .value(tokenDto.getRefreshToken())
+//        .build();
+//  }
 
   private Member validationMemberByPasswordEdit(Authentication authentication, String originPassword) {
     Member member = memberRepository.findByLoginId(authentication.getName())
