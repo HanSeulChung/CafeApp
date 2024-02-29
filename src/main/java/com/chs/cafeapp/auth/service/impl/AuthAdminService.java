@@ -1,10 +1,10 @@
 package com.chs.cafeapp.auth.service.impl;
 
-import static com.chs.cafeapp.auth.type.UserStatus.USER_STATUS_ING;
-import static com.chs.cafeapp.auth.type.UserStatus.USER_STATUS_REQ;
 import static com.chs.cafeapp.auth.token.type.ACCESS_TOKEN_TYPE.NO_ACCESS_TOKEN;
 import static com.chs.cafeapp.auth.type.Authority.ROLE_ADMIN;
 import static com.chs.cafeapp.auth.type.Authority.ROLE_YET_ADMIN;
+import static com.chs.cafeapp.auth.type.UserStatus.USER_STATUS_ING;
+import static com.chs.cafeapp.auth.type.UserStatus.USER_STATUS_REQ;
 import static com.chs.cafeapp.global.exception.type.ErrorCode.ADMIN_NOT_FOUND;
 import static com.chs.cafeapp.global.exception.type.ErrorCode.ALREADY_EXISTS_USER_LOGIN_ID;
 import static com.chs.cafeapp.global.exception.type.ErrorCode.MEMBER_NOT_FOUND;
@@ -35,7 +35,6 @@ import com.chs.cafeapp.auth.token.dto.TokenResponseDto;
 import com.chs.cafeapp.auth.token.entity.RefreshToken;
 import com.chs.cafeapp.auth.token.repository.RefreshTokenRepository;
 import com.chs.cafeapp.global.exception.CustomException;
-import com.chs.cafeapp.global.mail.dto.EmailRequest;
 import com.chs.cafeapp.global.mail.service.MailSendService;
 import com.chs.cafeapp.global.mail.service.MailVerifyService;
 import com.chs.cafeapp.global.security.TokenProvider;
@@ -151,11 +150,10 @@ public class AuthAdminService implements AuthService {
 
   @Override
   public AuthResponseDto emailAuth(String email, String certifiedNumber) {
-
-    mailVerifyService.verifyEmail(email, certifiedNumber);
     Admin admin = adminRepository.findByLoginId(email)
         .orElseThrow(() -> new CustomException(ADMIN_NOT_FOUND));
 
+    mailVerifyService.verifyEmail(email, certifiedNumber);
     admin.setAdminStatus(USER_STATUS_ING);
     admin.setAuthority(ROLE_ADMIN);
     adminRepository.save(admin);

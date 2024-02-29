@@ -8,6 +8,7 @@ import com.chs.cafeapp.auth.token.dto.TokenResponseDto;
 import com.chs.cafeapp.global.exception.CustomException;
 import com.chs.cafeapp.global.mail.dto.EmailAuthRequest;
 import com.chs.cafeapp.global.mail.dto.EmailRequest;
+import java.security.NoSuchAlgorithmException;
 import javax.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -33,6 +34,11 @@ public class AuthController {
   public ResponseEntity<Boolean> emailAuth(@RequestBody EmailAuthRequest emailAuthRequest) throws MessagingException {
     return ResponseEntity.ok(authService.emailAuth(emailAuthRequest.getEmail(),
         emailAuthRequest.getAuthNumber()));
+  }
+
+  @PostMapping("/re-email")
+  public ResponseEntity<String> reEmail(@RequestBody EmailRequest emailRequest) throws NoSuchAlgorithmException, MessagingException {
+    return ResponseEntity.ok(authService.reEmail(emailRequest.getEmail(), emailRequest.getUserType()));
   }
 
   /**

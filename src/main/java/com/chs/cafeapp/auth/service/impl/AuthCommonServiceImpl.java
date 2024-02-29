@@ -7,6 +7,9 @@ import static com.chs.cafeapp.global.exception.type.ErrorCode.LOGOUT_MEMBER;
 import static com.chs.cafeapp.global.exception.type.ErrorCode.NOT_EXISTS_LOGIN_ID;
 import static com.chs.cafeapp.global.exception.type.ErrorCode.NOT_MATCH_REFRESH_TOKEN_MEMBER;
 import static com.chs.cafeapp.global.exception.type.ErrorCode.NOT_VALID_REFRESH_TOKEN;
+import static com.chs.cafeapp.global.mail.MailConstant.RE_MAIL_SENDING_SUCCESS;
+import static com.chs.cafeapp.global.mail.MailConstant.TO_ADMIN;
+import static com.chs.cafeapp.global.mail.MailConstant.TO_MEMBER;
 
 import com.chs.cafeapp.auth.admin.entity.Admin;
 import com.chs.cafeapp.auth.admin.repository.AdminRepository;
@@ -23,9 +26,12 @@ import com.chs.cafeapp.auth.token.repository.RefreshTokenRepository;
 import com.chs.cafeapp.auth.type.UserType;
 import com.chs.cafeapp.global.exception.CustomException;
 import com.chs.cafeapp.global.mail.dto.EmailAuthRequest;
+import com.chs.cafeapp.global.mail.service.MailSendService;
 import com.chs.cafeapp.global.mail.service.MailVerifyService;
 import com.chs.cafeapp.global.security.TokenProvider;
+import java.security.NoSuchAlgorithmException;
 import java.util.Collections;
+import javax.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -40,6 +46,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class AuthCommonServiceImpl implements AuthCommonService, UserDetailsService  {
   private final TokenProvider tokenProvider;
+  private final MailSendService mailSendService;
   private final MailVerifyService mailVerifyService;
   private final TokenBlackList tokenBlackList;
   private final AdminRepository adminRepository;
@@ -83,6 +90,19 @@ public class AuthCommonServiceImpl implements AuthCommonService, UserDetailsServ
       return !memberRepository.existsByLoginId(email);
     }
     throw new IllegalArgumentException("UserType이 올바르지 않습니다.");
+  }
+
+  @Override
+  public String reEmail(String email, UserType userType) throws NoSuchAlgorithmException, MessagingException  {
+    String to = "";
+    if (userType == ADMIN) {
+      to = TO_ADMIN;
+    }
+    if (userType == MEMBER) {
+      to = TO_MEMBER;
+    }
+    mailSendService.certifiedNumberMail(email, to);
+    return RE_MAIL_SENDING_SUCCESS;
   }
 
   @Override

@@ -5,7 +5,6 @@ import com.chs.cafeapp.auth.dto.PasswordEditInput;
 import com.chs.cafeapp.auth.dto.PasswordEditResponse;
 import com.chs.cafeapp.auth.dto.SignInRequestDto;
 import com.chs.cafeapp.auth.token.dto.TokenResponseDto;
-import com.chs.cafeapp.global.mail.dto.EmailRequest;
 
 public interface AuthService {
 

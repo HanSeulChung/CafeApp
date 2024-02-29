@@ -7,6 +7,8 @@ import com.chs.cafeapp.auth.token.dto.TokenResponseDto;
 import com.chs.cafeapp.auth.type.UserType;
 import com.chs.cafeapp.global.mail.dto.EmailAuthRequest;
 import com.chs.cafeapp.global.mail.dto.EmailRequest;
+import java.security.NoSuchAlgorithmException;
+import javax.mail.MessagingException;
 
 public interface AuthCommonService {
 
@@ -19,6 +21,11 @@ public interface AuthCommonService {
    * 메일 중복 체크
    */
   Boolean checkEmail(String email, UserType userType);
+
+  /**
+   * 인증 메일 재전송
+   */
+  String reEmail(String email, UserType userType) throws NoSuchAlgorithmException, MessagingException;
 
   /**
    * access 토큰 재발급
