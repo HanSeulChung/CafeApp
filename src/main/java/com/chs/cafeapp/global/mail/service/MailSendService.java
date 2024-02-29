@@ -11,7 +11,7 @@ import static com.chs.cafeapp.global.mail.MailConstant.TO_MEMBER;
 
 import com.chs.cafeapp.auth.type.UserType;
 import com.chs.cafeapp.global.mail.certifiednumber.CertifiedNumberGenerator;
-import com.chs.cafeapp.global.redis.CertifiedNumberAuthRepository;
+import com.chs.cafeapp.global.redis.auth.CertifiedNumberAuthRepository;
 import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;

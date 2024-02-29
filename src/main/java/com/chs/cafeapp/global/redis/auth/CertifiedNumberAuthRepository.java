@@ -1,6 +1,7 @@
-package com.chs.cafeapp.global.redis;
+package com.chs.cafeapp.global.redis.auth;
 
 import static com.chs.cafeapp.global.mail.MailConstant.EMAIL_VERIFICATION_LIMIT_IN_SECONDS;
+import static com.chs.cafeapp.global.redis.constant.RedisKeyPrefix.EMAIL_AUTH;
 
 import java.time.Duration;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +19,7 @@ public class CertifiedNumberAuthRepository {
   public void saveCertificationNumber(String email, String certificationNumber) {
     if (redisTemplate != null) {
       redisTemplate.opsForValue()
-          .set(email, certificationNumber, Duration.ofSeconds(EMAIL_VERIFICATION_LIMIT_IN_SECONDS));
+          .set(EMAIL_AUTH + email, certificationNumber, Duration.ofSeconds(EMAIL_VERIFICATION_LIMIT_IN_SECONDS));
     } else {
       log.error("StringRedisTemplate is null. Check configuration.");
       throw new IllegalStateException("StringRedisTemplate is null. Check configuration.");
@@ -26,15 +27,15 @@ public class CertifiedNumberAuthRepository {
   }
 
   public String getCertificationNumber(String email) {
-    return redisTemplate.opsForValue().get(email);
+    return redisTemplate.opsForValue().get(EMAIL_AUTH + email);
   }
 
   public void removeCertificationNumber(String email) {
-    redisTemplate.delete(email);
+    redisTemplate.delete(EMAIL_AUTH + email);
   }
 
   public boolean hasKey(String email) {
-    Boolean keyExists = redisTemplate.hasKey(email);
+    Boolean keyExists = redisTemplate.hasKey(EMAIL_AUTH + email);
     return keyExists != null && keyExists;
   }
 

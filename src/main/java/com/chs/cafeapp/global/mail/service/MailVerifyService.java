@@ -5,7 +5,7 @@ import static com.chs.cafeapp.global.exception.type.ErrorCode.INVALID_CERTIFIED_
 import static com.chs.cafeapp.global.exception.type.ErrorCode.NOT_MATCH_CERTIFIED_NUMBER;
 
 import com.chs.cafeapp.global.exception.CustomException;
-import com.chs.cafeapp.global.redis.CertifiedNumberAuthRepository;
+import com.chs.cafeapp.global.redis.auth.CertifiedNumberAuthRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
