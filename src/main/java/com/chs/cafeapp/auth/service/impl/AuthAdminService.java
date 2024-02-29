@@ -35,6 +35,7 @@ import com.chs.cafeapp.auth.token.dto.TokenResponseDto;
 import com.chs.cafeapp.auth.token.entity.RefreshToken;
 import com.chs.cafeapp.auth.token.repository.RefreshTokenRepository;
 import com.chs.cafeapp.global.exception.CustomException;
+import com.chs.cafeapp.global.mail.dto.EmailRequest;
 import com.chs.cafeapp.global.mail.service.MailSendService;
 import com.chs.cafeapp.global.mail.service.MailVerifyService;
 import com.chs.cafeapp.global.security.TokenProvider;
@@ -90,7 +91,6 @@ public class AuthAdminService implements AuthService {
         .build();
 
     Admin saveAdmin = adminRepository.save(admin);
-
 
     String email = adminSignUpRequestDto.getUsername();
     mailSendService.certifiedNumberMail(email, TO_ADMIN);

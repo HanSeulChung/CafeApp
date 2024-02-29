@@ -30,6 +30,7 @@ public enum ErrorCode {
   INVALID_ACCESS_TOKEN(400, "유효하지 않은 Access Token 값입니다."),
   NO_ROLE_TOKEN(400, "권한 정보가 없는 토큰입니다."),
   INVALID_CERTIFIED_NUMBER(500, "유효하지 않은 인증 숫자 입니다."),
+  NOT_MATCH_CERTIFIED_NUMBER(400, "인증 숫자가 틀립니다."),
   EMAIL_NOT_FOUND(500, "이메일을 찾을 수 없습니다."),
   MEMBER_NOT_FOUND(400, "해당하는 사용자가 없습니다."),
   ADMIN_NOT_FOUND(400, "해당하는 카페 관계자가 없습니다."),

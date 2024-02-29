@@ -6,10 +6,11 @@ import com.chs.cafeapp.auth.dto.PasswordEditInput;
 import com.chs.cafeapp.auth.dto.PasswordEditResponse;
 import com.chs.cafeapp.auth.dto.AuthResponseDto;
 import com.chs.cafeapp.auth.dto.SignInRequestDto;
-import com.chs.cafeapp.auth.service.AuthTokenService;
+import com.chs.cafeapp.auth.service.AuthCommonService;
 import com.chs.cafeapp.auth.service.impl.AuthAdminService;
 import com.chs.cafeapp.auth.token.dto.TokenResponseDto;
 import com.chs.cafeapp.global.exception.CustomException;
+import com.chs.cafeapp.global.mail.dto.EmailRequest;
 import java.security.NoSuchAlgorithmException;
 import javax.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/auth/admins")
 public class AuthAdminController {
   private final AuthAdminService authService;
-  private final AuthTokenService authTokenService;
+  private final AuthCommonService authCommonService;
 
   /**
    * 카페관계자 회원가입 Controller
@@ -41,6 +42,19 @@ public class AuthAdminController {
   }
 
   /**
+   * 프론트가 존재하지 않을 때 이메일 인증 Controller
+   * @param -: 사용자의 이메일에서 확인한 랜덤한 6자리 수
+   * @exception CustomException : 이메일 인증기한(24시간)이 지났을 경우, 이미 인증이 끝난 사용자일 경우,
+   *                              해당 랜덤한 6자리 수 값으로 유효한 사용자가 없을 경우 CustomException 발생
+   * @return AuthResponseDto
+   */
+  @GetMapping("/email-auth")
+  public ResponseEntity<AuthResponseDto> emailAuth(@RequestParam String id,
+      @RequestParam String certifiedNumber) throws MessagingException {
+    return ResponseEntity.ok(authService.emailAuth(id, certifiedNumber));
+  }
+
+  /**
    * 카페관계자(Admin) 일반 로그인 Controller
    * @param signInRequestDto: 로그인 입력값 (username(loginId), password)
    * @exception CustomException: 로그인 아이디로 사용자가 존재하지 않을 경우, 비밀번호가 틀릴 경우 CustomException 발생
@@ -51,18 +65,6 @@ public class AuthAdminController {
     return ResponseEntity.ok(authService.signIn(signInRequestDto));
   }
 
-  /**
-   * 이메일 인증 Controller
-   * @param -: 사용자의 이메일에서 확인한 랜덤한 6자리 수
-   * @exception CustomException : 이메일 인증기한(24시간)이 지났을 경우, 이미 인증이 끝난 사용자일 경우,
-   *                              해당 랜덤한 6자리 수 값으로 유효한 사용자가 없을 경우 CustomException 발생
-   * @return AuthResponseDto
-   */
-  @GetMapping("/email-auth")
-  public ResponseEntity<AuthResponseDto> emailAuth(@RequestParam String id,
-                                                      @RequestParam String certifiedNumber) throws MessagingException{
-    return ResponseEntity.ok(authService.emailAuth(id, certifiedNumber));
-  }
 
   /**
    * 카페 관계자 비밀번호 변경 Controller
@@ -84,6 +86,6 @@ public class AuthAdminController {
    */
   @PostMapping("/logout")
   public ResponseEntity<LogOutResponse> logOut(@RequestHeader("Authorization") String accessToken) {
-    return ResponseEntity.ok(authTokenService.logOut(accessToken));
+    return ResponseEntity.ok(authCommonService.logOut(accessToken));
   }
 }

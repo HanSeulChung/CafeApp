@@ -1,10 +1,14 @@
 package com.chs.cafeapp.auth.controller;
 
+import com.chs.cafeapp.auth.dto.AuthResponseDto;
 import com.chs.cafeapp.auth.dto.LogOutResponse;
-import com.chs.cafeapp.auth.service.impl.AuthServiceImpl;
+import com.chs.cafeapp.auth.service.impl.AuthCommonServiceImpl;
 import com.chs.cafeapp.auth.token.dto.TokenRequestDto;
 import com.chs.cafeapp.auth.token.dto.TokenResponseDto;
 import com.chs.cafeapp.global.exception.CustomException;
+import com.chs.cafeapp.global.mail.dto.EmailAuthRequest;
+import com.chs.cafeapp.global.mail.dto.EmailRequest;
+import javax.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -17,7 +21,29 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @RequestMapping("/auth")
 public class AuthController {
-  private final AuthServiceImpl authService;
+  private final AuthCommonServiceImpl authService;
+
+  /**
+   * 프론트가 존재할 때 이메일 인증 controller
+   * @param emailAuthRequest
+   * @return
+   * @throws MessagingException
+   */
+  @PostMapping("/email-auth")
+  public ResponseEntity<Boolean> emailAuth(@RequestBody EmailAuthRequest emailAuthRequest) throws MessagingException {
+    return ResponseEntity.ok(authService.emailAuth(emailAuthRequest.getEmail(),
+        emailAuthRequest.getAuthNumber()));
+  }
+
+  /**
+   * 프론트가 존재할 때 이메일 중복 Controller
+   * @param emailRequest
+   * @return Boolean > 중복 email이 존재할 경우 true, 사용가능한 이메일일 경우 false
+   */
+  @PostMapping("/email/check")
+  public ResponseEntity<Boolean> checkEmail(@RequestBody EmailRequest emailRequest) {
+    return ResponseEntity.ok(authService.checkEmail(emailRequest.getEmail(), emailRequest.getUserType()));
+  }
 
   /**
    * 로그아웃 Controller
