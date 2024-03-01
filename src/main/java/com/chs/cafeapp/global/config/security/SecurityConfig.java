@@ -83,7 +83,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .authorizeRequests()
             .antMatchers(AUTH_WHITELIST).permitAll()
             .antMatchers(AUTH_ADMINLIST).hasAuthority("ROLE_ADMIN")
-            .antMatchers(AUTH_MEMBERLIST).hasAuthority("ROLE_USER")
+            .antMatchers(AUTH_MEMBERLIST).hasAuthority("ROLE_MEMBER")
             .and()
             .apply(new JwtSecurityConfig(tokenProvider));
     }
