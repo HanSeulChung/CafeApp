@@ -34,6 +34,7 @@ import com.chs.cafeapp.auth.token.dto.TokenResponseDto;
 import com.chs.cafeapp.global.exception.CustomException;
 import com.chs.cafeapp.global.mail.service.MailSendService;
 import com.chs.cafeapp.global.mail.service.MailVerifyService;
+import com.chs.cafeapp.global.redis.token.TokenRepository;
 import com.chs.cafeapp.global.security.TokenProvider;
 import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
@@ -56,6 +57,7 @@ public class AuthMemberService implements AuthService{
   private final MailVerifyService mailVerifyService;
   private final MemberService memberService;
   private final TokenProvider tokenProvider;
+  private final TokenRepository tokenRepository;
   private final MemberRepository memberRepository;
   private final PasswordEncoder passwordEncoder;
   private final AuthenticationManagerBuilder authenticationManagerBuilder;
@@ -125,11 +127,7 @@ public class AuthMemberService implements AuthService{
 
     UsernamePasswordAuthenticationToken authenticationToken = signInRequestDto.toAuthentication(signInRequestDto.getUsername(), signInRequestDto.getPassword());
     Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
-    TokenDto tokenDto = tokenProvider.generateTokenDto(authentication);
-
-
-//    RefreshToken refreshToken = buildRefreshToken(authentication, tokenDto);
-//    refreshTokenRepository.save(refreshToken);
+    TokenDto tokenDto = tokenProvider.saveTokenDto(authentication);
 
     memberService.updateLastLoginDateTime(member.getLoginId(), LocalDateTime.now());
     return new TokenResponseDto(tokenDto.getAccessToken(), tokenDto.getRefreshToken());
@@ -151,11 +149,9 @@ public class AuthMemberService implements AuthService{
     member.setPassword(passwordEncoder.encode(passwordEditInput.getNewPassword()));
     memberRepository.save(member);
 
-    String accessToken = null;
-    if (accessToken == null) {
-      throw new CustomException(NOTING_ACCESS_TOKEN);
-    }
-
+    tokenRepository.saveInValidAccessToken(member.getLoginId(), tokenRepository.getAccessToken(member.getLoginId()));
+    tokenRepository.deleteAccessToken(member.getLoginId());
+    tokenRepository.deleteRefreshToken(member.getLoginId());
     return new PasswordEditResponse(member.getLoginId(), "비밀번호가 변경되었습니다. 다시 로그인 후 이용해주세요.");
   }
 
@@ -179,13 +175,6 @@ public class AuthMemberService implements AuthService{
     }
     return member;
   }
-
-//  private RefreshToken buildRefreshToken(Authentication authentication, TokenDto tokenDto) {
-//    return RefreshToken.builder()
-//        .key(authentication.getName())
-//        .value(tokenDto.getRefreshToken())
-//        .build();
-//  }
 
   private Member validationMemberByPasswordEdit(Authentication authentication, String originPassword) {
     Member member = memberRepository.findByLoginId(authentication.getName())

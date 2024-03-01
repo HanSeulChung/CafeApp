@@ -32,6 +32,7 @@ import com.chs.cafeapp.auth.token.dto.TokenResponseDto;
 import com.chs.cafeapp.global.exception.CustomException;
 import com.chs.cafeapp.global.mail.service.MailSendService;
 import com.chs.cafeapp.global.mail.service.MailVerifyService;
+import com.chs.cafeapp.global.redis.token.TokenRepository;
 import com.chs.cafeapp.global.security.TokenProvider;
 import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
@@ -56,6 +57,7 @@ public class AuthAdminService implements AuthService {
   private final AdminRepository adminRepository;
   private final PasswordEncoder passwordEncoder;
   private final TokenProvider tokenProvider;
+  private final TokenRepository tokenRepository;
   private final AuthenticationManagerBuilder authenticationManagerBuilder;
 
   @Transactional
@@ -97,7 +99,7 @@ public class AuthAdminService implements AuthService {
 
     UsernamePasswordAuthenticationToken authenticationToken = signInRequestDto.toAuthentication(signInRequestDto.getUsername(), signInRequestDto.getPassword());
     Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
-    TokenDto tokenDto = tokenProvider.generateTokenDto(authentication);
+    TokenDto tokenDto = tokenProvider.saveTokenDto(authentication);
 
     adminService.updateLastLoginDateTime(admin.getLoginId(), LocalDateTime.now());
     return new TokenResponseDto(tokenDto.getAccessToken(), tokenDto.getRefreshToken());
@@ -115,16 +117,13 @@ public class AuthAdminService implements AuthService {
     if (!roleName.equals("ROLE_ADMIN")) {
       throw new CustomException(NOT_MATCH_ADMIN_ROLE);
     }
-
     Admin admin = validationAdminByPasswordEdit(authentication, passwordEditInput.getOriginPassword());
     admin.setPassword(passwordEncoder.encode(passwordEditInput.getNewPassword()));
     adminRepository.save(admin);
 
-    String accessToken = null;
-    if (accessToken == null) {
-      throw new CustomException(NOTING_ACCESS_TOKEN);
-    }
-
+    tokenRepository.saveInValidAccessToken(admin.getLoginId(), tokenRepository.getAccessToken(admin.getLoginId()));
+    tokenRepository.deleteAccessToken(admin.getLoginId());
+    tokenRepository.deleteRefreshToken(admin.getLoginId());
     return new PasswordEditResponse(admin.getLoginId(), "비밀번호가 변경되었습니다. 다시 로그인 후 이용해주세요.");
   }
 
@@ -145,12 +144,6 @@ public class AuthAdminService implements AuthService {
         .build();
   }
 
-//  private RefreshToken buildRefreshToken(Authentication authentication, TokenDto tokenDto) {
-//    return RefreshToken.builder()
-//        .key(authentication.getName())
-//        .value(tokenDto.getRefreshToken())
-//        .build();
-//  }
   private Admin validationAdmin(SignInRequestDto signInRequestDto) {
     Admin admin = adminRepository.findByLoginId(signInRequestDto.getUsername())
         .orElseThrow(() -> new CustomException(MEMBER_NOT_FOUND));

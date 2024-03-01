@@ -1,5 +1,7 @@
 package com.chs.cafeapp.global.security;
 
+import com.chs.cafeapp.global.exception.CustomException;
+import com.chs.cafeapp.global.exception.type.ErrorCode;
 import java.io.IOException;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -38,11 +40,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
       SecurityContextHolder.getContext().setAuthentication(authentication);
     }
 
-//    // 3. request url이 비밀번호 변경일 경우 우선 list에 담아둠.
-//    String requestURI = request.getRequestURI();
-//    if (requestURI.equals("/user") || requestURI.equals("/admin")) {
-////      tokenPrepareList.addToSpareList(authentication.getName(), jwt);
-//    }
+    if (authentication != null && tokenProvider.checkInvalidToken(authentication.getName(), jwt)) {
+      throw new CustomException(ErrorCode.INVALID_ACCESS_TOKEN);
+    }
     filterChain.doFilter(request, response);
   }
 
