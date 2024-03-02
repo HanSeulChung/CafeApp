@@ -10,6 +10,7 @@ import static com.chs.cafeapp.global.exception.type.ErrorCode.NOT_VALID_REFRESH_
 import static com.chs.cafeapp.global.mail.MailConstant.RE_MAIL_SENDING_SUCCESS;
 import static com.chs.cafeapp.global.mail.MailConstant.TO_ADMIN;
 import static com.chs.cafeapp.global.mail.MailConstant.TO_MEMBER;
+import static com.chs.cafeapp.global.security.JwtAuthenticationFilter.BEARER_PREFIX;
 
 import com.chs.cafeapp.auth.admin.entity.Admin;
 import com.chs.cafeapp.auth.admin.repository.AdminRepository;
@@ -118,6 +119,9 @@ public class AuthCommonServiceImpl implements AuthCommonService, UserDetailsServ
 
   @Override
   public LogOutResponse logOut(String accessToken) {
+    if (accessToken.startsWith(BEARER_PREFIX)) {
+      accessToken = accessToken.substring(BEARER_PREFIX.length());
+    }
     Authentication authentication = tokenProvider.getAuthentication(accessToken);
     if(!tokenProvider.validateToken(accessToken)) {
       throw new CustomException(INVALID_ACCESS_TOKEN);
@@ -128,6 +132,7 @@ public class AuthCommonServiceImpl implements AuthCommonService, UserDetailsServ
       throw new CustomException(LOGOUT_MEMBER);
     }
 
+    tokenRepository.saveInValidAccessToken(userId, accessToken);
     tokenRepository.deleteAccessToken(userId);
     tokenRepository.deleteRefreshToken(userId);
 
