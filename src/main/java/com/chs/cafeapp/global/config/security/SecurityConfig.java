@@ -1,6 +1,5 @@
 package com.chs.cafeapp.global.config.security;
 
-import com.chs.cafeapp.auth.component.TokenPrepareList;
 import com.chs.cafeapp.global.security.JwtAccessDeniedHandler;
 import com.chs.cafeapp.global.security.JwtAuthenticationEntryPoint;
 import com.chs.cafeapp.global.security.JwtAuthenticationFilter;
@@ -28,7 +27,6 @@ import org.springframework.web.filter.CorsFilter;
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private final CorsFilter corsFilter;
     private final TokenProvider tokenProvider;
-    private final TokenPrepareList tokenPrepareList;
     private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
     @Bean
@@ -73,7 +71,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
-            .addFilterBefore(new JwtAuthenticationFilter(tokenProvider, tokenPrepareList), UsernamePasswordAuthenticationFilter.class)
+            .addFilterBefore(new JwtAuthenticationFilter(tokenProvider), UsernamePasswordAuthenticationFilter.class)
             .httpBasic().disable()
             .csrf().disable()
             .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
@@ -85,8 +83,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .authorizeRequests()
             .antMatchers(AUTH_WHITELIST).permitAll()
             .antMatchers(AUTH_ADMINLIST).hasAuthority("ROLE_ADMIN")
-            .antMatchers(AUTH_MEMBERLIST).hasAuthority("ROLE_USER")
+            .antMatchers(AUTH_MEMBERLIST).hasAuthority("ROLE_MEMBER")
             .and()
-            .apply(new JwtSecurityConfig(tokenProvider, tokenPrepareList));
+            .apply(new JwtSecurityConfig(tokenProvider));
     }
 }

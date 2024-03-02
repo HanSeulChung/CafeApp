@@ -1,6 +1,5 @@
 package com.chs.cafeapp.auth.service.impl;
 
-import static com.chs.cafeapp.auth.token.type.ACCESS_TOKEN_TYPE.NO_ACCESS_TOKEN;
 import static com.chs.cafeapp.auth.type.Authority.ROLE_MEMBER;
 import static com.chs.cafeapp.auth.type.Authority.ROLE_YET_MEMBER;
 import static com.chs.cafeapp.auth.type.UserStatus.USER_STATUS_ING;
@@ -21,8 +20,6 @@ import static com.chs.cafeapp.global.mail.MailConstant.MAIL_CERTIFICATION_GUIDE;
 import static com.chs.cafeapp.global.mail.MailConstant.MAIL_CERTIFICATION_SUCCESS;
 import static com.chs.cafeapp.global.mail.MailConstant.TO_MEMBER;
 
-import com.chs.cafeapp.auth.component.TokenBlackList;
-import com.chs.cafeapp.auth.component.TokenPrepareList;
 import com.chs.cafeapp.auth.dto.AuthResponseDto;
 import com.chs.cafeapp.auth.dto.PasswordEditInput;
 import com.chs.cafeapp.auth.dto.PasswordEditResponse;
@@ -34,11 +31,10 @@ import com.chs.cafeapp.auth.member.service.MemberService;
 import com.chs.cafeapp.auth.service.AuthService;
 import com.chs.cafeapp.auth.token.dto.TokenDto;
 import com.chs.cafeapp.auth.token.dto.TokenResponseDto;
-import com.chs.cafeapp.auth.token.entity.RefreshToken;
-import com.chs.cafeapp.auth.token.repository.RefreshTokenRepository;
 import com.chs.cafeapp.global.exception.CustomException;
 import com.chs.cafeapp.global.mail.service.MailSendService;
 import com.chs.cafeapp.global.mail.service.MailVerifyService;
+import com.chs.cafeapp.global.redis.token.TokenRepository;
 import com.chs.cafeapp.global.security.TokenProvider;
 import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
@@ -61,12 +57,9 @@ public class AuthMemberService implements AuthService{
   private final MailVerifyService mailVerifyService;
   private final MemberService memberService;
   private final TokenProvider tokenProvider;
+  private final TokenRepository tokenRepository;
   private final MemberRepository memberRepository;
   private final PasswordEncoder passwordEncoder;
-
-  private final TokenBlackList tokenBlackList;
-  private final TokenPrepareList tokenPrepareList;
-  private final RefreshTokenRepository refreshTokenRepository;
   private final AuthenticationManagerBuilder authenticationManagerBuilder;
 
 
@@ -134,23 +127,15 @@ public class AuthMemberService implements AuthService{
 
     UsernamePasswordAuthenticationToken authenticationToken = signInRequestDto.toAuthentication(signInRequestDto.getUsername(), signInRequestDto.getPassword());
     Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
-    TokenDto tokenDto = tokenProvider.generateTokenDto(authentication);
-
-    // 프로그램 종료 후 다시 로그인할 때 저장되어있던 것 삭제 후 refresh 저장
-    boolean existsRefreshToken = refreshTokenRepository.existsByKey(signInRequestDto.getUsername());
-    if (existsRefreshToken) {
-      refreshTokenRepository.deleteAllByKey(signInRequestDto.getUsername());
-    }
-    RefreshToken refreshToken = buildRefreshToken(authentication, tokenDto);
-    refreshTokenRepository.save(refreshToken);
+    TokenDto tokenDto = tokenProvider.saveTokenDto(authentication);
 
     memberService.updateLastLoginDateTime(member.getLoginId(), LocalDateTime.now());
     return new TokenResponseDto(tokenDto.getAccessToken(), tokenDto.getRefreshToken());
   }
 
   @Override
-  public PasswordEditResponse changePassword(PasswordEditInput passwordEditInput) {
-    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+  public PasswordEditResponse changePassword(String accessToken, PasswordEditInput passwordEditInput) {
+    Authentication authentication = tokenProvider.getAuthentication(accessToken);
     Collection<? extends GrantedAuthority> authority = authentication.getAuthorities();
     if (authority.size() >= 2) {
       throw new CustomException(TOO_MANY_ROLE);
@@ -163,15 +148,10 @@ public class AuthMemberService implements AuthService{
     Member member = validationMemberByPasswordEdit(authentication, passwordEditInput.getOriginPassword());
     member.setPassword(passwordEncoder.encode(passwordEditInput.getNewPassword()));
     memberRepository.save(member);
-    refreshTokenRepository.deleteByKey(member.getLoginId());
 
-    String accessToken = tokenPrepareList.getAccessToken(member.getLoginId());
-    if (accessToken.equals(NO_ACCESS_TOKEN.getToken_value())) {
-      throw new CustomException(NOTING_ACCESS_TOKEN);
-    }
-
-    tokenBlackList.addToBlacklist(accessToken);
-    tokenPrepareList.delete(member.getLoginId());
+    tokenRepository.saveInValidAccessToken(member.getLoginId(), tokenRepository.getAccessToken(member.getLoginId()));
+    tokenRepository.deleteAccessToken(member.getLoginId());
+    tokenRepository.deleteRefreshToken(member.getLoginId());
     return new PasswordEditResponse(member.getLoginId(), "비밀번호가 변경되었습니다. 다시 로그인 후 이용해주세요.");
   }
 
@@ -194,13 +174,6 @@ public class AuthMemberService implements AuthService{
       throw new CustomException(NOT_EMAIL_AUTH);
     }
     return member;
-  }
-
-  private RefreshToken buildRefreshToken(Authentication authentication, TokenDto tokenDto) {
-    return RefreshToken.builder()
-        .key(authentication.getName())
-        .value(tokenDto.getRefreshToken())
-        .build();
   }
 
   private Member validationMemberByPasswordEdit(Authentication authentication, String originPassword) {

@@ -16,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -65,14 +66,15 @@ public class AuthMemberController {
 
   /**
    * 일반 사용자 비밀번호 변경 Controller
-   * @param passwordEditInput: 아이디, 기존 비밀번호, 새 비밀번호
+   * @param accessToken
+   * @param passwordEditInput 아이디, 기존 비밀번호, 새 비밀번호
    * @exception CustomException: 아이디로 일반 사용자가 존재하지 않을 경우, 기존 비밀번호가 틀렸을 경우,
    *                              해당 사용자의 token 값이 ROLE_ADMIN이 아닐 경우
    *                              해당 사용자의 권한이 2개 이상일 경우 CustomException 발생
    * @return PasswordEditResponse: 아이디, message(비밀번호가 변경되었습니다. or 비밀번호가 변경되지 않았습니다.)
-   */
+       */
   @PostMapping("/passwords")
-  public ResponseEntity<PasswordEditResponse> memberPassword(@RequestBody PasswordEditInput passwordEditInput) {
-    return ResponseEntity.ok(authService.changePassword(passwordEditInput));
+  public ResponseEntity<PasswordEditResponse> memberPassword(@RequestHeader("Authorization") String accessToken, @RequestBody PasswordEditInput passwordEditInput) {
+    return ResponseEntity.ok(authService.changePassword(accessToken, passwordEditInput));
   }
 }

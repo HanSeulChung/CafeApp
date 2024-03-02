@@ -21,5 +21,5 @@ public interface AuthService {
   /**
    * 비밀번호 변경
    */
-  PasswordEditResponse changePassword(PasswordEditInput passwordEditInput);
+  PasswordEditResponse changePassword(String accessToken, PasswordEditInput passwordEditInput);
 }
