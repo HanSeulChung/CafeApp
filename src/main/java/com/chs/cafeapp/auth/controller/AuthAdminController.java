@@ -75,8 +75,8 @@ public class AuthAdminController {
    * @return PasswordEditResponse: 아이디, message(비밀번호가 변경되었습니다. or 비밀번호가 변경되지 않았습니다.)
    */
   @PostMapping("/passwords")
-  public ResponseEntity<PasswordEditResponse> adminPassword(@RequestBody PasswordEditInput passwordEditInput) {
-    return ResponseEntity.ok(authService.changePassword(passwordEditInput));
+  public ResponseEntity<PasswordEditResponse> adminPassword(@RequestHeader("Authorization") String accessToken, @RequestBody PasswordEditInput passwordEditInput) {
+    return ResponseEntity.ok(authService.changePassword(accessToken, passwordEditInput));
   }
 
   /**

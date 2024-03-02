@@ -134,8 +134,8 @@ public class AuthMemberService implements AuthService{
   }
 
   @Override
-  public PasswordEditResponse changePassword(PasswordEditInput passwordEditInput) {
-    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+  public PasswordEditResponse changePassword(String accessToken, PasswordEditInput passwordEditInput) {
+    Authentication authentication = tokenProvider.getAuthentication(accessToken);
     Collection<? extends GrantedAuthority> authority = authentication.getAuthorities();
     if (authority.size() >= 2) {
       throw new CustomException(TOO_MANY_ROLE);

@@ -7,7 +7,6 @@ import static com.chs.cafeapp.auth.type.UserStatus.USER_STATUS_REQ;
 import static com.chs.cafeapp.global.exception.type.ErrorCode.ADMIN_NOT_FOUND;
 import static com.chs.cafeapp.global.exception.type.ErrorCode.ALREADY_EXISTS_USER_LOGIN_ID;
 import static com.chs.cafeapp.global.exception.type.ErrorCode.MEMBER_NOT_FOUND;
-import static com.chs.cafeapp.global.exception.type.ErrorCode.NOTING_ACCESS_TOKEN;
 import static com.chs.cafeapp.global.exception.type.ErrorCode.NOT_EQUALS_PASSWORD_REPASSWORD;
 import static com.chs.cafeapp.global.exception.type.ErrorCode.NOT_MATCH_ADMIN_ROLE;
 import static com.chs.cafeapp.global.exception.type.ErrorCode.NOT_MATCH_ORIGIN_PASSWORD;
@@ -43,7 +42,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -106,8 +104,9 @@ public class AuthAdminService implements AuthService {
   }
 
   @Override
-  public PasswordEditResponse changePassword(PasswordEditInput passwordEditInput) {
-    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+  public PasswordEditResponse changePassword(String accessToken, PasswordEditInput passwordEditInput) {
+//    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    Authentication authentication = tokenProvider.getAuthentication(accessToken);
     Collection<? extends GrantedAuthority> authority = authentication.getAuthorities();
     if (authority.size() >= 2) {
       throw new CustomException(TOO_MANY_ROLE);
