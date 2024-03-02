@@ -3,7 +3,7 @@ package com.chs.cafeapp.auth.token.constant;
 public class TokenConstant {
 
   public static final String AUTHORITIES_KEY = "auth";
-  public static final String BEARER_TYPE = "Bearer";
+  public static final String BEARER_TYPE = "Bearer ";
   public static final long  ACCESS_TOKEN_EXPIRE_TIME = 1000 * 60 * 60; // 1 hour
   public static final long  REFRESH_TOKEN_EXPIRE_TIME = 1000 * 60 * 60 * 24 * 7;  // 7 day
 

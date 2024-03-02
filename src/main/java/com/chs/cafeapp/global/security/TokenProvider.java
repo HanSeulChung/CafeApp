@@ -5,6 +5,7 @@ import static com.chs.cafeapp.auth.token.constant.TokenConstant.AUTHORITIES_KEY;
 import static com.chs.cafeapp.auth.token.constant.TokenConstant.BEARER_TYPE;
 import static com.chs.cafeapp.auth.token.constant.TokenConstant.REFRESH_TOKEN_EXPIRE_TIME;
 import static com.chs.cafeapp.global.exception.type.ErrorCode.NO_ROLE_TOKEN;
+import static com.chs.cafeapp.global.security.JwtAuthenticationFilter.BEARER_PREFIX;
 
 import com.chs.cafeapp.auth.token.dto.TokenDto;
 import com.chs.cafeapp.global.exception.CustomException;
@@ -89,6 +90,10 @@ public class TokenProvider {
   }
 
   public Authentication getAuthentication(String token) {
+
+    if (token.startsWith(BEARER_PREFIX)) {
+      token = token.substring(BEARER_PREFIX.length());
+    }
     // 토큰 복호화
     Claims claims = parseClaims(token);
 
