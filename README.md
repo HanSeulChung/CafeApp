@@ -1,5 +1,6 @@
 # 카페 메뉴 스마트 주문 서비스 : CafeApp
 * 프로젝트 기간 > 2023-10-18 ~ 2023-11-20(4주)
+* 리팩토링 > 1차: 2023-02-20 ~ 2023-03-02
 * 프로젝트 소개 > 해당 카페의 메뉴(음식, 음료, MD 굿즈)를 미리 결제하고 주문하는 서비스 입니다.
 
 ## Tech Stack
@@ -26,13 +27,12 @@
 ## 프로젝트 기능 설계
 * ### **공통**
   * 일반 회원가입 기능<br>
-    ➡️ 사용자(User)만 회원가입 가능<br>
-    ➡️ 카페관계자(Admin)은 admin-data.sql로 insert하는 것으로 진행했음.<br>
-    ➡️ admin-data.sql: 우선 3개의 admin 계정 insert 값 존재
+    ➡️ 사용자(User), 카페관계자(Admin) 회원가입 가능<br>
   * 로그인 기능<br>
     ➡️ 사용자(User), 카페관계자(Admin) 로그인 가능<br>
-    ➡️ 로그인 성공시 accessToken, refreshToken값을 json형태로 내보냄. (각 1시간, 7일의 유효기간을 가지고 있음)<br>
-    ➡️ 추후 서버와 클라이언트 관계가 명확해지면 클라이언트가 이 accessToken값을 저장하고있어야함<br>
+    ➡️ 로그인 성공시 accessToken, refreshToken값을 response로 보내고 redis에 저장함.(각 1시간, 7일의 유효기간을 가지고 있음)<br>
+  * 로그아웃 기능<br>
+     ➡️ 로그아웃시 쓰여진 accessToken은 invalid access token으로 reids에 저장함(7일의 시간)
   * [ ] 소셜 회원가입/로그인 기능
 * ### **카페 관계자(admin)**
   * 카테고리 
@@ -110,6 +110,9 @@ style: (코드의 수정 없이) 스타일만 변경(ex. 들여쓰기, 세미콜
 refactor: 코드를 리팩토링
 test: Test 관련한 코드의 추가, 수정
 chore: 코드 수정 없이 설정을 변경(build.gradle 등)
+
+리팩토링 기간내에서는
+Feat, Fix, Refactor과 같은 표현 이용
 ```
 
 ## Git Branch Convention
@@ -117,6 +120,7 @@ chore: 코드 수정 없이 설정을 변경(build.gradle 등)
 main <- dev : pull request 후 create merge 전략
 dev 브랜치에서 기능 branch 생성후 기능 구현
 dev <- 기능구현 branch : rebase 전략
+main <- refactor branch
 ```
 
 ### Trouble Shooting
