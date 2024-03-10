@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import org.springframework.data.domain.Page;
@@ -16,6 +17,7 @@ import org.springframework.data.domain.Page;
 @Builder
 @ToString
 @AllArgsConstructor
+@NoArgsConstructor
 public class MenuDto {
   private long id;
   private long categoryId;

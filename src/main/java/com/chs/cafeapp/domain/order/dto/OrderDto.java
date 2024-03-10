@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.springframework.data.domain.Slice;
 
@@ -16,6 +17,7 @@ import org.springframework.data.domain.Slice;
 @Builder
 @ToString
 @AllArgsConstructor
+@NoArgsConstructor
 public class OrderDto {
   private long id;
 

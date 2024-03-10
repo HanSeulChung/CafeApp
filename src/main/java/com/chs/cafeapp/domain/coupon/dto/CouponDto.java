@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.springframework.data.domain.Page;
 
@@ -15,6 +16,7 @@ import org.springframework.data.domain.Page;
 @Builder
 @ToString
 @AllArgsConstructor
+@NoArgsConstructor
 public class CouponDto {
   private long id;
   private String userId;

@@ -4,10 +4,12 @@ import com.chs.cafeapp.domain.stamp.entity.Stamp;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
 @Builder
 @AllArgsConstructor
+@NoArgsConstructor
 public class StampDto {
   private long id;
   private String userLoginId;
