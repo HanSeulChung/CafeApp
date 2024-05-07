@@ -2,7 +2,7 @@
 * 프로젝트 기간 > 2023-10-18 ~ 2023-11-20(4주)
 * 리팩토링 > 1차: 2023-02-20 ~ 2023-03-02
 * 프로젝트 소개 > 해당 카페의 메뉴(음식, 음료, MD 굿즈)를 미리 결제하고 주문하는 서비스 입니다.
-* swagger 확인: http://3.34.126.99:8080/swagger-ui/index.html
+* swagger 확인: http://3.34.126.99:8080/swagger-ui/index.html -> 서버 배포 중단
 
 ## ERD
 ![image](https://github.com/HanSeulChung/CafeApp/assets/94779505/9cfd7385-8cbb-4717-b1d7-f805cd96a798)
